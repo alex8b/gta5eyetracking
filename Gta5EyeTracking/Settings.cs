@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Gta5EyeTracking
 {
 	public enum FeeelookDevice : int
@@ -54,6 +56,8 @@ namespace Gta5EyeTracking
 		public bool MissilesAtGazeEnabled { get; set; }
 		public bool PedestrianInteractionEnabled { get; set; }
 		public bool DontFallFromBikesEnabled { get; set; }
+
+		public List<Deadzone> Deadzones { get; set; } = new List<Deadzone>();
 
 		public Settings()
 		{

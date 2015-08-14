@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Gta5EyeTracking.HidEmulation;
 using GTA;
 using GTA.Math;
+using NativeUI;
 
 namespace Gta5EyeTracking
 {
@@ -38,8 +41,13 @@ namespace Gta5EyeTracking
 			const double definingHeight = 1080.0;
 			const double minimapHeight = (minimapHeightPx / definingHeight) * 2;
 			var minimapWidth = (minnimapWidthPx / definingHeight) / aspectRatio * 2;
-			return ((screenCoord.X < (-1 + minimapWidth))
-				&& (screenCoord.Y > 1 - minimapHeight));
+			var safe = UIMenu.GetSafezoneBounds();
+			var safeHeight = (safe.Y / definingHeight)*2;
+			var safeWidth = (safe.X/definingHeight)/aspectRatio*2;
+
+			var tmpZone = new Deadzone(-1f, 1f - (float)minimapHeight, (float)(minimapWidth + safeWidth), (float)(minimapHeight + safeHeight));
+			var tmpZones = new List<Deadzone>(_settings.Deadzones) {tmpZone};
+			return tmpZones.Any(z => z.Contains(screenCoord));
 		}
 
 		private void EmulateHid(double deltaX, double deltaY)
@@ -185,7 +193,7 @@ namespace Gta5EyeTracking
 		public void FirstPersonAimFreelook(Vector2 gazeNormalizedCenterDelta, Ped ped, double aspectRatio)
 		{
 			if (!GameplayCamera.IsRendering) return;
-
+            
 			double deltaX = 0;
 			double deltaY = 0;
 			if (_settings.FirstPersonFreelookEnabled

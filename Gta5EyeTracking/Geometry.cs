@@ -135,25 +135,16 @@ namespace Gta5EyeTracking
 			return mindist < searchRange ? foundVeh : null;
 		}
 
-		public static unsafe bool WorldToScreenRel(Vector3 worldCoords, out Vector2 screenCoords)
+		public static bool WorldToScreenRel(Vector3 worldCoords, out Vector2 screenCoords)
 		{
-			var inputArgumentArray = new InputArgument[5];
-			var inputArgument1 = new InputArgument(worldCoords.X);
-			inputArgumentArray[0] = inputArgument1;
-			var inputArgument2 = new InputArgument(worldCoords.Y);
-			inputArgumentArray[1] = inputArgument2;
-			var inputArgument3 = new InputArgument(worldCoords.Z);
-			inputArgumentArray[2] = inputArgument3;
-			float num1 = 0;
-			inputArgumentArray[3] = (InputArgument)(&num1);
-			float num2 = 0;
-			inputArgumentArray[4] = (InputArgument)(&num2);
-			if (!Function.Call<bool>(Hash._WORLD3D_TO_SCREEN2D, inputArgumentArray))
+			var num1 = new OutputArgument();
+			var num2 = new OutputArgument();
+			if (!Function.Call<bool>(Hash._WORLD3D_TO_SCREEN2D, worldCoords.X, worldCoords.Y, worldCoords.Z, num1, num2))
 			{
 				screenCoords = new Vector2();
 				return false;
 			}
-			screenCoords = new Vector2((num1 - 0.5f) * 2, (num2 - 0.5f) * 2);
+			screenCoords = new Vector2((num1.GetResult<float>() - 0.5f) * 2, (num2.GetResult<float>() - 0.5f) * 2);
 			return true;
 		}
 

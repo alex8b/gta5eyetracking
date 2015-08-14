@@ -6,6 +6,7 @@ namespace Gta5EyeTracking
 {
 	public class SettingsMenu 
 	{
+		public UIMenu DeadzoneMenu;
 		private UIMenu _mainMenu;
 		private readonly MenuPool _menuPool;
 		private readonly Settings _settings;
@@ -222,7 +223,17 @@ namespace Gta5EyeTracking
 			dontFallFromBikes.CheckboxEvent += (sender, args) => { _settings.DontFallFromBikesEnabled = dontFallFromBikes.Checked; };
 			_mainMenu.AddItem(dontFallFromBikes);
 
+			var dedzns = new UIMenuItem("Deadzones");
+			_mainMenu.AddItem(dedzns);
+
 			_mainMenu.RefreshIndex();
+
+			DeadzoneMenu = new UIMenu("Tobii Eye Tracking", "~b~DEADZONES");
+			DeadzoneMenu.SetMenuWidthOffset(50);
+			_mainMenu.BindMenuToItem(DeadzoneMenu, dedzns);
+			DeadzoneMenu.AddItem(new UIMenuItem("Add Deadzone", "Deadzones prevent camera movement when you are looking inside the zone, for example, the minimap."));
+			DeadzoneMenu.RefreshIndex();
+			_menuPool.Add(DeadzoneMenu);
 		}
 
 		public void OpenMenu()
