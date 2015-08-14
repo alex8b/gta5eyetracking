@@ -137,9 +137,9 @@ namespace Gta5EyeTracking
 
 		public static bool WorldToScreenRel(Vector3 worldCoords, out Vector2 screenCoords)
 		{
-		    var num1 = new OutputArgument();
-            var num2 = new OutputArgument();
-            if (!Function.Call<bool>(Hash._WORLD3D_TO_SCREEN2D, worldCoords.X, worldCoords.Y, worldCoords.Z, num1, num2))
+			var num1 = new OutputArgument();
+			var num2 = new OutputArgument();
+			if (!Function.Call<bool>(Hash._WORLD3D_TO_SCREEN2D, worldCoords.X, worldCoords.Y, worldCoords.Z, num1, num2))
 			{
 				screenCoords = new Vector2();
 				return false;
