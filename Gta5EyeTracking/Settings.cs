@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Gta5EyeTracking
 {
 	public enum FeeelookDevice : int
@@ -55,6 +57,8 @@ namespace Gta5EyeTracking
 		public bool PedestrianInteractionEnabled { get; set; }
 		public bool DontFallFromBikesEnabled { get; set; }
 
+        public List<Deadzone> Deadzones { get; set; } = new List<Deadzone>();
+
 		public Settings()
 		{
 			FreelookDevice = FeeelookDevice.Gamepad;
@@ -103,6 +107,6 @@ namespace Gta5EyeTracking
 			MissilesAtGazeEnabled = true;
 			PedestrianInteractionEnabled = true;
 			DontFallFromBikesEnabled = true;
-		}
-	}
+        }
+    }
 }
