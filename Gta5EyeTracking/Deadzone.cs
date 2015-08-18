@@ -8,7 +8,7 @@ namespace Gta5EyeTracking
 		public PointF Position { get; set; }
 		public SizeF Size { get; set; }
 
-		public Color Color => Color.FromArgb(100, 200, 200, 50);
+		public Color Color { get; set; }
 
 		public Deadzone(float posX, float posY, float width, float height)
 			: this(new PointF(posX, posY), new SizeF(width, height))
@@ -17,6 +17,7 @@ namespace Gta5EyeTracking
 
 		public Deadzone(PointF pos, SizeF size)
 		{
+			Color = Color.FromArgb(100, 200, 200, 50);
 			Position = pos;
 			Size = size;
 		}

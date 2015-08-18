@@ -57,7 +57,7 @@ namespace Gta5EyeTracking
 		public bool PedestrianInteractionEnabled { get; set; }
 		public bool DontFallFromBikesEnabled { get; set; }
 
-		public List<Deadzone> Deadzones { get; set; } = new List<Deadzone>();
+		public List<Deadzone> Deadzones { get; set; }
 
 		public Settings()
 		{
@@ -107,6 +107,8 @@ namespace Gta5EyeTracking
 			MissilesAtGazeEnabled = true;
 			PedestrianInteractionEnabled = true;
 			DontFallFromBikesEnabled = true;
+
+			Deadzones = new List<Deadzone>();
 		}
 	}
 }

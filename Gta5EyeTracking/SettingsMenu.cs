@@ -227,13 +227,14 @@ namespace Gta5EyeTracking
 			_mainMenu.AddItem(dedzns);
 
 			_mainMenu.RefreshIndex();
-
-			DeadzoneMenu = new UIMenu("Tobii Eye Tracking", "~b~DEADZONES");
-			DeadzoneMenu.SetMenuWidthOffset(50);
-			_mainMenu.BindMenuToItem(DeadzoneMenu, dedzns);
-			DeadzoneMenu.AddItem(new UIMenuItem("Add Deadzone", "Deadzones prevent camera movement when you are looking inside the zone, for example, the minimap."));
-			DeadzoneMenu.RefreshIndex();
-			_menuPool.Add(DeadzoneMenu);
+			{
+				DeadzoneMenu = new UIMenu("Tobii Eye Tracking", "~b~DEADZONES");
+				DeadzoneMenu.SetMenuWidthOffset(50);
+				_mainMenu.BindMenuToItem(DeadzoneMenu, dedzns);
+				DeadzoneMenu.AddItem(new UIMenuItem("Add Deadzone", "Deadzones prevent camera movement when you are looking inside the zone, for example, the minimap."));
+				DeadzoneMenu.RefreshIndex();
+				_menuPool.Add(DeadzoneMenu);
+			}
 		}
 
 		public void OpenMenu()
