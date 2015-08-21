@@ -95,17 +95,22 @@ namespace Gta5EyeTracking
 	        return 1.0; // change in slow motion;
 	    }
 
-	    public static void PlaySoundFromEntity(int soundID, string soundName, Entity ent, string category)
+	    public static void PlaySoundFromEntity(int soundId, string soundName, Entity ent, string category)
 	    {
 	        if (category == "")
 	        {
-	            Function.Call(Hash.PLAY_SOUND_FROM_ENTITY, soundID, soundName, ent, 0, 0, 0);
+	            Function.Call(Hash.PLAY_SOUND_FROM_ENTITY, soundId, soundName, ent, 0, 0, 0);
 	        }
 	        else
 	        {
-	            Function.Call(Hash.PLAY_SOUND_FROM_ENTITY, soundID, soundName, ent, category, 0, 0);
+	            Function.Call(Hash.PLAY_SOUND_FROM_ENTITY, soundId, soundName, ent, category, 0, 0);
 	        }
 	    }
+
+        public static void StopSound(int soundId)
+        {
+            Function.Call(Hash.STOP_SOUND, soundId);
+        }
 
         public static void PtfxRequestAsset(string sAsset)
         {

@@ -18,7 +18,11 @@ namespace Gta5EyeTracking.HomingMissiles
         private double _flightFixCoef;
         private TimeSpan _timeout;
         private TimeSpan _initTime;
+        private TimeSpan _waitAfterDetonationTime;
+        private double _detonatedTime;
+        private int _soundId;
         public bool Exists { get; set; }
+        public bool Detonated { get; set; }
 
         public HomingMissile(Entity target)
         {
@@ -49,6 +53,7 @@ namespace Gta5EyeTracking.HomingMissiles
             _speed = 100;
             _timeout = TimeSpan.FromSeconds(15);
             _initTime = TimeSpan.FromSeconds(0.25);
+            _waitAfterDetonationTime = TimeSpan.FromSeconds(1.75);
         }
 
         private void CreateMissileEntity()
@@ -58,8 +63,8 @@ namespace Gta5EyeTracking.HomingMissiles
             _missile = World.CreateProp(model, position, false, false);
 
             GTA.Native.Function.Call(GTA.Native.Hash.SET_ENTITY_RECORDS_COLLISIONS, _missile, false);
-
-            Util.PlaySoundFromEntity(Util.GetSoundId(), "SPL_RPG_DIST_FLIGHT_MASTER", _missile, "");
+            _soundId = Util.GetSoundId();
+            Util.PlaySoundFromEntity(_soundId, "SPL_RPG_DIST_FLIGHT_MASTER", _missile, "");
             Util.PtfxRequestAsset("scr_exile2");
             _fxId = Util.PtfxStartOnEntity(_missile, "scr_ex2_rpg_trail", "scr_exile2", new Vector3(0.56f, 0, 0), new Vector3(0, 0, -90), 1.0);
             UpdatePosition();
@@ -67,16 +72,19 @@ namespace Gta5EyeTracking.HomingMissiles
 
         private void Detonate()
         {
-            if (Exists)
+            if (Exists && !Detonated)
             {
                 var player = Game.Player.Character;
                 var dist = (player.Position - _missile.Position).Length();
                 if (dist > 1.5)
                 {
                     World.AddOwnedExplosion(player, _missile.Position, ExplosionType.Explosion1, 1.5f, 0.1f);
-                    RemoveMissileEntity();                      
+                    Util.PtfxStop(_fxId);
+                    Util.StopSound(_soundId);
+                    Detonated = true;
                 }              
             }
+            
         }
 
         private void RemoveMissileEntity()
@@ -123,6 +131,16 @@ namespace Gta5EyeTracking.HomingMissiles
             {
                 Detonate();
             }
+
+            if (Detonated)
+            {
+                _detonatedTime = _detonatedTime  + 0.05;
+            }
+
+            if (_detonatedTime > _waitAfterDetonationTime.TotalSeconds)
+            {
+                RemoveMissileEntity(); 
+            }
         }
 
         private void UpdateTargetPosition()
@@ -150,7 +168,14 @@ namespace Gta5EyeTracking.HomingMissiles
             tmpRot.Z += 90;
 
             _missile.Rotation = tmpRot;
-            _missile.Velocity = _launchDir*(float) _speed;
+            if (Detonated)
+            {
+                _missile.Velocity = Vector3.Zero;
+            }
+            else
+            {
+                _missile.Velocity = _launchDir * (float)_speed;
+            }
         }
 
         private bool HasTimeOut()
