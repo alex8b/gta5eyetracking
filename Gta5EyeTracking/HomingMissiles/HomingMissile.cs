@@ -48,13 +48,13 @@ namespace Gta5EyeTracking.HomingMissiles
             _flightFixCoef = 0;
             _speed = 100;
             _timeout = TimeSpan.FromSeconds(15);
-            _initTime = TimeSpan.FromSeconds(0.3);
+            _initTime = TimeSpan.FromSeconds(0.25);
         }
 
         private void CreateMissileEntity()
         {
             var model = new Model("w_at_ar_supp_02");
-            var position = Game.Player.Character.GetBoneCoord(Bone.SKEL_R_Hand) + _launchDir * 1.0f;
+            var position = Game.Player.Character.GetBoneCoord(Bone.SKEL_R_Hand) + _launchDir * 1f;
             _missile = World.CreateProp(model, position, false, false);
 
             GTA.Native.Function.Call(GTA.Native.Hash.SET_ENTITY_RECORDS_COLLISIONS, _missile, false);
@@ -67,9 +67,16 @@ namespace Gta5EyeTracking.HomingMissiles
 
         private void Detonate()
         {
-            var player = Game.Player.Character;
-            World.AddOwnedExplosion(player, _missile.Position, ExplosionType.Explosion1, 2, 0.1f);
-            RemoveMissileEntity();
+            if (Exists)
+            {
+                var player = Game.Player.Character;
+                var dist = (player.Position - _missile.Position).Length();
+                if (dist > 1.5)
+                {
+                    World.AddOwnedExplosion(player, _missile.Position, ExplosionType.Explosion1, 1.5f, 0.1f);
+                    RemoveMissileEntity();                      
+                }              
+            }
         }
 
         private void RemoveMissileEntity()
@@ -107,8 +114,12 @@ namespace Gta5EyeTracking.HomingMissiles
 
             if (_flightTime < _initTime.TotalSeconds) return; //start
 
-            if (HasTimeOut()
-                || HasCollided())
+            if (HasTimeOut())
+            {
+                RemoveMissileEntity(); 
+            }
+
+            if (HasCollided())
             {
                 Detonate();
             }

@@ -35,11 +35,12 @@ namespace Gta5EyeTracking.HidEmulation
 		{
 			ControllerState = new State();
 			_fakeState = new State();
-			CrateHooks();
+			CreateHooks();
 		}
 
-		private void CrateHooks()
+		private void CreateHooks()
 		{
+            Util.Log("Begin CreateHooks");
 			try
 			{
 				_hooks = new List<LocalHook>();
@@ -52,23 +53,37 @@ namespace Gta5EyeTracking.HidEmulation
 			}
 			catch
 			{
-				//Hooking failed
+                Util.Log("Failed to create hooks");
 			}
-		
+            Util.Log("End CreateHooks");
 		}
 
 		protected override void Dispose(bool disposing)
 		{
 			base.Dispose();
-
-			foreach (var hook in _hooks)
-			{
-				if (hook != null)
-				{
-					hook.Dispose();	
-				}
-			}
+		    RemoveHooks();
 		}
+
+	    public void RemoveHooks()
+	    {
+            if (_hooks == null) return;
+            foreach (var hook in _hooks)
+            {
+                if (hook != null)
+                {
+                    try
+                    {
+                        //hook.Dispose();
+                        //crashes
+                    }
+                    catch
+                    {
+                        Util.Log("Disposing hooks failed.");
+                    }
+                }
+            }
+	    }
+
 
 		private void HookXInput()
 		{
@@ -81,28 +96,29 @@ namespace Gta5EyeTracking.HidEmulation
 				_hooks.Add(LocalHook.Create(LocalHook.GetProcAddress("xinput1_3.dll", "XInputGetState"),
 					new DXInputGetState(XInputGetState_Hooked),
 					this));
-				_hooks.Add(LocalHook.Create(LocalHook.GetProcAddress("xinput1_3.dll", "XInputEnable"), 
-					new DXInputEnable(XInputEnable_Hooked), 
-					this));
-				_hooks.Add(LocalHook.Create(LocalHook.GetProcAddress("xinput1_3.dll", "XInputGetBatteryInformation"),
-					new DXInputGetBatteryInformation(XInputGetBatteryInformation_Hooked),
-					this));
-				_hooks.Add(LocalHook.Create(LocalHook.GetProcAddress("xinput1_3.dll", "XInputGetCapabilities"),
-					new DXInputGetCapabilities(XInputGetCapabilities_Hooked),
-					this));
-				_hooks.Add(LocalHook.Create(LocalHook.GetProcAddress("xinput1_3.dll", "XInputGetDSoundAudioDeviceGuids"),
-					new DXInputGetDSoundAudioDeviceGuids(XInputGetDSoundAudioDeviceGuids_Hooked),
-					this));
-				_hooks.Add(LocalHook.Create(LocalHook.GetProcAddress("xinput1_3.dll", "XInputGetKeystroke"),
-					new DXInputGetKeystroke(XInputGetKeystroke_Hooked),
-					this));
-				_hooks.Add(LocalHook.Create(LocalHook.GetProcAddress("xinput1_3.dll", "XInputSetState"),
-					new DXInputSetState(XInputSetState_Hooked),
-					this));
+                //_hooks.Add(LocalHook.Create(LocalHook.GetProcAddress("xinput1_3.dll", "XInputEnable"), 
+                //    new DXInputEnable(XInputEnable_Hooked), 
+                //    this));
+                //_hooks.Add(LocalHook.Create(LocalHook.GetProcAddress("xinput1_3.dll", "XInputGetBatteryInformation"),
+                //    new DXInputGetBatteryInformation(XInputGetBatteryInformation_Hooked),
+                //    this));
+                //_hooks.Add(LocalHook.Create(LocalHook.GetProcAddress("xinput1_3.dll", "XInputGetCapabilities"),
+                //    new DXInputGetCapabilities(XInputGetCapabilities_Hooked),
+                //    this));
+                //_hooks.Add(LocalHook.Create(LocalHook.GetProcAddress("xinput1_3.dll", "XInputGetDSoundAudioDeviceGuids"),
+                //    new DXInputGetDSoundAudioDeviceGuids(XInputGetDSoundAudioDeviceGuids_Hooked),
+                //    this));
+                //_hooks.Add(LocalHook.Create(LocalHook.GetProcAddress("xinput1_3.dll", "XInputGetKeystroke"),
+                //    new DXInputGetKeystroke(XInputGetKeystroke_Hooked),
+                //    this));
+                //_hooks.Add(LocalHook.Create(LocalHook.GetProcAddress("xinput1_3.dll", "XInputSetState"),
+                //    new DXInputSetState(XInputSetState_Hooked),
+                //    this));
 			}
 			catch
 			{
 				//Hooking failed
+                Util.Log("Hooking XInput failed.");
 			}
 		}
 

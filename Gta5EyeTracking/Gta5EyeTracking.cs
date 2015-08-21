@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using EyeXFramework;
 using Gta5EyeTracking.HidEmulation;
@@ -16,7 +18,6 @@ namespace Gta5EyeTracking
 {
 	public class Gta5EyeTracking: Script
 	{
-		private const string SettingsPath = "Gta5EyeTracking";
 		private const string SettingsFileName = "settings.xml";
 
 		private readonly EyeXHost _host;
@@ -59,6 +60,8 @@ namespace Gta5EyeTracking
 
 		public Gta5EyeTracking()
 		{
+            Util.Log("Begin Initialize");
+            _shutDownRequestedEvent = new ManualResetEvent(false);
 			_aspectRatio = 1;
 			_host = new EyeXHost();
 			_host.Start();
@@ -110,7 +113,8 @@ namespace Gta5EyeTracking
 			KeyDown += OnKeyDown;
 
 			Tick += OnTick;
-		}
+            Util.Log("End Initialize");
+        }
 
 	    private void SettingsMenuOnShutDownRequested(object sender, EventArgs eventArgs)
 	    {
@@ -157,49 +161,60 @@ namespace Gta5EyeTracking
 
         private void ShutDown()
         {
-            _disposed = true;
-	        SaveSettings();
-
-		    _settingsMenu.ShutDownRequested -= SettingsMenuOnShutDownRequested;
-
-			if (_lightlyFilteredGazePointDataProvider != null)
-			{
-				_lightlyFilteredGazePointDataProvider.Next -= NewGazePoint;
-				_lightlyFilteredGazePointDataProvider.Dispose();
-			}
-
-			if (_host != null)
-			{
-				_host.Dispose();
-			}
-			
-			if (_controllerEmulation != null)
-			{
-				_controllerEmulation.OnModifyState -= OnModifyControllerState;
-				_controllerEmulation.Dispose();
-			}
-
-			if (_gazeVisualization != null)
-			{
-				_gazeVisualization.Dispose();
-			}
-
-			if (_foregroundWindowWatcher != null)
-			{
-				_foregroundWindowWatcher.Dispose();
-			}
-
-            if (_aiming != null)
+            _shutDownRequestFlag = true;
+            Tick -= OnTick;
+            Task.Run(() =>
             {
-                _aiming.Dispose();
-            }
+                _shutDownRequestedEvent.WaitOne(1000);
+                Util.Log("Begin ShutDown");
+                SaveSettings();
+                
+                if (_controllerEmulation != null)
+                {
+                    _controllerEmulation.Enabled = false;
+                    //_controllerEmulation.OnModifyState -= OnModifyControllerState;
+                    //_controllerEmulation.Dispose();
+                    //TODO:crash!
+                }
+                if (_settingsMenu != null)
+                {
+                    _settingsMenu.ShutDownRequested -= SettingsMenuOnShutDownRequested;
+                }
+
+                if (_lightlyFilteredGazePointDataProvider != null)
+                {
+                    _lightlyFilteredGazePointDataProvider.Next -= NewGazePoint;
+                    _lightlyFilteredGazePointDataProvider.Dispose();
+                }
+
+                if (_host != null)
+                {
+                    _host.Dispose();
+                }
+
+                if (_gazeVisualization != null)
+                {
+                    _gazeVisualization.Dispose();
+                }
+
+                if (_foregroundWindowWatcher != null)
+                {
+                    _foregroundWindowWatcher.Dispose();
+                }
+
+                if (_aiming != null)
+                {
+                    _aiming.Dispose();
+                }
+                Util.Log("End ShutDown");
+            });
 		}
 
 		private void LoadSettings()
 		{
 			try
 			{
-				var folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), SettingsPath);
+				var folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Util.SettingsPath);
 				var filePath = Path.Combine(folderPath, SettingsFileName);
 				System.Xml.Serialization.XmlSerializer reader = new System.Xml.Serialization.XmlSerializer(typeof(Settings));
 				var file = new StreamReader(filePath);
@@ -224,7 +239,7 @@ namespace Gta5EyeTracking
 			try
 			{
 				var writer = new System.Xml.Serialization.XmlSerializer(typeof (Settings));
-				var folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), SettingsPath);
+                var folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Util.SettingsPath);
 				if (!Directory.Exists(folderPath))
 				{
 					Directory.CreateDirectory(folderPath);
@@ -272,7 +287,7 @@ namespace Gta5EyeTracking
 
 		public void OnTick(object sender, EventArgs e)
 		{
-		    if (_disposed) return;
+		    if (_shutDownRequestFlag) return;
 
 			_controllerEmulation.Enabled = !Game.IsPaused;
 			_mouseEmulation.Enabled = !Game.IsPaused && !_menuPool.IsAnyMenuOpen() &&_isWindowForeground;
@@ -329,6 +344,10 @@ namespace Gta5EyeTracking
 
 			_mouseEmulation.ProcessInput();
 			_tickStopwatch.Restart();
+		    if (_shutDownRequestFlag)
+		    {
+                _shutDownRequestedEvent.Set();		        
+		    }
 		}
 
 		private void CheckFreelookDevice()
@@ -367,7 +386,8 @@ namespace Gta5EyeTracking
 		private bool _isDrawingDeadzone = false;
 		private Vector2? _firstPoint;
 		private Vector2? _secondPoint;
-	    private bool _disposed;
+	    private bool _shutDownRequestFlag;
+	    private readonly ManualResetEvent _shutDownRequestedEvent;
 
 	    private void DeadzoneCreator()
 		{
@@ -645,6 +665,7 @@ namespace Gta5EyeTracking
 
 		private void OnModifyControllerState(object sender, ModifyStateEventArgs modifyStateEventArgs)
 		{
+            if (_shutDownRequestFlag) return;
 			if (_isPaused) return;
 			var timePausedThershold = TimeSpan.FromSeconds(0.5);
 			if (_tickStopwatch.Elapsed > timePausedThershold) return;

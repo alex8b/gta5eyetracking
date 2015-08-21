@@ -1,6 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Reflection;
+using System.IO;
 using System.Runtime.InteropServices;
 using GTA;
 using GTA.Math;
@@ -10,6 +9,8 @@ namespace Gta5EyeTracking
 {
 	public static class Util
 	{
+        public const string SettingsPath = "Gta5EyeTracking";
+
 		public static void SetPedShootsAtCoord(Ped ped, Vector3 target)
 		{
 			Function.Call(Hash.SET_PED_SHOOTS_AT_COORD, new InputArgument[5]
@@ -140,5 +141,42 @@ namespace Gta5EyeTracking
         {
             return Function.Call<int>(Hash.GET_SOUND_ID);
         }
+
+        public static void Log(string message)
+	    {
+		    var now = DateTime.Now;
+            var folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), SettingsPath);
+			if (!Directory.Exists(folderPath))
+			{
+				Directory.CreateDirectory(folderPath);
+			}
+
+		
+            var logpath = Path.Combine(folderPath, "log.txt");
+
+		    try
+		    {
+			    var fs = new FileStream(logpath, FileMode.Append, FileAccess.Write, FileShare.Read);
+			    var sw = new StreamWriter(fs);
+
+			    try
+			    {
+				    sw.Write("[" + now.ToString("HH:mm:ss") + "] ");
+
+					sw.Write(message);
+
+				    sw.WriteLine();
+			    }
+			    finally
+			    {
+				    sw.Close();
+				    fs.Close();
+			    }
+		    }
+		    catch
+		    {
+			    return;
+		    }
+	    }
 	}
 }

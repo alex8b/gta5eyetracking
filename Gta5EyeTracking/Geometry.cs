@@ -75,7 +75,7 @@ namespace Gta5EyeTracking
 		public static Ped RaycastPed(Vector2 screenCoords)
 		{
 			const double searchRange = 0.1;
-			var peds = World.GetNearbyPeds(Game.Player.Character, 100);
+			var peds = World.GetNearbyPeds(Game.Player.Character.Position, 100);
 			var mindist = Double.MaxValue;
 			Ped foundPed = null;
 			foreach (var ped in peds)
@@ -116,25 +116,23 @@ namespace Gta5EyeTracking
 
 		public static Vehicle RaycastVehicle(Vector2 screenCoords)
 		{
-			const double searchRange = 0.15;
-			var vehs = World.GetNearbyVehicles(Game.Player.Character, 300);
+			const double searchRange = 0.2;
+			var vehs = World.GetNearbyVehicles(Game.Player.Character.Position, 300);
 			var mindist = Double.MaxValue;
 			Vehicle foundVeh = null;
 			foreach (var vehicle in vehs)
 			{
 				if ((Game.Player.Character.IsInVehicle()) && (vehicle.Handle == Game.Player.Character.CurrentVehicle.Handle)) continue; //you own veh
 				//if (vehicle.IsOccluded) continue;
-				var headOffest = vehicle.Position;
-				Vector2 pedScreenCoords;
-				if (WorldToScreenRel(headOffest, out pedScreenCoords))
-				{
-					var dist = (screenCoords - pedScreenCoords).Length();
-					if (dist < mindist) 
-					{
-						mindist = dist;
-						foundVeh = vehicle;
-					}
-				}
+				var vehOffset = vehicle.Position;
+				Vector2 vehScreenCoords;
+			    
+                if (!WorldToScreenRel(vehOffset, out vehScreenCoords)) continue;
+			    
+                var dist = (screenCoords - vehScreenCoords).Length();
+			    if (!(dist < mindist)) continue;
+			    mindist = dist;
+			    foundVeh = vehicle;
 			}
 			return mindist < searchRange ? foundVeh : null;
 		}
