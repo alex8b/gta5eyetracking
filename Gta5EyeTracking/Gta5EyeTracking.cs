@@ -82,6 +82,7 @@ namespace Gta5EyeTracking
 					_settingsMenu.DeadzoneMenu.RefreshIndex();
 				}
 			};
+            _settingsMenu.ShutDownRequested += SettingsMenuOnShutDownRequested;
 
 			_gazeVisualization = new GazeVisualization();
 			_debugOutput = new DebugOutput();
@@ -111,7 +112,12 @@ namespace Gta5EyeTracking
 			Tick += OnTick;
 		}
 
-		private void ForegroundWindowWatcherOnForegroundWindowChanged(object sender, ForegroundWindowChangedEventArgs foregroundWindowChangedEventArgs)
+	    private void SettingsMenuOnShutDownRequested(object sender, EventArgs eventArgs)
+	    {
+	        ShutDown();
+	    }
+
+	    private void ForegroundWindowWatcherOnForegroundWindowChanged(object sender, ForegroundWindowChangedEventArgs foregroundWindowChangedEventArgs)
 		{
 			_isWindowForeground = foregroundWindowChangedEventArgs.GameIsForegroundWindow;
 		}
@@ -143,11 +149,18 @@ namespace Gta5EyeTracking
 			}
 		}
 
-		protected override void Dispose(bool disposing)
-		{
-			base.Dispose();
+	    protected override void Dispose(bool disposing)
+	    {
+	        base.Dispose();
+	        ShutDown();
+	    }
 
-			SaveSettings();
+        private void ShutDown()
+        {
+            _disposed = true;
+	        SaveSettings();
+
+		    _settingsMenu.ShutDownRequested -= SettingsMenuOnShutDownRequested;
 
 			if (_lightlyFilteredGazePointDataProvider != null)
 			{
@@ -259,6 +272,8 @@ namespace Gta5EyeTracking
 
 		public void OnTick(object sender, EventArgs e)
 		{
+		    if (_disposed) return;
+
 			_controllerEmulation.Enabled = !Game.IsPaused;
 			_mouseEmulation.Enabled = !Game.IsPaused && !_menuPool.IsAnyMenuOpen() &&_isWindowForeground;
 
@@ -352,8 +367,9 @@ namespace Gta5EyeTracking
 		private bool _isDrawingDeadzone = false;
 		private Vector2? _firstPoint;
 		private Vector2? _secondPoint;
+	    private bool _disposed;
 
-		private void DeadzoneCreator()
+	    private void DeadzoneCreator()
 		{
 			if(!_isDrawingDeadzone) return;
 			var mouseX = Function.Call<float>(Hash.GET_CONTROL_NORMAL, 0, (int)GTA.Control.CursorX);
@@ -420,15 +436,26 @@ namespace Gta5EyeTracking
 			_gazePlusJoystickDelta = _gazePointDelta + joystickDelta;
 			_unfilteredgazePlusJoystickDelta = _lastNormalizedCenterDelta;
 
-			var hitUnfiltered = Geometry.RaycastEverything(_unfilteredgazePlusJoystickDelta);
+            Entity unfilteredEntity;
+            Entity filteredEntity;
+            var hitUnfiltered = Geometry.RaycastEverything(_unfilteredgazePlusJoystickDelta, out unfilteredEntity);
 			shootMissileCoord = hitUnfiltered;
 			shootCoordSnap = hitUnfiltered;
 
-			var hitFiltered = Geometry.RaycastEverything(_gazePlusJoystickDelta);
+
+            var hitFiltered = Geometry.RaycastEverything(_gazePlusJoystickDelta, out filteredEntity);
 			shootCoord = hitFiltered;
 
-
-			ped = Geometry.RaycastPed(_unfilteredgazePlusJoystickDelta);
+            if (unfilteredEntity != null
+                && Util.IsEntityAPed(unfilteredEntity))
+            {
+                ped = unfilteredEntity as Ped;
+            }
+            else
+            {
+                ped = Geometry.RaycastPed(_unfilteredgazePlusJoystickDelta);
+            }
+            		
 			if ((ped != null)
 				&& (ped.Handle != Game.Player.Character.Handle))
 			{
@@ -442,7 +469,17 @@ namespace Gta5EyeTracking
 			}
 			else
 			{
-				var vehicle = Geometry.RaycastVehicle(_unfilteredgazePlusJoystickDelta);
+			    Vehicle vehicle;
+			    if (unfilteredEntity != null
+			        && Util.IsEntityAPed(unfilteredEntity))
+			    {
+			        vehicle = unfilteredEntity as Vehicle;
+			    }
+			    else
+			    {
+			        vehicle = Geometry.RaycastVehicle(_unfilteredgazePlusJoystickDelta);
+			    }
+                _debugOutput.DebugText5.Caption = "raycasing veh " + DateTime.Now;
 				if (vehicle != null
 					&& !((Game.Player.Character.IsInVehicle())
 						&& (vehicle.Handle == Game.Player.Character.CurrentVehicle.Handle)))
@@ -450,6 +487,7 @@ namespace Gta5EyeTracking
 					shootCoordSnap = vehicle.Position + vehicle.Velocity * 0.06f;
 					shootMissileCoord = shootCoordSnap;
 				    target = vehicle;
+				    _debugOutput.DebugText4.Caption = "veh " + vehicle.Handle;
 				}
 			}
 			var playerDistToGround = Game.Player.Character.Position.Z - World.GetGroundHeight(Game.Player.Character.Position);

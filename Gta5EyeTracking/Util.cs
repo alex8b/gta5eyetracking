@@ -111,6 +111,16 @@ namespace Gta5EyeTracking
             Function.Call(Hash.REQUEST_NAMED_PTFX_ASSET, sAsset);
         }
 
+        public static bool IsEntityAVehicle(Entity entity)
+        {
+            return Function.Call<bool>(Hash.IS_ENTITY_A_VEHICLE, entity);
+        }
+
+        public static bool IsEntityAPed(Entity entity)
+        {
+            return Function.Call<bool>(Hash.IS_ENTITY_A_PED, entity);
+        }
+
         public static int PtfxStartOnEntity(Entity ent, string sPTFX, string sAsset, Vector3 offset, Vector3 rot, double size = 1.0)
         {
             if (sAsset != "")

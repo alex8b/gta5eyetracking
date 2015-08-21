@@ -36,8 +36,9 @@ namespace Gta5EyeTracking
 			//return ((rotationDiffBound < 90) || (rotationDiffBound > 270));
 		}
 
-		public static Vector3 RaycastEverything(Vector2 screenCoord)
+		public static Vector3 RaycastEverything(Vector2 screenCoord, out Entity hitEntity)
 		{
+		    hitEntity = null;
 			var camPos = GameplayCamera.Position;
 			var camRot = GameplayCamera.Rotation;
 			const float raycastToDist = 100.0f;
@@ -61,6 +62,10 @@ namespace Gta5EyeTracking
 
 			if (raycastResults.DitHitAnything)
 			{
+			    if (raycastResults.DitHitEntity)
+			    {
+			        hitEntity = raycastResults.HitEntity;
+			    }
 				return raycastResults.HitCoords;
 			}
 
@@ -111,15 +116,14 @@ namespace Gta5EyeTracking
 
 		public static Vehicle RaycastVehicle(Vector2 screenCoords)
 		{
-			const double searchRange = 0.1;
-			var vehs = World.GetNearbyVehicles(Game.Player.Character, 200);
+			const double searchRange = 0.15;
+			var vehs = World.GetNearbyVehicles(Game.Player.Character, 300);
 			var mindist = Double.MaxValue;
 			Vehicle foundVeh = null;
 			foreach (var vehicle in vehs)
 			{
 				if ((Game.Player.Character.IsInVehicle()) && (vehicle.Handle == Game.Player.Character.CurrentVehicle.Handle)) continue; //you own veh
-				if (vehicle.IsOccluded) continue;
-
+				//if (vehicle.IsOccluded) continue;
 				var headOffest = vehicle.Position;
 				Vector2 pedScreenCoords;
 				if (WorldToScreenRel(headOffest, out pedScreenCoords))

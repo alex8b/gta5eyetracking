@@ -1,3 +1,4 @@
+using System;
 using GTA;
 using GTA.Math;
 using Tobii.EyeX.Client;
@@ -15,6 +16,8 @@ namespace Gta5EyeTracking.HomingMissiles
         private double _flightTime;
         private int _fxId;
         private double _flightFixCoef;
+        private TimeSpan _timeout;
+        private TimeSpan _initTime;
         public bool Exists { get; set; }
 
         public HomingMissile(Entity target)
@@ -24,11 +27,7 @@ namespace Gta5EyeTracking.HomingMissiles
             var player = Game.Player.Character;
             _launchDir = (_target.Position - player.Position);
             _launchDir.Normalize();
-            Exists = true;
-            CreateMissileEntity();
-            _initialWait = true;
-            _flightFixCoef = 0;
-            _speed = 50;
+            Init();
         }
 
         public HomingMissile(Vector3 targetPosition)
@@ -36,29 +35,40 @@ namespace Gta5EyeTracking.HomingMissiles
             _targetPosition = targetPosition;
             var player = Game.Player.Character;
             _launchDir = _targetPosition - player.Position;
+            _targetPosition = player.Position + _launchDir*10000;
             _launchDir.Normalize();
+            Init();
+        }
+
+        private void Init()
+        {
             Exists = true;
             CreateMissileEntity();
             _initialWait = true;
             _flightFixCoef = 0;
-            _speed = 50;
+            _speed = 100;
+            _timeout = TimeSpan.FromSeconds(15);
+            _initTime = TimeSpan.FromSeconds(0.3);
         }
 
         private void CreateMissileEntity()
         {
             var model = new Model("w_at_ar_supp_02");
-            var position = Game.Player.Character.GetBoneCoord(Bone.SKEL_R_Hand);
+            var position = Game.Player.Character.GetBoneCoord(Bone.SKEL_R_Hand) + _launchDir * 1.0f;
             _missile = World.CreateProp(model, position, false, false);
+
+            GTA.Native.Function.Call(GTA.Native.Hash.SET_ENTITY_RECORDS_COLLISIONS, _missile, false);
 
             Util.PlaySoundFromEntity(Util.GetSoundId(), "SPL_RPG_DIST_FLIGHT_MASTER", _missile, "");
             Util.PtfxRequestAsset("scr_exile2");
             _fxId = Util.PtfxStartOnEntity(_missile, "scr_ex2_rpg_trail", "scr_exile2", new Vector3(0.56f, 0, 0), new Vector3(0, 0, -90), 1.0);
+            UpdatePosition();
         }
 
         private void Detonate()
         {
             var player = Game.Player.Character;
-            World.AddOwnedExplosion(player, _missile.Position, ExplosionType.Explosion1, 5, 0.1f);
+            World.AddOwnedExplosion(player, _missile.Position, ExplosionType.Explosion1, 2, 0.1f);
             RemoveMissileEntity();
         }
 
@@ -75,6 +85,7 @@ namespace Gta5EyeTracking.HomingMissiles
 
         private bool IsNearTarget()
         {
+            if (_target == null) return false;
             double tmpDist = _missile.Position.DistanceTo(_targetPosition - _launchDir * 0.25f);
             double tmpDistAhead = _missile.Position.DistanceTo(_targetPosition + _launchDir * 0.25f);
 
@@ -92,9 +103,9 @@ namespace Gta5EyeTracking.HomingMissiles
 
             UpdatePosition();
 
-            _flightTime = _flightTime + 1;
+            _flightTime = _flightTime + 0.05;
 
-            if (!(_flightTime > 200)) return; //start
+            if (_flightTime < _initTime.TotalSeconds) return; //start
 
             if (HasTimeOut()
                 || HasCollided())
@@ -133,7 +144,7 @@ namespace Gta5EyeTracking.HomingMissiles
 
         private bool HasTimeOut()
         {
-            return (_flightTime > 20000*Util.GetTimeCoef());
+            return (_flightTime > _timeout.TotalSeconds * Util.GetTimeCoef());
         }
 
         private bool HasCollided()

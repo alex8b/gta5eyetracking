@@ -6,12 +6,13 @@ namespace Gta5EyeTracking
 {
 	public class SettingsMenu 
 	{
+        public event EventHandler<EventArgs> ShutDownRequested = delegate {  };
 		public UIMenu DeadzoneMenu;
 		private UIMenu _mainMenu;
 		private readonly MenuPool _menuPool;
 		private readonly Settings _settings;
 		private UIMenuListItem _freelookDevice;
-
+        
 		public SettingsMenu(MenuPool menuPool, Settings settings)
 		{
 			_menuPool = menuPool;
@@ -223,8 +224,16 @@ namespace Gta5EyeTracking
 			dontFallFromBikes.CheckboxEvent += (sender, args) => { _settings.DontFallFromBikesEnabled = dontFallFromBikes.Checked; };
 			_mainMenu.AddItem(dontFallFromBikes);
 
-			var dedzns = new UIMenuItem("Deadzones");
+            var dedzns = new UIMenuItem("Deadzones", "Deadzones prevent camera movement when you are looking inside the zone, for example, the minimap.");
 			_mainMenu.AddItem(dedzns);
+
+            var shutDown = new UIMenuItem("Shut down", "Unload the mod");
+		    shutDown.Activated += (sender, item) =>
+		    {
+		        ShutDownRequested(this, new EventArgs());
+		    };
+            
+            _mainMenu.AddItem(shutDown);
 
 			_mainMenu.RefreshIndex();
 			{
