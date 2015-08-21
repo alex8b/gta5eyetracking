@@ -92,6 +92,8 @@
     <Compile Include="Gta5EyeTracking.cs" />
     <Compile Include="HidEmulation\ControllerEmulation.cs" />
     <Compile Include="HidEmulation\IHidEmulation.cs" />
+    <Compile Include="HomingMissiles\HomingMissile.cs" />
+    <Compile Include="HomingMissiles\HomingMissilesHelper.cs" />
     <Compile Include="IComparableExtensions.cs" />
     <Compile Include="HidEmulation\MouseEmulation.cs" />
     <Compile Include="HidEmulation\MouseApi.cs" />

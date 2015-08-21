@@ -175,6 +175,11 @@ namespace Gta5EyeTracking
 			{
 				_foregroundWindowWatcher.Dispose();
 			}
+
+            if (_aiming != null)
+            {
+                _aiming.Dispose();
+            }
 		}
 
 		private void LoadSettings()
@@ -280,9 +285,10 @@ namespace Gta5EyeTracking
 			Vector3 shootCoordSnap;
 			Vector3 shootMissileCoord;
 			Ped ped;
-			FindGazeProjection(out shootCoord, out shootCoordSnap, out shootMissileCoord, out ped);
+		    Entity target;
+            FindGazeProjection(out shootCoord, out shootCoordSnap, out shootMissileCoord, out ped, out target);
 
-			ProcessControls(shootCoord, shootCoordSnap, shootMissileCoord);
+			ProcessControls(shootCoord, shootCoordSnap, shootMissileCoord, target);
             
 			//TurnHead(ped, shootCoord);
 			_menuPool.ProcessMenus();
@@ -397,8 +403,9 @@ namespace Gta5EyeTracking
 			}
 		}
 
-		private void FindGazeProjection(out Vector3 shootCoord, out Vector3 shootCoordSnap, out Vector3 shootMissileCoord, out Ped ped)
-		{
+        private void FindGazeProjection(out Vector3 shootCoord, out Vector3 shootCoordSnap, out Vector3 shootMissileCoord, out Ped ped, out Entity target)
+        {
+            target = null;
 			const float joystickRadius = 0.1f;
 
 			var controllerState = _controllerEmulation.ControllerState;
@@ -426,10 +433,11 @@ namespace Gta5EyeTracking
 				&& (ped.Handle != Game.Player.Character.Handle))
 			{
 				shootCoordSnap = ped.GetBoneCoord(Bone.SKEL_L_Clavicle);
-
+                target = ped;
 				if (_settings.SnapAtPedestriansEnabled)
 				{
 					shootCoord = shootCoordSnap;
+                    
 				}
 			}
 			else
@@ -441,6 +449,7 @@ namespace Gta5EyeTracking
 				{
 					shootCoordSnap = vehicle.Position + vehicle.Velocity * 0.06f;
 					shootMissileCoord = shootCoordSnap;
+				    target = vehicle;
 				}
 			}
 			var playerDistToGround = Game.Player.Character.Position.Z - World.GetGroundHeight(Game.Player.Character.Position);
@@ -474,9 +483,10 @@ namespace Gta5EyeTracking
 			{
 				_freelook.Process(_lastNormalizedCenterDelta, ped, _aspectRatio);
 			}
+           
 		}
 
-		private void ProcessControls(Vector3 shootCoord, Vector3 shootCoordSnap, Vector3 shootMissileCoord)
+		private void ProcessControls(Vector3 shootCoord, Vector3 shootCoordSnap, Vector3 shootMissileCoord, Entity target)
 		{
 			var controllerState = _controllerEmulation.ControllerState;
 
@@ -575,6 +585,7 @@ namespace Gta5EyeTracking
 					_aiming.Water(shootCoord);
 				}
 			}
+
 			if (shootMissileCoord.Length() > 0 && Geometry.IsInFrontOfThePlayer(shootMissileCoord))
 			{
 				if (_settings.MissilesAtGazeEnabled
@@ -582,7 +593,14 @@ namespace Gta5EyeTracking
 					|| Game.IsKeyPressed(Keys.PageDown)
 					|| (!radialMenuActive && !_menuOpen && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.B))))
 				{
-					_aiming.ShootMissile(shootMissileCoord);
+				    if (target != null)
+				    {
+				        _aiming.ShootMissile(target);
+				    }
+				    else
+				    {
+                        _aiming.ShootMissile(shootMissileCoord);
+				    }
 				}
 			}
 		}

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using GTA;
@@ -87,5 +88,47 @@ namespace Gta5EyeTracking
 					|| weapon.Hash == WeaponHash.SmokeGrenade
 					|| weapon.Hash == WeaponHash.Snowball;
 		}
+
+	    public static double GetTimeCoef()
+	    {
+	        return 1.0; // change in slow motion;
+	    }
+
+	    public static void PlaySoundFromEntity(int soundID, string soundName, Entity ent, string category)
+	    {
+	        if (category == "")
+	        {
+	            Function.Call(Hash.PLAY_SOUND_FROM_ENTITY, soundID, soundName, ent, 0, 0, 0);
+	        }
+	        else
+	        {
+	            Function.Call(Hash.PLAY_SOUND_FROM_ENTITY, soundID, soundName, ent, category, 0, 0);
+	        }
+	    }
+
+        public static void PtfxRequestAsset(string sAsset)
+        {
+            Function.Call(Hash.REQUEST_NAMED_PTFX_ASSET, sAsset);
+        }
+
+        public static int PtfxStartOnEntity(Entity ent, string sPTFX, string sAsset, Vector3 offset, Vector3 rot, double size = 1.0)
+        {
+            if (sAsset != "")
+            {
+                Function.Call(Hash._SET_PTFX_ASSET_NEXT_CALL, sAsset); 
+            }
+
+            return Function.Call<int>(Hash.START_PARTICLE_FX_LOOPED_ON_ENTITY, sPTFX, ent, offset.X, offset.Y, offset.Z, rot.X, rot.Y, rot.Z, size, 0, 0, 0);
+        }
+
+        public static void PtfxStop(int fxID)
+        {
+            Function.Call(Hash.STOP_PARTICLE_FX_LOOPED, fxID);
+        }
+
+        public static int GetSoundId()
+        {
+            return Function.Call<int>(Hash.GET_SOUND_ID);
+        }
 	}
 }

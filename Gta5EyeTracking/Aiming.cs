@@ -2,13 +2,15 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using Gta5EyeTracking.HomingMissiles;
 using GTA;
 using GTA.Math;
 using GTA.Native;
+using Tobii.EyeX.Client;
 
 namespace Gta5EyeTracking
 {
-	public class Aiming
+	public class Aiming: DisposableBase
 	{
 		public bool AlwaysShowCrosshair { get; set; }
 
@@ -18,16 +20,23 @@ namespace Gta5EyeTracking
 		private bool _drawCrosshair;
 		private Vector2 _crosshairPosition;
 		private readonly Settings _settings;
+	    private readonly HomingMissilesHelper _homingMissilesHelper;
 
-		public Aiming(Settings settings)
+	    public Aiming(Settings settings)
 		{
 			_settings = settings;
 			_shootStopWatch = new Stopwatch();
 			_shootStopWatch.Restart();
+		    _homingMissilesHelper = new HomingMissilesHelper();
 			CreateCrosshair();
 		}
 
-		private void CreateCrosshair()
+	    protected override void DisposeManagedResources()
+	    {
+	        _homingMissilesHelper.Dispose();
+	    }
+
+	    private void CreateCrosshair()
 		{
 			_uiContainerCrosshair = new UIContainer(new Point(0, 0), new Size(4, 4), Color.FromArgb(0, 0, 0, 0));
 			var crosshair1 = new UIRectangle(new Point(0, 0), new Size(4, 4), Color.FromArgb(220, 0, 0, 0));
@@ -99,10 +108,31 @@ namespace Gta5EyeTracking
 			var fireRateTime = TimeSpan.FromSeconds(0.2);
 			if (_shootStopWatch.Elapsed > fireRateTime)
 			{
-				World.ShootBullet(weaponPos, target, Game.Player.Character, WeaponHash.HomingLauncher, 1);
+				//World.ShootBullet(weaponPos, target, Game.Player.Character, WeaponHash.HomingLauncher, 1);
+                _homingMissilesHelper.Launch(target);
 				_shootStopWatch.Restart();
 			}
 		}
+
+        public void ShootMissile(Entity target)
+        {
+            var weaponPos = Game.Player.Character.Position;
+
+            //take velocity into account
+            if (Game.Player.Character.IsInVehicle())
+            {
+                var vehicle = Game.Player.Character.CurrentVehicle;
+                weaponPos += vehicle.Velocity * 0.06f;
+            }
+
+            var fireRateTime = TimeSpan.FromSeconds(0.2);
+            if (_shootStopWatch.Elapsed > fireRateTime)
+            {
+                //World.ShootBullet(weaponPos, target, Game.Player.Character, WeaponHash.HomingLauncher, 1);
+                _homingMissilesHelper.Launch(target);
+                _shootStopWatch.Restart();
+            }
+        }
 
 		public void Incinerate(Vector3 target)
 		{
@@ -139,7 +169,7 @@ namespace Gta5EyeTracking
 				_uiContainerCrosshair.Draw();
 			}
 
-
+		    _homingMissilesHelper.Process();
 			_drawCrosshair = false;
 		}
 
