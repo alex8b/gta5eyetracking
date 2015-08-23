@@ -18,10 +18,13 @@ namespace Gta5EyeTracking
 
 		private readonly MouseEmulation _mouseEmulation;
 		private readonly double _freelookVelocityPixelsPerSec;
+        private readonly double _freelookVelocityCam;
 		
 		private bool _lastInVehicle;
+	    private double _relativeHeadingVehicle;
+        private double _relativePitchVehicle;
 
-		public Freelook(ControllerEmulation controllerEmulation,
+	    public Freelook(ControllerEmulation controllerEmulation,
 			MouseEmulation mouseEmulation,
 			Settings settings
 			)
@@ -32,6 +35,7 @@ namespace Gta5EyeTracking
 
 			_freelookVelocityJoystick = 2;
 			_freelookVelocityPixelsPerSec = 1500;
+	        _freelookVelocityCam = 5;
 		}
 
 		public bool IsInFixedDeadzone(Vector2 screenCoord, double aspectRatio)
@@ -68,6 +72,9 @@ namespace Gta5EyeTracking
 
 		public void ThirdPersonFreelook(Vector2 gazeNormalizedCenterDelta, double aspectRatio)
 		{
+            _relativeHeadingVehicle = 0;
+            _relativePitchVehicle = 0;
+
 			if (!GameplayCamera.IsRendering) return;
 
 			if (!_lastInVehicle && Game.Player.Character.IsInVehicle())
@@ -135,6 +142,9 @@ namespace Gta5EyeTracking
 
 		public void ThirdPersonAimFreelook(Vector2 gazeNormalizedCenterDelta, Ped ped, double aspectRatio)
 		{
+            _relativeHeadingVehicle = 0;
+            _relativePitchVehicle = 0;
+
 			if (!GameplayCamera.IsRendering) return;
 
 			double deltaX = 0;
@@ -161,6 +171,9 @@ namespace Gta5EyeTracking
 
 		public void FirstPersonFreelook(Vector2 gazeNormalizedCenterDelta, double aspectRatio)
 		{
+            _relativeHeadingVehicle = 0;
+            _relativePitchVehicle = 0;
+
 			if (!GameplayCamera.IsRendering) return;
 
 			double deltaX = 0;
@@ -190,10 +203,43 @@ namespace Gta5EyeTracking
 			EmulateHid(deltaX, deltaY);
 		}
 
+        public void FirstPersonFreelookVehicle(Vector2 gazeNormalizedCenterDelta, double aspectRatio)
+        {
+            double deltaX = 0;
+            double deltaY = 0;
+            if (_settings.FirstPersonFreelookEnabled
+                && (!IsInFixedDeadzone(gazeNormalizedCenterDelta, aspectRatio)))
+            {
+                var freelookDeltaVector = new Vector2(gazeNormalizedCenterDelta.X, gazeNormalizedCenterDelta.Y);
+
+                if (!(Math.Abs(freelookDeltaVector.X) <= _settings.FirstPersonDeadZoneWidth))
+                {
+                    deltaX = (freelookDeltaVector.X - Math.Sign(freelookDeltaVector.X) * _settings.FirstPersonDeadZoneWidth) * (float)(_settings.FirstPersonSensitivity);
+                }
+
+                if (!(Math.Abs(freelookDeltaVector.Y) <= _settings.FirstPersonDeadZoneHeight))
+                {
+
+                    if (((GameplayCamera.Rotation.X >= _settings.FirstPersonMinPitchDeg) && (freelookDeltaVector.Y > 0))
+                        || ((GameplayCamera.Rotation.X <= _settings.FirstPersonMaxPitchDeg) && (freelookDeltaVector.Y < 0)))
+                    {
+                        deltaY = (freelookDeltaVector.Y - Math.Sign(freelookDeltaVector.Y) * _settings.FirstPersonDeadZoneHeight) * (float)(_settings.FirstPersonSensitivity);
+                    }
+                }
+
+            }
+            _relativeHeadingVehicle += -deltaX * _freelookVelocityCam;
+            _relativePitchVehicle += deltaY * _freelookVelocityCam;
+            GameplayCamera.RelativeHeading = (float)(_relativeHeadingVehicle);
+            Util.SetGamePlayCamRawPitch((float)(_relativePitchVehicle));
+        }
+
 		public void FirstPersonAimFreelook(Vector2 gazeNormalizedCenterDelta, Ped ped, double aspectRatio)
 		{
-			if (!GameplayCamera.IsRendering) return;
-            
+            _relativeHeadingVehicle = 0;
+            _relativePitchVehicle = 0;
+            if (!GameplayCamera.IsRendering) return;
+
 			double deltaX = 0;
 			double deltaY = 0;
 			if (_settings.FirstPersonFreelookEnabled
@@ -222,9 +268,7 @@ namespace Gta5EyeTracking
 
 				if (Geometry.IsFirstPersonCameraActive())
 				{
-					//never works
-					//mouse doesn't work
-					FirstPersonFreelook(gazeNormalizedCenterDelta, aspectRatio);
+					FirstPersonFreelookVehicle(gazeNormalizedCenterDelta, aspectRatio);
 				}
 				else
 				{

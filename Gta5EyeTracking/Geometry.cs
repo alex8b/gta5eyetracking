@@ -10,9 +10,9 @@ namespace Gta5EyeTracking
 	{
 		public static bool IsFirstPersonCameraActive()
 		{
-			//return !GameplayCamera.IsRendering;
-			var dist = Game.Player.Character.Position - GameplayCamera.Position;
-			dist.Z = 0;
+            return Util.GetFollowPedCamViewMode() == 4;
+            //var dist = Game.Player.Character.Position - GameplayCamera.Position;
+            //dist.Z = 0;
 
 			//_debugText5.Caption = Math.Round(Game.Player.Character.Position.X, 1) + " | "
 			//	+ Math.Round(Game.Player.Character.Position.Y, 1) + " ||| "
@@ -21,7 +21,7 @@ namespace Gta5EyeTracking
 			//	+ Math.Round(GameplayCamera.Position.Z, 1) + " | "
 			//	+ Math.Round(dist.Length(), 1);
 
-			return (dist.Length() < 0.2);
+			//return (dist.Length() < 0.2);
 		}
 
 		public static bool IsInFrontOfThePlayer(Vector3 shootCoord)

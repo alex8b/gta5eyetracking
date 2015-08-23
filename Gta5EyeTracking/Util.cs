@@ -117,6 +117,16 @@ namespace Gta5EyeTracking
             Function.Call(Hash.REQUEST_NAMED_PTFX_ASSET, sAsset);
         }
 
+        public static int GetFollowPedCamViewMode()
+        {
+            return Function.Call<int>(Hash.GET_FOLLOW_PED_CAM_VIEW_MODE);
+        }
+
+        public static void SetGamePlayCamRawPitch(float pitch)
+        {
+            Function.Call(Hash._SET_GAMEPLAY_CAM_RAW_PITCH, pitch);
+        }
+
         public static bool IsEntityAVehicle(Entity entity)
         {
             return Function.Call<bool>(Hash.IS_ENTITY_A_VEHICLE, entity);
