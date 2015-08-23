@@ -84,7 +84,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Aiming.cs" />
-    <Compile Include="Deadzone.cs" />
+    <Compile Include="Deadzones\Deadzone.cs" />
+    <Compile Include="Deadzones\DeadzoneEditor.cs" />
     <Compile Include="DebugOutput.cs" />
     <Compile Include="ForegroundWindowWatcher.cs" />
     <Compile Include="Freelook.cs" />

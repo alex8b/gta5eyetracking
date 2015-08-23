@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Gta5EyeTracking.Deadzones;
 
 namespace Gta5EyeTracking
 {
@@ -47,7 +48,14 @@ namespace Gta5EyeTracking
 		public double FirstPersonDeadZoneWidth { get; set; }
 		public double FirstPersonMinPitchDeg { get; set; }
 		public double FirstPersonMaxPitchDeg { get; set; }
-		
+
+        public bool FirstPersonFreelookDrivingEnabled { get; set; }
+        public double FirstPersonMaxPitchDegDriving { get; set; }
+        public double FirstPersonMinPitchDegDriving { get; set; }
+        public double FirstPersonDeadZoneHeightDriving { get; set; }
+        public double FirstPersonDeadZoneWidthDriving { get; set; }
+
+        public double FirstPersonSensitivityDriving { get; set; }
 		public bool AimWithGazeEnabled { get; set; }
 		public bool SnapAtPedestriansEnabled { get; set; }
 		public double GazeFiltering { get; set; }
@@ -97,6 +105,14 @@ namespace Gta5EyeTracking
 			FirstPersonDeadZoneHeight = 0.3;
 			FirstPersonMinPitchDeg = -45;
 			FirstPersonMaxPitchDeg = 33;
+
+		    FirstPersonFreelookDrivingEnabled = true;
+            FirstPersonSensitivityDriving = 0.5;
+
+            FirstPersonDeadZoneWidthDriving = 0.2;
+            FirstPersonDeadZoneHeightDriving = 0.3;
+            FirstPersonMinPitchDegDriving = -45;
+            FirstPersonMaxPitchDegDriving = 33;
 			
 			AimingSensitivity = 0.4;
 			GazeFiltering = 0.5;

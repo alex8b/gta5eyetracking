@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Gta5EyeTracking.Deadzones;
 using Gta5EyeTracking.HidEmulation;
 using GTA;
 using GTA.Math;
@@ -207,31 +208,33 @@ namespace Gta5EyeTracking
         {
             double deltaX = 0;
             double deltaY = 0;
-            if (_settings.FirstPersonFreelookEnabled
-                && (!IsInFixedDeadzone(gazeNormalizedCenterDelta, aspectRatio)))
+            if (_settings.FirstPersonFreelookDrivingEnabled)
             {
-                var freelookDeltaVector = new Vector2(gazeNormalizedCenterDelta.X, gazeNormalizedCenterDelta.Y);
-
-                if (!(Math.Abs(freelookDeltaVector.X) <= _settings.FirstPersonDeadZoneWidth))
+                if (!IsInFixedDeadzone(gazeNormalizedCenterDelta, aspectRatio))
                 {
-                    deltaX = (freelookDeltaVector.X - Math.Sign(freelookDeltaVector.X) * _settings.FirstPersonDeadZoneWidth) * (float)(_settings.FirstPersonSensitivity);
-                }
+                    var freelookDeltaVector = new Vector2(gazeNormalizedCenterDelta.X, gazeNormalizedCenterDelta.Y);
 
-                if (!(Math.Abs(freelookDeltaVector.Y) <= _settings.FirstPersonDeadZoneHeight))
-                {
-
-                    if (((GameplayCamera.Rotation.X >= _settings.FirstPersonMinPitchDeg) && (freelookDeltaVector.Y > 0))
-                        || ((GameplayCamera.Rotation.X <= _settings.FirstPersonMaxPitchDeg) && (freelookDeltaVector.Y < 0)))
+                    if (!(Math.Abs(freelookDeltaVector.X) <= _settings.FirstPersonDeadZoneWidthDriving))
                     {
-                        deltaY = (freelookDeltaVector.Y - Math.Sign(freelookDeltaVector.Y) * _settings.FirstPersonDeadZoneHeight) * (float)(_settings.FirstPersonSensitivity);
+                        deltaX = (freelookDeltaVector.X - Math.Sign(freelookDeltaVector.X) * _settings.FirstPersonDeadZoneWidthDriving) * (float)(_settings.FirstPersonSensitivityDriving);
+                    }
+
+                    if (!(Math.Abs(freelookDeltaVector.Y) <= _settings.FirstPersonDeadZoneHeightDriving))
+                    {
+
+                        if (((GameplayCamera.Rotation.X >= _settings.FirstPersonMinPitchDegDriving) && (freelookDeltaVector.Y > 0))
+                            || ((GameplayCamera.Rotation.X <= _settings.FirstPersonMaxPitchDegDriving) && (freelookDeltaVector.Y < 0)))
+                        {
+                            deltaY = (freelookDeltaVector.Y - Math.Sign(freelookDeltaVector.Y) * _settings.FirstPersonDeadZoneHeightDriving) * (float)(_settings.FirstPersonSensitivityDriving);
+                        }
                     }
                 }
 
+                _relativeHeadingVehicle += -deltaX * _freelookVelocityCam;
+                _relativePitchVehicle += deltaY * _freelookVelocityCam;
+                GameplayCamera.RelativeHeading = (float)(_relativeHeadingVehicle);
+                Util.SetGamePlayCamRawPitch((float)(_relativePitchVehicle));
             }
-            _relativeHeadingVehicle += -deltaX * _freelookVelocityCam;
-            _relativePitchVehicle += deltaY * _freelookVelocityCam;
-            GameplayCamera.RelativeHeading = (float)(_relativeHeadingVehicle);
-            Util.SetGamePlayCamRawPitch((float)(_relativePitchVehicle));
         }
 
 		public void FirstPersonAimFreelook(Vector2 gazeNormalizedCenterDelta, Ped ped, double aspectRatio)
