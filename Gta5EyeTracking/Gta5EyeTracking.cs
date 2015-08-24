@@ -306,7 +306,7 @@ namespace Gta5EyeTracking
 		    Entity target;
             FindGazeProjection(out shootCoord, out shootCoordSnap, out shootMissileCoord, out ped, out target);
 
-			ProcessControls(shootCoord, shootCoordSnap, shootMissileCoord, target);
+			ProcessControls(shootCoord, shootCoordSnap, shootMissileCoord, ped, target);
             
 			//TurnHead(ped, shootCoord);
 			_menuPool.ProcessMenus();
@@ -379,6 +379,14 @@ namespace Gta5EyeTracking
 
         private void FindGazeProjection(out Vector3 shootCoord, out Vector3 shootCoordSnap, out Vector3 shootMissileCoord, out Ped ped, out Entity target)
         {
+            //debug
+            Geometry.ScreenRelToWorld(new Vector2(0, 0));
+            var result = GameplayCamera.Position;
+            _debugOutput.DebugText3.Caption = "Point: " + Math.Round(result.X, 1) + " | " + Math.Round(result.Y, 1) +
+                                              " | " + Math.Round(result.Z, 1);
+            //end Debug
+
+
             target = null;
 			const float joystickRadius = 0.1f;
 
@@ -386,6 +394,7 @@ namespace Gta5EyeTracking
 
 			var joystickDelta = new Vector2(controllerState.Gamepad.RightThumbX, -controllerState.Gamepad.RightThumbY)*
 								(1.0f/32768.0f)*joystickRadius;
+            
 
 			var w = (float)(1 - _settings.GazeFiltering * 0.9);
 			_gazePointDelta = new Vector2(_gazePointDelta.X + (_lastNormalizedCenterDelta.X - _gazePointDelta.X) * w,
@@ -396,12 +405,12 @@ namespace Gta5EyeTracking
 
             Entity unfilteredEntity;
             Entity filteredEntity;
-            var hitUnfiltered = Geometry.RaycastEverything(_unfilteredgazePlusJoystickDelta, out unfilteredEntity);
+            var hitUnfiltered = Geometry.ConecastPedsAndVehicles(_unfilteredgazePlusJoystickDelta, out unfilteredEntity);
 			shootMissileCoord = hitUnfiltered;
 			shootCoordSnap = hitUnfiltered;
 
 
-            var hitFiltered = Geometry.RaycastEverything(_gazePlusJoystickDelta, out filteredEntity);
+            var hitFiltered = Geometry.RaycastEverything(_gazePlusJoystickDelta, out filteredEntity, true);
 			shootCoord = hitFiltered;
 
             if (unfilteredEntity != null
@@ -411,7 +420,7 @@ namespace Gta5EyeTracking
             }
             else
             {
-                ped = Geometry.RaycastPed(_unfilteredgazePlusJoystickDelta);
+                ped = Geometry.SearchPed(_unfilteredgazePlusJoystickDelta);
             }
             		
 			if ((ped != null)
@@ -435,7 +444,7 @@ namespace Gta5EyeTracking
 			    }
 			    else
 			    {
-			        vehicle = Geometry.RaycastVehicle(_unfilteredgazePlusJoystickDelta);
+			        vehicle = Geometry.SearchVehicle(_unfilteredgazePlusJoystickDelta);
 			    }
                 _debugOutput.DebugText5.Caption = "raycasing veh " + DateTime.Now;
 				if (vehicle != null
@@ -463,28 +472,27 @@ namespace Gta5EyeTracking
 					shootMissileCoord.Z = World.GetGroundHeight(justBeforeTarget) //ground level at target
 						+ playerDistToGround; //offset
 				}
-			}
-
-			if (!_menuOpen 
-				&& (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadDown)
-				|| User32.IsKeyPressed(VirtualKeyStates.VK_LMENU)))
-			{
-				//character selection
-			}
-			else if (!_isInVehicle && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder))
-			{
-				_radialMenu.Process(_lastNormalizedCenterDelta, _aspectRatio);
-			}
-			else
-			{
-				_freelook.Process(_lastNormalizedCenterDelta, ped, _aspectRatio);
-			}
-           
+			}           
 		}
 
-		private void ProcessControls(Vector3 shootCoord, Vector3 shootCoordSnap, Vector3 shootMissileCoord, Entity target)
+		private void ProcessControls(Vector3 shootCoord, Vector3 shootCoordSnap, Vector3 shootMissileCoord, Ped ped, Entity target)
 		{
 			var controllerState = _controllerEmulation.ControllerState;
+
+            if (!_menuOpen
+                && (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadDown)
+                || User32.IsKeyPressed(VirtualKeyStates.VK_LMENU)))
+            {
+                //character selection
+            }
+            else if (!_isInVehicle && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder))
+            {
+                _radialMenu.Process(_lastNormalizedCenterDelta, _aspectRatio);
+            }
+            else
+            {
+                _freelook.Process(_lastNormalizedCenterDelta, ped, _aspectRatio);
+            }
 
 			var radialMenuActive = (!Game.Player.Character.IsInVehicle()
 								&& controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder));
@@ -546,9 +554,6 @@ namespace Gta5EyeTracking
 				{
 					_aiming.MoveCrosshair(screenCoords);
 				}	
-
-				_debugOutput.DebugText2.Caption = "Cr: " + Math.Round(shootCoord.X, 1) + " | " + Math.Round(shootCoord.Y, 1) + " | " +
-									Math.Round(shootCoord.Z, 1);
 
 				if (_settings.AimWithGazeEnabled 
 					&& _isInVehicle

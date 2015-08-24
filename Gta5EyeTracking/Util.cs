@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using GTA;
 using GTA.Math;
 using GTA.Native;
+using Matrix = SharpDX.Matrix;
 
 namespace Gta5EyeTracking
 {
@@ -192,6 +193,11 @@ namespace Gta5EyeTracking
 		    {
 			    return;
 		    }
+	    }
+
+	    public static Matrix GetCameraMatrix()
+	    {
+	        return Matrix.Identity;
 	    }
 	}
 }
