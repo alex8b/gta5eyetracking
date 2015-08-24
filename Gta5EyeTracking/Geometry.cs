@@ -30,7 +30,7 @@ namespace Gta5EyeTracking
 		    hitEntity = null;
 			var camPos = GameplayCamera.Position;
 			var camRot = GameplayCamera.Rotation;
-			const float raycastToDist = 150.0f;
+			const float raycastToDist = 200.0f;
 			const float raycastFromDist = 1f;
 
             var target3D = ScreenRelToWorld(camPos, camRot, screenCoord, skipProjection);
@@ -100,7 +100,7 @@ namespace Gta5EyeTracking
 		public static Ped SearchPed(Vector2 screenCoords)
 		{
 			const double searchRange = 0.1;
-			var peds = World.GetNearbyPeds(Game.Player.Character.Position, 150);
+			var peds = World.GetNearbyPeds(Game.Player.Character.Position, 200);
 			var mindist = Double.MaxValue;
 			Ped foundPed = null;
 			foreach (var ped in peds)
@@ -141,8 +141,8 @@ namespace Gta5EyeTracking
 
 		public static Vehicle SearchVehicle(Vector2 screenCoords)
 		{
-			const double searchRange = 0.2;
-			var vehs = World.GetNearbyVehicles(Game.Player.Character.Position, 300);
+			const double searchRange = 0.1;
+			var vehs = World.GetNearbyVehicles(Game.Player.Character.Position, 200);
 			var mindist = Double.MaxValue;
 			Vehicle foundVeh = null;
 			foreach (var vehicle in vehs)
@@ -244,26 +244,8 @@ namespace Gta5EyeTracking
 
 		public static RaycastResult Raycast(Vector3 source, Vector3 target, int options, Entity entity)
 		{
-			var inputArgumentArray = new InputArgument[9];
-			var inputArgument1 = new InputArgument(source.X);
-			inputArgumentArray[0] = inputArgument1;
-			var inputArgument2 = new InputArgument(source.Y);
-			inputArgumentArray[1] = inputArgument2;
-			var inputArgument3 = new InputArgument(source.Z);
-			inputArgumentArray[2] = inputArgument3;
-			var inputArgument4 = new InputArgument(target.X);
-			inputArgumentArray[3] = inputArgument4;
-			var inputArgument5 = new InputArgument(target.Y);
-			inputArgumentArray[4] = inputArgument5;
-			var inputArgument6 = new InputArgument(target.Z);
-			inputArgumentArray[5] = inputArgument6;
-			var inputArgument7 = new InputArgument(options);
-			inputArgumentArray[6] = inputArgument7;
-			var inputArgument8 = new InputArgument((entity != null) ? entity.Handle : 0);
-			inputArgumentArray[7] = inputArgument8;
-			var inputArgument9 = new InputArgument(7);
-			inputArgumentArray[8] = inputArgument9;
-			var result = (Function.Call<int>(Hash._CAST_RAY_POINT_TO_POINT, inputArgumentArray));
+            var result = Function.Call<int>(Hash._CAST_RAY_POINT_TO_POINT, source.X, source.Y, source.Z, target.X, target.Y, target.Z, options,
+                (entity != null) ? entity.Handle : 0, 7);
 			var obj = (RaycastResult) typeof(RaycastResult).GetConstructor(
 				BindingFlags.NonPublic | BindingFlags.Instance,
 				null, Type.EmptyTypes, null).Invoke(new[] {(object)result});

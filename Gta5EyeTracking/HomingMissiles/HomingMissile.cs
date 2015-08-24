@@ -58,16 +58,37 @@ namespace Gta5EyeTracking.HomingMissiles
 
         private void CreateMissileEntity()
         {
-            var model = new Model("w_at_ar_supp_02");
-            var position = Game.Player.Character.GetBoneCoord(Bone.SKEL_R_Hand) + _launchDir * 1f;
-            _missile = World.CreateProp(model, position, false, false);
+            try
+            {
+                var model = new Model("w_at_ar_supp_02");
+                var playerCharacter = Game.Player.Character;
+                if (playerCharacter != null)
+                {
+                    var position = playerCharacter.GetBoneCoord(Bone.SKEL_R_Hand) + _launchDir * 1f;
+                    if (playerCharacter.IsInVehicle())
+                    {
+                        position = playerCharacter.GetBoneCoord(Bone.SKEL_R_Hand) + _launchDir * 2f;
+                    }
+                    if (playerCharacter.IsInPlane)
+                    {
+                        position = playerCharacter.GetBoneCoord(Bone.SKEL_R_Hand) + _launchDir * 4f;
+                    }
+                    _missile = World.CreateProp(model, position, false, false);
 
-            GTA.Native.Function.Call(GTA.Native.Hash.SET_ENTITY_RECORDS_COLLISIONS, _missile, false);
-            _soundId = Util.GetSoundId();
-            Util.PlaySoundFromEntity(_soundId, "SPL_RPG_DIST_FLIGHT_MASTER", _missile, "");
-            Util.PtfxRequestAsset("scr_exile2");
-            _fxId = Util.PtfxStartOnEntity(_missile, "scr_ex2_rpg_trail", "scr_exile2", new Vector3(0.56f, 0, 0), new Vector3(0, 0, -90), 1.0);
-            UpdatePosition();
+                    GTA.Native.Function.Call(GTA.Native.Hash.SET_ENTITY_RECORDS_COLLISIONS, _missile, false);
+                    _soundId = Util.GetSoundId();
+                    Util.PlaySoundFromEntity(_soundId, "SPL_RPG_DIST_FLIGHT_MASTER", _missile, "");
+                    Util.PtfxRequestAsset("scr_exile2");
+                    _fxId = Util.PtfxStartOnEntity(_missile, "scr_ex2_rpg_trail", "scr_exile2", new Vector3(0.56f, 0, 0),
+                        new Vector3(0, 0, -90), 1.0);
+                    UpdatePosition();
+                }               
+            }
+            catch (NullReferenceException)
+            {
+                Util.Log("Failed to create a missile entity");
+                Exists = false;
+            }
         }
 
         private void Detonate()
@@ -90,11 +111,14 @@ namespace Gta5EyeTracking.HomingMissiles
         private void RemoveMissileEntity()
         {
             Util.PtfxStop(_fxId);
-           
-            _missile.IsVisible = false;
-            _missile.Detach();
-            _missile.MarkAsNoLongerNeeded();
-            _missile.Position = Vector3.Zero;
+            if (_missile != null)
+            {
+                _missile.IsVisible = false;
+                _missile.Detach();
+                _missile.MarkAsNoLongerNeeded();
+                _missile.Position = Vector3.Zero;                
+            }
+
             Exists = false;
         }
 

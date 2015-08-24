@@ -9,10 +9,12 @@ namespace Gta5EyeTracking.HomingMissiles
     public class HomingMissilesHelper: DisposableBase
     {
         private List<HomingMissile> _missiles;
+        private bool _initFlag;
 
         public HomingMissilesHelper()
         {
             _missiles = new List<HomingMissile>();
+            _initFlag = true;
         }
 
         public void Launch(Entity target)
@@ -24,12 +26,24 @@ namespace Gta5EyeTracking.HomingMissiles
         public void Launch(Vector3 targetPosition)
         {
             var missile = new HomingMissile(targetPosition);
-            _missiles.Add(missile);
+            if (missile.Exists)
+            {
+                _missiles.Add(missile);
+            }
+            else
+            {
+                missile.Dispose();
+            }
         }
 
         public void Process()
         {
-            Util.PtfxRequestAsset("scr_exile2");
+            if (_initFlag)
+            {
+                Util.PtfxRequestAsset("scr_exile2");
+                _initFlag = false;
+            }
+            
             foreach (var missile in _missiles)
             {
                 missile.Process();
