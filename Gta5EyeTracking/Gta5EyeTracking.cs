@@ -382,6 +382,8 @@ namespace Gta5EyeTracking
             var result = GameplayCamera.Position;
             _debugOutput.DebugText3.Caption = "Point: " + Math.Round(result.X, 1) + " | " + Math.Round(result.Y, 1) +
                                               " | " + Math.Round(result.Z, 1);
+            _debugOutput.DebugText2.Caption = "Cam: " + Math.Round(GameplayCamera.Position.X, 1) + " | " + Math.Round(GameplayCamera.Position.Y, 1) +
+                                              " | " + Math.Round(GameplayCamera.Position.Z, 1);
             //end Debug
 
 
@@ -715,7 +717,7 @@ namespace Gta5EyeTracking
 			if (_gazeStopwatch.Elapsed > maxAwayTime)
 			{
 				//_lastNormalizedCenterDelta = new Vector2();
-				if (!Game.IsPaused) Game.Pause(true); //TODO: doesn't work
+				//if (!Game.IsPaused) Game.Pause(true); //TODO: doesn't work
 			}
 		}
 	}

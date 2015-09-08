@@ -33,7 +33,8 @@ namespace Gta5EyeTracking
 			const float raycastToDist = 200.0f;
 			const float raycastFromDist = 1f;
 
-            var target3D = ScreenRelToWorld(camPos, camRot, screenCoord, skipProjection);
+            //var target3D = ScreenRelToWorld(screenCoord);
+            var target3D = ScreenRelToWorld(new Vector2(0,0));
 			var source3D = camPos;
 
 			Entity ignoreEntity = Game.Player.Character;
@@ -175,53 +176,6 @@ namespace Gta5EyeTracking
 			return true;
 		}
 
-        private static Vector2 _point2DZero;
-        private static Vector2 _point2D;
-		public static Vector3 ScreenRelToWorld(Vector3 camPos, Vector3 camRot, Vector2 screenCoordsRel, bool skipProjection)
-		{
-            var camForward = RotationToDirection(camRot);
-            var rotUp = camRot + new Vector3(10, 0, 0);
-            var rotDown = camRot + new Vector3(-10, 0, 0);
-            var rotLeft = camRot + new Vector3(0, 0, -10);
-            var rotRight = camRot + new Vector3(0, 0, 10);
-
-            var camRight = RotationToDirection(rotRight) - RotationToDirection(rotLeft);
-            var camUp = RotationToDirection(rotUp) - RotationToDirection(rotDown);
-
-            var rollRad = -DegToRad(camRot.Y);
-
-            var camRightRoll = camRight * (float)Math.Cos(rollRad) - camUp * (float)Math.Sin(rollRad);
-            var camUpRoll = camRight * (float)Math.Sin(rollRad) + camUp * (float)Math.Cos(rollRad);
-
-		    var defaultResult = camPos + camForward*10.0f;
-            if (!skipProjection) {
-                var point3D = camPos + camForward * 10.0f + camRightRoll + camUpRoll;
-                if (!WorldToScreenRel(point3D, out _point2D))
-                {
-                    _point2DZero = new Vector2();
-                    _point2D = new Vector2();
-                    return defaultResult;
-                }
-                var point3DZero = camPos + camForward * 10.0f;
-                if (!WorldToScreenRel(point3DZero, out _point2DZero))
-                {
-                    _point2DZero = new Vector2();
-                    _point2D = new Vector2();
-                    return defaultResult;
-                }
-            }
-
-            const double eps = 0.001;
-		    if (Math.Abs(_point2D.X - _point2DZero.X) < eps || Math.Abs(_point2D.Y - _point2DZero.Y) < eps)
-		    {
-		        return defaultResult;
-		    }
-            var scaleX = (screenCoordsRel.X - _point2DZero.X) / (_point2D.X - _point2DZero.X);
-            var scaleY = (screenCoordsRel.Y - _point2DZero.Y) / (_point2D.Y - _point2DZero.Y);
-            var point3Dret = camPos + camForward * 10.0f + camRightRoll * scaleX + camUpRoll * scaleY;
-            return point3Dret;
-		}
-
         public static Vector3 ScreenRelToWorld(Vector2 screenCoordsRel)
 	    {
 	        SharpDX.Matrix camMat = Util.GetCameraMatrix();
@@ -230,13 +184,17 @@ namespace Gta5EyeTracking
                                                        1,       0, 0, 0,
                                                        0,       0, 0, 0);
 		    var epsilon = 0.00001;
+            UI.ShowSubtitle("Cam: " + Math.Round(camMat.M11, 1) + " " + Math.Round(camMat.M12, 1) + " " + Math.Round(camMat.M13, 1) + " " + Math.Round(camMat.M14, 1)
+             + "\n | " + Math.Round(camMat.M21, 1) + " " + Math.Round(camMat.M22, 1) + " " + Math.Round(camMat.M23, 1) + " " + Math.Round(camMat.M24, 1)
+             + "\n | " + Math.Round(camMat.M31, 1) + " " + Math.Round(camMat.M32, 1) + " " + Math.Round(camMat.M33, 1) + " " + Math.Round(camMat.M34, 1)
+             + "\n | " + Math.Round(camMat.M41, 1) + " " + Math.Round(camMat.M42, 1) + " " + Math.Round(camMat.M43, 1) + " " + Math.Round(camMat.M44, 1));
 		    if (Math.Abs(camMat.Determinant()) > epsilon)
 		    {
 		        var camMatInvert = camMat;
 		        camMatInvert.Invert();
 		        var worldPointVector = camMatInvert * screenPointVector;
                 var result = new Vector3(worldPointVector.M11, worldPointVector.M21, worldPointVector.M31);
-                //UI.ShowSubtitle("Point: " + Math.Round(result.X, 1) + " | " + Math.Round(result.Y, 1) + " | " + Math.Round(result.Z, 1));
+                
 		        return result;
 		    }
             return new Vector3(0,0,0);
