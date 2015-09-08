@@ -1,4 +1,3 @@
-version: Build No. {build}
 configuration: Release
 platform: x64
 install:
@@ -29,7 +28,7 @@ install:
 - mkdir lib\EyeXSDK\
 - cd lib/EyeXSDK/
 - 'echo Downloading EyeXSDK ...'
-- appveyor DownloadFile https://docs.google.com/uc?authuser=0&id=0B6-bgpo2fEmJOG1UOURiMUJDRms&export=download -FileName EyeXSDK.zip
+- appveyor DownloadFile https://drive.google.com/uc?export=download&id=0B6-bgpo2fEmJOG1UOURiMUJDRms -FileName EyeXSDK.zip
 - echo Download completed. Extracting ...
 - 7z x EyeXSDK.zip
 - echo Extraction completed. Compiling ...
