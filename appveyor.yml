@@ -2,7 +2,7 @@ version: Build No. {build}
 configuration: Release
 platform: x64
 install:
-- mkdir lib/ScriptHookVDotNet/
+- cmd: mkdir lib/ScriptHookVDotNet/
 - cd lib/ScriptHookVDotNet/
 - 'echo Downloading ScriptHook.NET ...'
 - appveyor DownloadFile https://github.com/crosire/scripthookvdotnet/releases/download/v2.1/ScriptHookVDotNet.zip -FileName ScriptHookVDotNet.zip
@@ -10,7 +10,7 @@ install:
 - 7z x ScriptHookVDotNet.zip
 - echo Extraction completed. Compiling ...
 - cd ../../
-- mkdir lib/NativeUI/
+- cmd: mkdir lib/NativeUI/
 - cd lib/NativeUI/
 - 'echo Downloading NativeUI ...'
 - appveyor DownloadFile https://github.com/Guad/NativeUI/releases/download/1.4/NativeUI.zip -FileName NativeUI.zip
@@ -18,7 +18,7 @@ install:
 - 7z x NativeUI.zip
 - echo Extraction completed. Compiling ...
 - cd ../../
-- mkdir lib/EasyHook/
+- cmd: mkdir lib/EasyHook/
 - cd lib/EasyHook/
 - 'echo Downloading EasyHook ...'
 - appveyor DownloadFile https://github.com/EasyHook/EasyHook/releases/download/v2.7.5726.0/EasyHook-2.7.5726.0-Binaries.zip -FileName EasyHook.zip
@@ -26,7 +26,7 @@ install:
 - 7z x EasyHook.zip
 - echo Extraction completed. Compiling ...
 - cd ../../
-- mkdir lib/EyeXSDK/
+- cmd: mkdir lib/EyeXSDK/
 - cd lib/EyeXSDK/
 - 'echo Downloading EyeXSDK ...'
 - appveyor DownloadFile https://docs.google.com/uc?authuser=0&id=0B6-bgpo2fEmJOG1UOURiMUJDRms&export=download -FileName EyeXSDK.zip
