@@ -10,7 +10,7 @@ install:
 - mkdir lib\ScriptHookV\
 - cd lib/ScriptHookV/
 - 'echo Downloading ScriptHookV ...'
-- appveyor DownloadFile http://www.dev-c.com/files/ScriptHookV_1.0.393.4a.zip -FileName ScriptHookV.zip
+- appveyor DownloadFile https://www.dropbox.com/s/jbp5s0m86xnoo4m/ScriptHookV_1.0.393.4a.zip?dl=1 -FileName ScriptHookV.zip
 - echo Download completed. Extracting ...
 - 7z x ScriptHookV.zip
 - echo Extraction completed. Compiling ...
