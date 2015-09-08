@@ -5,6 +5,9 @@
 
 Gta5EyeTracking/bin/
 Gta5EyeTracking/obj/
+bin/
+lib/
+packages/
 
 *_i.c
 *_p.c
