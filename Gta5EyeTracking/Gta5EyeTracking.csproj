@@ -56,12 +56,15 @@
     <Reference Include="EyeXFramework">
       <HintPath>..\lib\EyeXSDK\lib\x64\EyeXFramework.dll</HintPath>
     </Reference>
+    <Reference Include="MemoryAccess">
+      <HintPath>..\x64\Debug\MemoryAccess.dll</HintPath>
+    </Reference>
     <Reference Include="NativeUI">
       <HintPath>..\lib\NativeUI\NativeUI.dll</HintPath>
     </Reference>
     <Reference Include="ScriptHookVDotNet, Version=0.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\ScriptHookVDotNet\ScriptHookVDotNet.dll</HintPath>
+      <HintPath>E:\Games\Rockstar Games\Grand Theft Auto V\ScriptHookVDotNet.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX, Version=2.6.3.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

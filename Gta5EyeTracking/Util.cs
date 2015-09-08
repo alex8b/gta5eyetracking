@@ -5,6 +5,7 @@ using GTA;
 using GTA.Math;
 using GTA.Native;
 using Matrix = SharpDX.Matrix;
+using MemoryAccess;
 
 namespace Gta5EyeTracking
 {
@@ -195,9 +196,20 @@ namespace Gta5EyeTracking
 		    }
 	    }
 
-	    public static Matrix GetCameraMatrix()
-	    {
-	        return Matrix.Identity;
-	    }
-	}
+        public static Matrix GetCameraMatrix()
+        {
+            IntPtr baseAddress = System.Diagnostics.Process.GetCurrentProcess().MainModule.BaseAddress;
+            int length = System.Diagnostics.Process.GetCurrentProcess().MainModule.ModuleMemorySize;
+            Matrix matrix = CCamera.GetCurrentCameraMatrix(baseAddress, length);
+
+            if (matrix != Matrix.Zero)
+                return matrix;
+            else
+            {
+                Log("ERROR: Matrix haven't returned anything!");
+                return Matrix.Identity;
+            }
+
+        }
+    }
 }
