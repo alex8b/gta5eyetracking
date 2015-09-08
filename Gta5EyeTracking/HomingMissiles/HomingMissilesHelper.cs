@@ -47,6 +47,10 @@ namespace Gta5EyeTracking.HomingMissiles
             foreach (var missile in _missiles)
             {
                 missile.Process();
+                if (!missile.Exists)
+                {
+                    missile.Dispose();
+                }
             }
             _missiles = _missiles.Where(missile => missile.Exists).ToList();
         }

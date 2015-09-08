@@ -96,8 +96,6 @@ namespace Gta5EyeTracking
 			_foregroundWindowWatcher.ForegroundWindowChanged += ForegroundWindowWatcherOnForegroundWindowChanged;
 			_isWindowForeground = _foregroundWindowWatcher.IsWindowForeground();
 
-			View.MenuTransitions = true;
-
 			KeyDown += OnKeyDown;
 
 			Tick += OnTick;
@@ -717,7 +715,7 @@ namespace Gta5EyeTracking
 			if (_gazeStopwatch.Elapsed > maxAwayTime)
 			{
 				//_lastNormalizedCenterDelta = new Vector2();
-				if (!Game.IsPaused) Game.Pause(); //TODO: doesn't work
+				if (!Game.IsPaused) Game.Pause(true); //TODO: doesn't work
 			}
 		}
 	}

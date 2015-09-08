@@ -58,48 +58,45 @@ namespace Gta5EyeTracking.HomingMissiles
 
         private void CreateMissileEntity()
         {
-            try
+            var model = new Model("w_at_ar_supp_02");
+            var playerCharacter = Game.Player.Character;
+            if (playerCharacter == null) return;
+            var position = playerCharacter.GetBoneCoord(Bone.SKEL_R_Hand) + _launchDir * 1f;
+            if (playerCharacter.IsInVehicle())
             {
-                var model = new Model("w_at_ar_supp_02");
-                var playerCharacter = Game.Player.Character;
-                if (playerCharacter != null)
-                {
-                    var position = playerCharacter.GetBoneCoord(Bone.SKEL_R_Hand) + _launchDir * 1f;
-                    if (playerCharacter.IsInVehicle())
-                    {
-                        position = playerCharacter.GetBoneCoord(Bone.SKEL_R_Hand) + _launchDir * 2f;
-                    }
-                    if (playerCharacter.IsInPlane)
-                    {
-                        position = playerCharacter.GetBoneCoord(Bone.SKEL_R_Hand) + _launchDir * 4f;
-                    }
-                    _missile = World.CreateProp(model, position, false, false);
-
-                    GTA.Native.Function.Call(GTA.Native.Hash.SET_ENTITY_RECORDS_COLLISIONS, _missile, false);
-                    _soundId = Util.GetSoundId();
-                    Util.PlaySoundFromEntity(_soundId, "SPL_RPG_DIST_FLIGHT_MASTER", _missile, "");
-                    Util.PtfxRequestAsset("scr_exile2");
-                    _fxId = Util.PtfxStartOnEntity(_missile, "scr_ex2_rpg_trail", "scr_exile2", new Vector3(0.56f, 0, 0),
-                        new Vector3(0, 0, -90), 1.0);
-                    UpdatePosition();
-                }               
+                position = playerCharacter.GetBoneCoord(Bone.SKEL_R_Hand) + _launchDir * 2f;
             }
-            catch (NullReferenceException)
+            if (playerCharacter.IsInPlane)
             {
-                Util.Log("Failed to create a missile entity");
+                position = playerCharacter.GetBoneCoord(Bone.SKEL_R_Hand) + _launchDir * 4f;
+            }
+            _missile = World.CreateProp(model, position, false, false);
+            if (_missile == null)
+            {
+                Util.Log("Failed to create a missile prop");
                 Exists = false;
+                return;
             }
+            GTA.Native.Function.Call(GTA.Native.Hash.SET_ENTITY_RECORDS_COLLISIONS, _missile, false);
+            _soundId = Util.GetSoundId();
+            Util.PlaySoundFromEntity(_soundId, "SPL_RPG_DIST_FLIGHT_MASTER", _missile, "");
+            Util.PtfxRequestAsset("scr_exile2");
+            _fxId = Util.PtfxStartOnEntity(_missile, "scr_ex2_rpg_trail", "scr_exile2", new Vector3(0.56f, 0, 0),
+                new Vector3(0, 0, -90), 1.0);
+            UpdatePosition();
         }
 
         private void Detonate()
         {
+            if (_missile == null) return;
+
             if (Exists && !Detonated)
             {
                 var player = Game.Player.Character;
                 var dist = (player.Position - _missile.Position).Length();
                 if (dist > 1.5)
                 {
-                    World.AddOwnedExplosion(player, _missile.Position, ExplosionType.Explosion1, 1.5f, 0.1f);
+                    World.AddOwnedExplosion(player, _missile.Position, ExplosionType.Rocket, 1.5f, 0.1f);
                     Util.PtfxStop(_fxId);
                     Util.StopSound(_soundId);
                     Detonated = true;
@@ -125,6 +122,8 @@ namespace Gta5EyeTracking.HomingMissiles
         private bool IsNearTarget()
         {
             if (_target == null) return false;
+            if (_missile == null) return false;
+
             double tmpDist = _missile.Position.DistanceTo(_targetPosition - _launchDir * 0.25f);
             double tmpDistAhead = _missile.Position.DistanceTo(_targetPosition + _launchDir * 0.25f);
 
@@ -179,6 +178,8 @@ namespace Gta5EyeTracking.HomingMissiles
 
         private void UpdatePosition()
         {
+            if (_missile == null) return;
+
             var flightDir = _targetPosition - _missile.Position;
             flightDir.Normalize();
             _launchDir += (flightDir - _launchDir)*(float) _flightFixCoef;
@@ -192,6 +193,7 @@ namespace Gta5EyeTracking.HomingMissiles
             tmpRot.Z += 90;
 
             _missile.Rotation = tmpRot;
+
             if (Detonated)
             {
                 _missile.Velocity = Vector3.Zero;

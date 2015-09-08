@@ -149,7 +149,7 @@ namespace Gta5EyeTracking
 			var dist = (target - Game.Player.Character.Position).Length();
 			if (dist > 3)
 			{
-				World.AddExplosion(target, ExplosionType.ValveWater1, 2, 0);
+				World.AddExplosion(target, ExplosionType.WaterHydrant, 2, 0);
 			}
 		}
 

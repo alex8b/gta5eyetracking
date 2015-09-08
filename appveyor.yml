@@ -1,0 +1,71 @@
+configuration: Release
+platform: x64
+assembly_info:
+  patch: true
+  file: Gta5EyeTracking\Properties\AssemblyInfo.cs
+  assembly_version: '{version}'
+  assembly_file_version: '{version}'
+  assembly_informational_version: '{version}'
+install:
+- mkdir lib\ScriptHookV\
+- cd lib/ScriptHookV/
+- 'echo Downloading ScriptHookV ...'
+- appveyor DownloadFile https://www.dropbox.com/s/jbp5s0m86xnoo4m/ScriptHookV_1.0.393.4a.zip?dl=1 -FileName ScriptHookV.zip
+- echo Download completed. Extracting ...
+- 7z x ScriptHookV.zip
+- echo Extraction completed. Compiling ...
+- cd ../../
+- mkdir lib\ScriptHookVDotNet\
+- cd lib/ScriptHookVDotNet/
+- 'echo Downloading ScriptHookVDotNet ...'
+- appveyor DownloadFile https://github.com/crosire/scripthookvdotnet/releases/download/v2.1/ScriptHookVDotNet.zip -FileName ScriptHookVDotNet.zip
+- echo Download completed. Extracting ...
+- 7z x ScriptHookVDotNet.zip
+- echo Extraction completed. Compiling ...
+- cd ../../
+- mkdir lib\NativeUI\
+- cd lib/NativeUI/
+- 'echo Downloading NativeUI ...'
+- appveyor DownloadFile https://github.com/Guad/NativeUI/releases/download/1.4/NativeUI.zip -FileName NativeUI.zip
+- echo Download completed. Extracting ...
+- 7z x NativeUI.zip
+- echo Extraction completed. Compiling ...
+- cd ../../
+- mkdir lib\EasyHook\
+- cd lib/EasyHook/
+- 'echo Downloading EasyHook ...'
+- appveyor DownloadFile https://github.com/EasyHook/EasyHook/releases/download/v2.7.5726.0/EasyHook-2.7.5726.0-Binaries.zip -FileName EasyHook.zip
+- echo Download completed. Extracting ...
+- 7z x EasyHook.zip
+- echo Extraction completed. Compiling ...
+- cd ../../
+- mkdir lib\EyeXSDK\
+- cd lib/EyeXSDK/
+- 'echo Downloading EyeXSDK ...'
+- appveyor DownloadFile https://www.dropbox.com/s/qt4jtg4y4ispoua/TobiiEyeXSdk-DotNet-1.5.466.zip?dl=1 -FileName EyeXSDK.zip
+- echo Download completed. Extracting ...
+- 7z x EyeXSDK.zip
+- echo Extraction completed. Compiling ...
+- cd ../../
+before_build:
+  - nuget restore
+build:
+  project: Gta5EyeTracking.sln
+  parallel: true
+  verbosity: minimal
+artifacts:
+- path: bin/
+  name: Gta5EyeTracking_bundle
+- path: bin/scripts/
+  name: Gta5EyeTracking
+deploy:
+- provider: GitHub
+  tag: $(appveyor_repo_tag_name)
+  release: Gta5EyeTracking $(appveyor_repo_tag_name)
+  auth_token:
+    secure: XGNrRPut5e3rnjwY8YkPnlOlz18Qd/XvWUfnsAeOYZkmeoJp/zH10uOURNlK726f
+  artifact: Gta5EyeTracking
+  draft: true
+  on:
+    branch: master
+    appveyor_repo_tag: true
