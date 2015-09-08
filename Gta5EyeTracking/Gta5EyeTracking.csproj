@@ -56,15 +56,11 @@
     <Reference Include="EyeXFramework">
       <HintPath>..\lib\EyeXSDK\lib\x64\EyeXFramework.dll</HintPath>
     </Reference>
-    <Reference Include="MemoryAccess">
-      <HintPath>..\x64\Debug\MemoryAccess.dll</HintPath>
-    </Reference>
     <Reference Include="NativeUI">
       <HintPath>..\lib\NativeUI\NativeUI.dll</HintPath>
     </Reference>
-    <Reference Include="ScriptHookVDotNet, Version=0.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>E:\Games\Rockstar Games\Grand Theft Auto V\ScriptHookVDotNet.dll</HintPath>
+    <Reference Include="ScriptHookVDotNet">
+      <HintPath>..\lib\ScriptHookVDotNet\ScriptHookVDotNet.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX, Version=2.6.3.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -115,11 +111,18 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MemoryAccess\MemoryAccess.vcxproj">
+      <Project>{3b6acfed-0b3c-4e64-b419-f8651fd42e9f}</Project>
+      <Name>MemoryAccess</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\SharpDX.2.6.3\build\SharpDX.targets" Condition="Exists('..\packages\SharpDX.2.6.3\build\SharpDX.targets')" />
   <PropertyGroup>
     <PostBuildEvent>rd /s /q "$(SolutionDir)bin\"
 xcopy "$(ProjectDir)bin\x64\Release\Gta5EyeTracking.dll" "$(SolutionDir)bin\scripts\"
+xcopy "$(ProjectDir)bin\x64\Release\MemoryAccess.dll" "$(SolutionDir)bin\scripts\"
 
 xcopy "$(SolutionDir)licenses\*.*" "$(SolutionDir)bin\scripts\licenses\*.*"
 
