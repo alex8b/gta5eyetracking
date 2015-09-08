@@ -33,21 +33,22 @@ install:
 - 7z x EyeXSDK.zip
 - echo Extraction completed. Compiling ...
 - cd ../../
-
+before_build:
+  - nuget restore
 build:
   project: Gta5EyeTracking.sln
   parallel: true
   verbosity: minimal
 artifacts:
 - path: bin/Release/
-  name: ScriptHookVDotNet
+  name: Gta5EyeTracking
 deploy:
 - provider: GitHub
   tag: $(appveyor_repo_tag_name)
-  release: ScriptHookVDotNet $(appveyor_repo_tag_name)
+  release: Gta5EyeTracking $(appveyor_repo_tag_name)
   auth_token:
-    secure: yXWwz+eBEafzOqCBMb7z/gvhR9eZ5YZuCgwtvZ6UiCyA8tWabAEjQadromc7f7vM
-  artifact: ScriptHookVDotNet
+    secure: XGNrRPut5e3rnjwY8YkPnlOlz18Qd/XvWUfnsAeOYZkmeoJp/zH10uOURNlK726f
+  artifact: Gta5EyeTracking
   draft: true
   on:
     branch: master
