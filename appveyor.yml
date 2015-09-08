@@ -28,7 +28,7 @@ install:
 - mkdir lib\EyeXSDK\
 - cd lib/EyeXSDK/
 - 'echo Downloading EyeXSDK ...'
-- appveyor DownloadFile https://drive.google.com/uc?export=download&id=0B6-bgpo2fEmJOG1UOURiMUJDRms -FileName EyeXSDK.zip
+- appveyor DownloadFile https://www.dropbox.com/s/qt4jtg4y4ispoua/TobiiEyeXSdk-DotNet-1.5.466.zip?dl=1 -FileName EyeXSDK.zip
 - echo Download completed. Extracting ...
 - 7z x EyeXSDK.zip
 - echo Extraction completed. Compiling ...
