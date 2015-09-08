@@ -236,7 +236,7 @@ namespace Gta5EyeTracking
 		        camMatInvert.Invert();
 		        var worldPointVector = camMatInvert * screenPointVector;
                 var result = new Vector3(worldPointVector.M11, worldPointVector.M21, worldPointVector.M31);
-                UI.ShowSubtitle("Point: " + Math.Round(result.X, 1) + " | " + Math.Round(result.Y, 1) + " | " + Math.Round(result.Z, 1));
+                //UI.ShowSubtitle("Point: " + Math.Round(result.X, 1) + " | " + Math.Round(result.Y, 1) + " | " + Math.Round(result.Z, 1));
 		        return result;
 		    }
             return new Vector3(0,0,0);
