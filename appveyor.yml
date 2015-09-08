@@ -7,9 +7,17 @@ assembly_info:
   assembly_file_version: '{version}'
   assembly_informational_version: '{version}'
 install:
+- mkdir lib\ScriptHookV\
+- cd lib/ScriptHookV/
+- 'echo Downloading ScriptHookV ...'
+- appveyor DownloadFile http://www.dev-c.com/files/ScriptHookV_1.0.393.4a.zip -FileName ScriptHookV.zip
+- echo Download completed. Extracting ...
+- 7z x ScriptHookV.zip
+- echo Extraction completed. Compiling ...
+- cd ../../
 - mkdir lib\ScriptHookVDotNet\
 - cd lib/ScriptHookVDotNet/
-- 'echo Downloading ScriptHook.NET ...'
+- 'echo Downloading ScriptHookVDotNet ...'
 - appveyor DownloadFile https://github.com/crosire/scripthookvdotnet/releases/download/v2.1/ScriptHookVDotNet.zip -FileName ScriptHookVDotNet.zip
 - echo Download completed. Extracting ...
 - 7z x ScriptHookVDotNet.zip
@@ -46,6 +54,8 @@ build:
   parallel: true
   verbosity: minimal
 artifacts:
+- path: bin/
+  name: Gta5EyeTracking_bundle
 - path: bin/scripts/
   name: Gta5EyeTracking
 deploy:

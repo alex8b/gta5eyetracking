@@ -128,7 +128,16 @@ xcopy "$(SolutionDir)lib\EyeXSDK\lib\x64\Tobii.EyeX.Client.Net20.dll" "$(Solutio
 xcopy "$(SolutionDir)lib\EyeXSDK\lib\x64\Tobii.EyeX.Client.dll" "$(SolutionDir)bin\scripts\"
 
 xcopy "$(ProjectDir)bin\x64\Release\SharpDX.dll" "$(SolutionDir)bin\scripts\"
-xcopy "$(ProjectDir)bin\x64\Release\SharpDX.XInput.dll" "$(SolutionDir)bin\scripts\"</PostBuildEvent>
+xcopy "$(ProjectDir)bin\x64\Release\SharpDX.XInput.dll" "$(SolutionDir)bin\scripts\"
+
+xcopy "$(SolutionDir)lib\ScriptHookVDotNet\ScriptHookVDotNet.asi" "$(SolutionDir)bin\"
+xcopy "$(SolutionDir)lib\ScriptHookVDotNet\ScriptHookVDotNet.dll" "$(SolutionDir)bin\"
+xcopy "$(SolutionDir)lib\ScriptHookVDotNet\ScriptHookVDotNet.dll.metagen" "$(SolutionDir)bin\"
+
+xcopy "$(SolutionDir)lib\ScriptHookV\bin\NativeTrainer.asi" "$(SolutionDir)bin\"
+xcopy "$(SolutionDir)lib\ScriptHookV\bin\ScriptHookV.dll" "$(SolutionDir)bin\"
+xcopy "$(SolutionDir)lib\ScriptHookV\bin\dinput8.dll" "$(SolutionDir)bin\"
+</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
