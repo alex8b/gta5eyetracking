@@ -114,6 +114,22 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\SharpDX.2.6.3\build\SharpDX.targets" Condition="Exists('..\packages\SharpDX.2.6.3\build\SharpDX.targets')" />
+  <PropertyGroup>
+    <PostBuildEvent>rd /s /q "$(SolutionDir)bin\"
+xcopy "$(ProjectDir)bin\x64\Release\Gta5EyeTracking.dll" "$(SolutionDir)bin\scripts\"
+
+xcopy "$(SolutionDir)licenses\*.*" "$(SolutionDir)bin\scripts\licenses\*.*"
+
+xcopy "$(SolutionDir)lib\EasyHook\NetFX4.0\EasyHook64.dll" "$(SolutionDir)bin\scripts\"
+xcopy "$(SolutionDir)lib\EasyHook\NetFX4.0\EasyHook.dll" "$(SolutionDir)bin\scripts\"
+
+xcopy "$(SolutionDir)lib\EyeXSDK\lib\x64\EyeXFramework.dll" "$(SolutionDir)bin\scripts\"
+xcopy "$(SolutionDir)lib\EyeXSDK\lib\x64\Tobii.EyeX.Client.Net20.dll" "$(SolutionDir)bin\scripts\"
+xcopy "$(SolutionDir)lib\EyeXSDK\lib\x64\Tobii.EyeX.Client.dll" "$(SolutionDir)bin\scripts\"
+
+xcopy "$(ProjectDir)bin\x64\Release\SharpDX.dll" "$(SolutionDir)bin\scripts\"
+xcopy "$(ProjectDir)bin\x64\Release\SharpDX.XInput.dll" "$(SolutionDir)bin\scripts\"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

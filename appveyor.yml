@@ -40,7 +40,7 @@ build:
   parallel: true
   verbosity: minimal
 artifacts:
-- path: Gta5EyeTracking/bin/x64/Release/
+- path: bin/scripts/
   name: Gta5EyeTracking
 deploy:
 - provider: GitHub
