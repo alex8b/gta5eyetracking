@@ -51,10 +51,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EasyHook">
-      <HintPath>..\lib\EasyHook\EasyHook.dll</HintPath>
+      <HintPath>..\lib\EasyHook\NetFX4.0\EasyHook.dll</HintPath>
     </Reference>
     <Reference Include="EyeXFramework">
-      <HintPath>..\lib\EyeXSDK\EyeXFramework.dll</HintPath>
+      <HintPath>..\lib\EyeXSDK\lib\x64\EyeXFramework.dll</HintPath>
     </Reference>
     <Reference Include="NativeUI">
       <HintPath>..\lib\NativeUI\NativeUI.dll</HintPath>
@@ -80,7 +80,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="Tobii.EyeX.Client.Net20">
-      <HintPath>..\lib\EyeXSDK\Tobii.EyeX.Client.Net20.dll</HintPath>
+      <HintPath>..\lib\EyeXSDK\lib\x64\Tobii.EyeX.Client.Net20.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
