@@ -34,7 +34,7 @@ namespace Gta5EyeTracking
 			const float raycastFromDist = 1f;
 
             //var target3D = ScreenRelToWorld(screenCoord);
-            var target3D = ScreenRelToWorld(new Vector2(0,0));
+            var target3D = ScreenRelToWorld(new Vector2(0.0f,0.0f));
 			var source3D = camPos;
 
 			Entity ignoreEntity = Game.Player.Character;
@@ -176,13 +176,43 @@ namespace Gta5EyeTracking
 			return true;
 		}
 
+        public static bool WorldToScreenRel2(Vector3 entityPosition, out Vector2 screenCoords)
+        {
+            var mView = Util.GetCameraMatrix();
+
+            var vForward = mView.Row4;
+            var vRight = mView.Row2;
+            var vUpward = mView.Row3;
+
+            var result = new SharpDX.Vector3(0,0,0);
+            result.Z = (vForward.X * entityPosition.X) + (vForward.Y * entityPosition.Y) + (vForward.Z * entityPosition.Z) + vForward.W;
+            result.X = (vRight.X * entityPosition.X) + (vRight.Y * entityPosition.Y) + (vRight.Z * entityPosition.Z) + vRight.W;
+            result.Y = (vUpward.X * entityPosition.X) + (vUpward.Y * entityPosition.Y) + (vUpward.Z * entityPosition.Z) + vUpward.W;
+            if (result.Z < 0.001f)
+            {
+                screenCoords = new Vector2(0, 0);
+                return false;
+            }
+
+            float invw = 1.0f / result.Z;
+            result.X *= invw;
+            result.Y *= invw;
+            screenCoords = new Vector2(result.X, result.Y);
+            return true;
+        }
+
         public static Vector3 ScreenRelToWorld(Vector2 screenCoordsRel)
 	    {
-	        SharpDX.Matrix camMat = Util.GetCameraMatrix();
-		    var screenPointVector = new SharpDX.Matrix(screenCoordsRel.X, 0, 0, 0,
-                                                       screenCoordsRel.Y, 0, 0, 0,
-                                                       1,       0, 0, 0,
-                                                       0,       0, 0, 0);
+            var mView = Util.GetCameraMatrix();
+
+
+            var camMat = mView;
+            var screenPointVector = new SharpDX.Matrix(screenCoordsRel.X, screenCoordsRel.Y, 1, 0,
+                                                       0, 0, 0, 0,
+                                                       0, 0, 0, 0,
+                                                       0, 0, 0, 0);
+
+
 		    var epsilon = 0.00001;
             UI.ShowSubtitle("Cam: " + Math.Round(camMat.M11, 1) + " " + Math.Round(camMat.M12, 1) + " " + Math.Round(camMat.M13, 1) + " " + Math.Round(camMat.M14, 1)
              + "\n | " + Math.Round(camMat.M21, 1) + " " + Math.Round(camMat.M22, 1) + " " + Math.Round(camMat.M23, 1) + " " + Math.Round(camMat.M24, 1)
@@ -191,9 +221,9 @@ namespace Gta5EyeTracking
 		    if (Math.Abs(camMat.Determinant()) > epsilon)
 		    {
 		        var camMatInvert = camMat;
-		        camMatInvert.Invert();
-		        var worldPointVector = camMatInvert * screenPointVector;
-                var result = new Vector3(worldPointVector.M11, worldPointVector.M21, worldPointVector.M31);
+                camMatInvert.Invert();
+		        var worldPointVector = screenPointVector * camMatInvert;
+                var result = new Vector3(worldPointVector.M11, worldPointVector.M12, worldPointVector.M13);
                 
 		        return result;
 		    }
