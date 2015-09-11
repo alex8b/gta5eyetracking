@@ -48,7 +48,8 @@ install:
 - echo Extraction completed. Compiling ...
 - cd ../../
 before_build:
-  - nuget restore
+- set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
+- nuget restore
 build:
   project: Gta5EyeTracking.sln
   parallel: true
