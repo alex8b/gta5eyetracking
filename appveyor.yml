@@ -1,5 +1,7 @@
 configuration: Release
 platform: x64
+environment:
+  VisualStudioVersion: 14.0
 assembly_info:
   patch: true
   file: Gta5EyeTracking\Properties\AssemblyInfo.cs
