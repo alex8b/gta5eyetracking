@@ -550,12 +550,12 @@ namespace Gta5EyeTracking
 				}
 
 				Vector2 screenCoords;
-				if (Geometry.WorldToScreenRel(shootCoord, out screenCoords))
+				if (Geometry.WorldToScreenRel(new Vector3(0,0,0), out screenCoords))
 				{
 					_aiming.MoveCrosshair(screenCoords);
                     _debugOutput.DebugText2.Caption = "1: " + Math.Round(screenCoords.X, 1) + " | " + Math.Round(screenCoords.Y, 1);
                 }
-                if (Geometry.WorldToScreenRel2(shootCoord, out screenCoords))
+                if (Geometry.WorldToScreenRel2(new Vector3(0, 0, 0), out screenCoords))
                 {
                     _debugOutput.DebugText3.Caption = "2: " + Math.Round(screenCoords.X, 1) + " | " + Math.Round(screenCoords.Y, 1);
                 }

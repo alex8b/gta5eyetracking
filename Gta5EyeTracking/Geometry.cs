@@ -1,8 +1,10 @@
 using System;
+using System.IO.MemoryMappedFiles;
 using System.Reflection;
 using GTA;
 using GTA.Math;
 using GTA.Native;
+using Tobii.EyeX.Client.Interop;
 
 namespace Gta5EyeTracking
 {
@@ -33,8 +35,7 @@ namespace Gta5EyeTracking
 			const float raycastToDist = 200.0f;
 			const float raycastFromDist = 1f;
 
-            //var target3D = ScreenRelToWorld(screenCoord);
-            var target3D = ScreenRelToWorld(new Vector2(0.0f,0.0f));
+            var target3D = ScreenRelToWorld(new Vector2(0,0));
 			var source3D = camPos;
 
 			Entity ignoreEntity = Game.Player.Character;
@@ -185,19 +186,26 @@ namespace Gta5EyeTracking
             var vUpward = mView.Row3;
 
             var result = new SharpDX.Vector3(0,0,0);
-            result.Z = (vForward.X * entityPosition.X) + (vForward.Y * entityPosition.Y) + (vForward.Z * entityPosition.Z) + vForward.W;
-            result.X = (vRight.X * entityPosition.X) + (vRight.Y * entityPosition.Y) + (vRight.Z * entityPosition.Z) + vRight.W;
+            result.X = (vForward.X * entityPosition.X) + (vForward.Y * entityPosition.Y) + (vForward.Z * entityPosition.Z) + vForward.W;
+            result.Z = (vRight.X * entityPosition.X) + (vRight.Y * entityPosition.Y) + (vRight.Z * entityPosition.Z) + vRight.W;
             result.Y = (vUpward.X * entityPosition.X) + (vUpward.Y * entityPosition.Y) + (vUpward.Z * entityPosition.Z) + vUpward.W;
-            if (result.Z < 0.001f)
-            {
-                screenCoords = new Vector2(0, 0);
-                return false;
-            }
 
-            float invw = 1.0f / result.Z;
+            UI.ShowSubtitle("Result: " + Math.Round(result.X, 1) + " " + Math.Round(result.Y, 1) + " " + Math.Round(result.Z, 1) 
+
+                + "\n Cam: " + Math.Round(mView.M11, 1) + " " + Math.Round(mView.M12, 1) + " " + Math.Round(mView.M13, 1) + " " + Math.Round(mView.M14, 1)
++ "\n " + Math.Round(mView.M21, 1) + " " + Math.Round(mView.M22, 1) + " " + Math.Round(mView.M23, 1) + " " + Math.Round(mView.M24, 1)
++ "\n " + Math.Round(mView.M31, 1) + " " + Math.Round(mView.M32, 1) + " " + Math.Round(mView.M33, 1) + " " + Math.Round(mView.M34, 1)
++ "\n " + Math.Round(mView.M41, 1) + " " + Math.Round(mView.M42, 1) + " " + Math.Round(mView.M43, 1) + " " + Math.Round(mView.M44, 1));
+            //if (result.Z < 0.001f)
+            //{
+            //    screenCoords = new Vector2(0, 0);
+            //    return false;
+            //}
+
+            float invw = 1;//1.0f / result.Z;
             result.X *= invw;
             result.Y *= invw;
-            screenCoords = new Vector2(result.X, result.Y);
+            screenCoords = new Vector2(result.X * 2, result.Y * 2);
             return true;
         }
 
@@ -214,10 +222,7 @@ namespace Gta5EyeTracking
 
 
 		    var epsilon = 0.00001;
-            UI.ShowSubtitle("Cam: " + Math.Round(camMat.M11, 1) + " " + Math.Round(camMat.M12, 1) + " " + Math.Round(camMat.M13, 1) + " " + Math.Round(camMat.M14, 1)
-             + "\n | " + Math.Round(camMat.M21, 1) + " " + Math.Round(camMat.M22, 1) + " " + Math.Round(camMat.M23, 1) + " " + Math.Round(camMat.M24, 1)
-             + "\n | " + Math.Round(camMat.M31, 1) + " " + Math.Round(camMat.M32, 1) + " " + Math.Round(camMat.M33, 1) + " " + Math.Round(camMat.M34, 1)
-             + "\n | " + Math.Round(camMat.M41, 1) + " " + Math.Round(camMat.M42, 1) + " " + Math.Round(camMat.M43, 1) + " " + Math.Round(camMat.M44, 1));
+
 		    if (Math.Abs(camMat.Determinant()) > epsilon)
 		    {
 		        var camMatInvert = camMat;

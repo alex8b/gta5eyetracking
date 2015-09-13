@@ -12,6 +12,17 @@ namespace MemoryAccess
 	{
 	public:
 		static Matrix GetCurrentCameraMatrix(System::IntPtr baseAddress, int length);
+		static DWORD64 GetPointer();
 	};
+
+	class CViewPortGame
+	{
+	public:
+		char _0x0000[588];
+		float mViewMatrix[16]; //0x024C 
+
+	};//Size=0x028C
+
+	CViewPortGame* g_pViewPortGame;
 }
 #endif
