@@ -380,11 +380,10 @@ namespace Gta5EyeTracking
             //debug
            
             var result = Geometry.ScreenRelToWorld(new Vector2(0.0f, 0.0f));
-            //_debugOutput.DebugText3.Caption = "Point: " + Math.Round(result.X, 1) + " | " + Math.Round(result.Y, 1) +
-            //                                  " | " + Math.Round(result.Z, 1);
-            //_debugOutput.DebugText2.Caption = "Cam: " + Math.Round(GameplayCamera.Position.X, 1) + " | " + Math.Round(GameplayCamera.Position.Y, 1) +
-            //                                  " | " + Math.Round(GameplayCamera.Position.Z, 1);
-            //end Debug
+            _debugOutput.DebugText1.Caption = "Point: " + Math.Round(result.X, 1) + " | " + Math.Round(result.Y, 1) +
+                                              " | " + Math.Round(result.Z, 1);
+            _debugOutput.DebugText2.Caption = "Cam: " + Math.Round(GameplayCamera.Position.X, 1) + " | " + Math.Round(GameplayCamera.Position.Y, 1) +
+                                              " | " + Math.Round(GameplayCamera.Position.Z, 1);
 
 
             target = null;
@@ -553,7 +552,7 @@ namespace Gta5EyeTracking
 				if (Geometry.WorldToScreenRel(new Vector3(0,0,0), out screenCoords))
 				{
 					_aiming.MoveCrosshair(screenCoords);
-                    _debugOutput.DebugText2.Caption = "1: " + Math.Round(screenCoords.X, 1) + " | " + Math.Round(screenCoords.Y, 1);
+                   // _debugOutput.DebugText2.Caption = "1: " + Math.Round(screenCoords.X, 1) + " | " + Math.Round(screenCoords.Y, 1);
                 }
                 if (Geometry.WorldToScreenRel2(new Vector3(0, 0, 0), out screenCoords))
                 {

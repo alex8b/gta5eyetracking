@@ -180,57 +180,59 @@ namespace Gta5EyeTracking
         public static bool WorldToScreenRel2(Vector3 entityPosition, out Vector2 screenCoords)
         {
             var mView = Util.GetCameraMatrix();
+            mView.Transpose();
 
             var vForward = mView.Row4;
             var vRight = mView.Row2;
             var vUpward = mView.Row3;
 
             var result = new SharpDX.Vector3(0,0,0);
-            result.X = (vForward.X * entityPosition.X) + (vForward.Y * entityPosition.Y) + (vForward.Z * entityPosition.Z) + vForward.W;
-            result.Z = (vRight.X * entityPosition.X) + (vRight.Y * entityPosition.Y) + (vRight.Z * entityPosition.Z) + vRight.W;
+            result.Z = (vForward.X * entityPosition.X) + (vForward.Y * entityPosition.Y) + (vForward.Z * entityPosition.Z) + vForward.W;
+            result.X = (vRight.X * entityPosition.X) + (vRight.Y * entityPosition.Y) + (vRight.Z * entityPosition.Z) + vRight.W;
             result.Y = (vUpward.X * entityPosition.X) + (vUpward.Y * entityPosition.Y) + (vUpward.Z * entityPosition.Z) + vUpward.W;
 
-            UI.ShowSubtitle("Result: " + Math.Round(result.X, 1) + " " + Math.Round(result.Y, 1) + " " + Math.Round(result.Z, 1) 
+            if (result.Z < 0.001f)
+            {
+                screenCoords = new Vector2(0, 0);
+                return false;
+            }
 
-                + "\n Cam: " + Math.Round(mView.M11, 1) + " " + Math.Round(mView.M12, 1) + " " + Math.Round(mView.M13, 1) + " " + Math.Round(mView.M14, 1)
-+ "\n " + Math.Round(mView.M21, 1) + " " + Math.Round(mView.M22, 1) + " " + Math.Round(mView.M23, 1) + " " + Math.Round(mView.M24, 1)
-+ "\n " + Math.Round(mView.M31, 1) + " " + Math.Round(mView.M32, 1) + " " + Math.Round(mView.M33, 1) + " " + Math.Round(mView.M34, 1)
-+ "\n " + Math.Round(mView.M41, 1) + " " + Math.Round(mView.M42, 1) + " " + Math.Round(mView.M43, 1) + " " + Math.Round(mView.M44, 1));
-            //if (result.Z < 0.001f)
-            //{
-            //    screenCoords = new Vector2(0, 0);
-            //    return false;
-            //}
-
-            float invw = 1;//1.0f / result.Z;
+            float invw = 1.0f / result.Z;
             result.X *= invw;
             result.Y *= invw;
-            screenCoords = new Vector2(result.X * 2, result.Y * 2);
+            screenCoords = new Vector2(result.X, result.Y);
             return true;
         }
 
         public static Vector3 ScreenRelToWorld(Vector2 screenCoordsRel)
 	    {
             var mView = Util.GetCameraMatrix();
-
-
-            var camMat = mView;
-            var screenPointVector = new SharpDX.Matrix(screenCoordsRel.X, screenCoordsRel.Y, 1, 0,
-                                                       0, 0, 0, 0,
-                                                       0, 0, 0, 0,
-                                                       0, 0, 0, 0);
-
+            mView.Transpose();
 
 		    var epsilon = 0.00001;
 
-		    if (Math.Abs(camMat.Determinant()) > epsilon)
+            if (Math.Abs(mView.Determinant()) > epsilon)
 		    {
-		        var camMatInvert = camMat;
+		        var camMatInvert = mView;
                 camMatInvert.Invert();
-		        var worldPointVector = screenPointVector * camMatInvert;
-                var result = new Vector3(worldPointVector.M11, worldPointVector.M12, worldPointVector.M13);
-                
-		        return result;
+
+                var vForward = mView.Row2;
+                var vRight = mView.Row3;
+                var vUpward = mView.Row4;
+
+                var result = new Vector3(0, 0, 0);
+                result.Y = (vForward.X * 0) + (vForward.Y * screenCoordsRel.X) + (vForward.Z * screenCoordsRel.Y) + vForward.W;
+                result.Z = (vRight.X * 0) + (vRight.Y * screenCoordsRel.X) + (vRight.Z * screenCoordsRel.Y) + vRight.W;
+                result.X = (vUpward.X * 0) + (vUpward.Y * screenCoordsRel.X) + (vUpward.Z * screenCoordsRel.Y) + vUpward.W;
+
+                UI.ShowSubtitle("Result: " + Math.Round(result.X, 1) + " " + Math.Round(result.Y, 1) + " " + Math.Round(result.Z, 1) 
+
++ "\n Cam: " + Math.Round(mView.M11, 1) + " " + Math.Round(mView.M12, 1) + " " + Math.Round(mView.M13, 1) + " " + Math.Round(mView.M14, 1)
++ "\n " + Math.Round(mView.M21, 1) + " " + Math.Round(mView.M22, 1) + " " + Math.Round(mView.M23, 1) + " " + Math.Round(mView.M24, 1)
++ "\n " + Math.Round(mView.M31, 1) + " " + Math.Round(mView.M32, 1) + " " + Math.Round(mView.M33, 1) + " " + Math.Round(mView.M34, 1)
++ "\n " + Math.Round(mView.M41, 1) + " " + Math.Round(mView.M42, 1) + " " + Math.Round(mView.M43, 1) + " " + Math.Round(mView.M44, 1));
+
+                return result;
 		    }
             return new Vector3(0,0,0);
 	    }
