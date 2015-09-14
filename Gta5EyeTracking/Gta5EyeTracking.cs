@@ -571,10 +571,11 @@ namespace Gta5EyeTracking
 				if (_settings.IncinerateAtGazeEnabled
 					&& (Game.IsKeyPressed(Keys.J)
 						|| (User32.IsKeyPressed(VirtualKeyStates.VK_XBUTTON2))
-						|| (!_isInAircraft && !_menuOpen && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.A))
-						|| (_isInAircraft && !_menuOpen && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.A))))
+						|| (!_menuOpen && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.A))))
 				{
-					_aiming.Incinerate(shootCoordSnap);
+                    //UI.ShowSubtitle("Inc " + Math.Round(shootCoordSnap.X, 1) + " | " + Math.Round(shootCoordSnap.Y, 1) + " | " + Math.Round(shootCoordSnap.Z, 1) 
+                    //    + "\nCam: " + Math.Round(GameplayCamera.Position.X, 1) + " | " + Math.Round(GameplayCamera.Position.Y, 1) + " | " + Math.Round(GameplayCamera.Position.Z, 1));
+                    _aiming.Incinerate(shootCoordSnap);
 				}
 
 				if (_settings.TaseAtGazeEnabled 

@@ -33,9 +33,9 @@ namespace Gta5EyeTracking
 		{
 		    hitEntity = null;
 			var camPos = GameplayCamera.Position;
-			var camRot = GameplayCamera.Rotation;
 			const float raycastToDist = 200.0f;
 			const float raycastFromDist = 1f;
+		    const float defaultDist = 60.0f;
 
             var target3D = ScreenRelToWorld(screenCoord);
 			var source3D = camPos;
@@ -62,7 +62,7 @@ namespace Gta5EyeTracking
 				return raycastResults.HitCoords;
 			}
 
-			return camPos + dir * raycastToDist;
+			return camPos + dir * defaultDist;
 		}
 
         public static Vector3 ConecastPedsAndVehicles(Vector2 screenCoords, out  Entity hitEntity)
