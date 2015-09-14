@@ -217,7 +217,7 @@ namespace Gta5EyeTracking
 
             var d = 1 - vForward.W;
             var h = screenCoordsRel.X - vRight.W;
-            var s = screenCoordsRel.Y - vUpward.W;
+            var s = -screenCoordsRel.Y - vUpward.W;
 
             SharpDX.Matrix m = new Matrix(vForward.X, vForward.Y, vForward.Z, 0,
                 vRight.X, vRight.Y, vRight.Z, 0,
