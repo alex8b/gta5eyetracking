@@ -121,6 +121,7 @@
   <Import Project="..\packages\SharpDX.2.6.3\build\SharpDX.targets" Condition="Exists('..\packages\SharpDX.2.6.3\build\SharpDX.targets')" />
   <PropertyGroup>
     <PostBuildEvent>rd /s /q "$(SolutionDir)bin\"
+
 xcopy "$(ProjectDir)bin\x64\Release\Gta5EyeTracking.dll" "$(SolutionDir)bin\scripts\"
 xcopy "$(ProjectDir)bin\x64\Release\MemoryAccess.dll" "$(SolutionDir)bin\scripts\"
 
@@ -136,14 +137,16 @@ xcopy "$(SolutionDir)lib\EyeXSDK\lib\x64\Tobii.EyeX.Client.dll" "$(SolutionDir)b
 xcopy "$(ProjectDir)bin\x64\Release\SharpDX.dll" "$(SolutionDir)bin\scripts\"
 xcopy "$(ProjectDir)bin\x64\Release\SharpDX.XInput.dll" "$(SolutionDir)bin\scripts\"
 
-xcopy "$(SolutionDir)lib\ScriptHookVDotNet\ScriptHookVDotNet.asi" "$(SolutionDir)bin\"
-xcopy "$(SolutionDir)lib\ScriptHookVDotNet\ScriptHookVDotNet.dll" "$(SolutionDir)bin\"
-xcopy "$(SolutionDir)lib\ScriptHookVDotNet\ScriptHookVDotNet.dll.metagen" "$(SolutionDir)bin\"
+xcopy "$(SolutionDir)lib\ScriptHookVDotNet\ScriptHookVDotNet.asi" "$(SolutionDir)bin\bundle\"
+xcopy "$(SolutionDir)lib\ScriptHookVDotNet\ScriptHookVDotNet.dll" "$(SolutionDir)bin\bundle\"
+xcopy "$(SolutionDir)lib\ScriptHookVDotNet\ScriptHookVDotNet.dll.metagen" "$(SolutionDir)bin\bundle\"
 
-xcopy "$(SolutionDir)lib\ScriptHookV\bin\NativeTrainer.asi" "$(SolutionDir)bin\"
-xcopy "$(SolutionDir)lib\ScriptHookV\bin\ScriptHookV.dll" "$(SolutionDir)bin\"
-xcopy "$(SolutionDir)lib\ScriptHookV\bin\dinput8.dll" "$(SolutionDir)bin\"
-</PostBuildEvent>
+xcopy "$(SolutionDir)lib\ScriptHookV\bin\NativeTrainer.asi" "$(SolutionDir)bin\bundle\"
+xcopy "$(SolutionDir)lib\ScriptHookV\bin\ScriptHookV.dll" "$(SolutionDir)bin\bundle\"
+xcopy "$(SolutionDir)lib\ScriptHookV\bin\dinput8.dll" "$(SolutionDir)bin\bundle\"
+
+xcopy "$(SolutionDir)bin\scripts" "$(SolutionDir)bin\bundle\scripts" /s /i
+xcopy "$(SolutionDir)lib\NativeUI\NativeUI.dll" "$(SolutionDir)bin\bundle\scripts\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

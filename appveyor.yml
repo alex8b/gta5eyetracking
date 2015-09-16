@@ -59,7 +59,7 @@ build:
   parallel: true
   verbosity: minimal
 artifacts:
-- path: bin/
+- path: bin/bundle/
   name: Gta5EyeTracking_bundle
 - path: bin/scripts/
   name: Gta5EyeTracking
