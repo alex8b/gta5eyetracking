@@ -27,7 +27,9 @@ namespace Gta5EyeTracking
 			_settings = settings;
 
 			CreateMenu();
-		}
+
+            _menuPool.DisableInstructionalButtons = true;
+        }
 
 		private void CreateMenu()
 		{
