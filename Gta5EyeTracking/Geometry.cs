@@ -1,10 +1,8 @@
 using System;
-using System.IO.MemoryMappedFiles;
 using System.Reflection;
 using GTA;
 using GTA.Native;
 using SharpDX;
-using Tobii.EyeX.Client.Interop;
 using Vector2 = GTA.Math.Vector2;
 using Vector3 = GTA.Math.Vector3;
 
@@ -206,7 +204,7 @@ namespace Gta5EyeTracking
             return true;
         }
 
-        private static Vector3 ViewMatrixToCamPos(Matrix mView)
+        private static Vector3 ViewMatrixToCameraPosition(Matrix mView)
         {
             mView.Transpose();
 
@@ -228,6 +226,9 @@ namespace Gta5EyeTracking
 
             var top = (n2n3 * d1) + (n3n1 * d2) + (n1n2 * d3);
             var denom = Vector3.Dot(n1, n2n3);
+
+            var epsilon = 0.0000001;
+            if  (Math.Abs(denom) < epsilon) return new Vector3();
 
             return top / -denom;
         }
@@ -269,18 +270,13 @@ namespace Gta5EyeTracking
             var detz = mz.Determinant();
 
             var epsilon = 0.0000001;
-            if (!(Math.Abs(d) > epsilon))
-            {
-                return new Vector3();
-            }
-
-            return new Vector3(detx / det, dety / det, detz / det);
-        }
+            return Math.Abs(det) < epsilon ? new Vector3() : new Vector3(detx / det, dety / det, detz / det);
+	    }
         public static void ScreenRelToWorld(Vector2 screenCoordsRel, out Vector3 camPoint, out Vector3 farPoint)
 	    {
             var mView = Util.GetCameraMatrix();
 
-            camPoint = ViewMatrixToCamPos(mView);
+            camPoint = ViewMatrixToCameraPosition(mView);
             farPoint = ScreenRelToWorld(mView, screenCoordsRel);
 
             //UI.ShowSubtitle("Cam: " + Math.Round(camPoint.X, 1) + " " + Math.Round(camPoint.Y, 1) + " " +
