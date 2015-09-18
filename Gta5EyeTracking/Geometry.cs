@@ -32,13 +32,13 @@ namespace Gta5EyeTracking
 		public static Vector3 RaycastEverything(Vector2 screenCoord, out Entity hitEntity, bool skipProjection)
 		{
 		    hitEntity = null;
-			var camPos = GameplayCamera.Position;
 			const float raycastToDist = 200.0f;
 			const float raycastFromDist = 1f;
 		    const float defaultDist = 60.0f;
 
-            var target3D = ScreenRelToWorld(screenCoord);
-			var source3D = camPos;
+		    Vector3 source3D;
+		    Vector3 target3D;
+            ScreenRelToWorld(screenCoord, out source3D, out target3D);
 
 			Entity ignoreEntity = Game.Player.Character;
 			if (Game.Player.Character.IsInVehicle())
@@ -62,7 +62,7 @@ namespace Gta5EyeTracking
 				return raycastResults.HitCoords;
 			}
 
-			return camPos + dir * defaultDist;
+			return source3D + dir * defaultDist;
 		}
 
         public static Vector3 ConecastPedsAndVehicles(Vector2 screenCoords, out  Entity hitEntity)
@@ -166,7 +166,7 @@ namespace Gta5EyeTracking
 			return mindist < searchRange ? foundVeh : null;
 		}
 
-		public static bool WorldToScreenRel(Vector3 worldCoords, out Vector2 screenCoords)
+		public static bool WorldToScreenRel_Native(Vector3 worldCoords, out Vector2 screenCoords)
 		{
 			var num1 = new OutputArgument();
 			var num2 = new OutputArgument();
@@ -179,7 +179,7 @@ namespace Gta5EyeTracking
 			return true;
 		}
 
-        public static bool WorldToScreenRel2(Vector3 entityPosition, out Vector2 screenCoords)
+        public static bool WorldToScreenRel(Vector3 entityPosition, out Vector2 screenCoords)
         {
             var mView = Util.GetCameraMatrix();
             mView.Transpose();
@@ -202,13 +202,38 @@ namespace Gta5EyeTracking
             float invw = 1.0f / result.Z;
             result.X *= invw;
             result.Y *= invw;
-            screenCoords = new Vector2(result.X, result.Y);
+            screenCoords = new Vector2(result.X, -result.Y);
             return true;
         }
 
-        public static Vector3 ScreenRelToWorld(Vector2 screenCoordsRel)
+        private static Vector3 ViewMatrixToCamPos(Matrix mView)
+        {
+            mView.Transpose();
+
+            var vForward = mView.Row4;
+            var vRight = mView.Row2;
+            var vUpward = mView.Row3;
+
+            var n1 = new Vector3(vForward.X, vForward.Y, vForward.Z);
+            var n2 = new Vector3(vRight.X, vRight.Y, vRight.Z);
+            var n3 = new Vector3(vUpward.X, vUpward.Y, vUpward.Z);
+
+            var d1 = vForward.W;
+            var d2 = vRight.W;
+            var d3 = vUpward.W;
+
+            var n2n3 = Vector3.Cross(n2, n3);
+            var n3n1 = Vector3.Cross(n3, n1);
+            var n1n2 = Vector3.Cross(n1, n2);
+
+            var top = (n2n3 * d1) + (n3n1 * d2) + (n1n2 * d3);
+            var denom = Vector3.Dot(n1, n2n3);
+
+            return top / -denom;
+        }
+
+        private static Vector3 ScreenRelToWorld(Matrix mView, Vector2 screenCoordsRel)
 	    {
-            var mView = Util.GetCameraMatrix();
             mView.Transpose();
 
             var vForward = mView.Row4;
@@ -219,43 +244,54 @@ namespace Gta5EyeTracking
             var h = screenCoordsRel.X - vRight.W;
             var s = -screenCoordsRel.Y - vUpward.W;
 
-            SharpDX.Matrix m = new Matrix(vForward.X, vForward.Y, vForward.Z, 0,
+            var m = new Matrix(vForward.X, vForward.Y, vForward.Z, 0,
                 vRight.X, vRight.Y, vRight.Z, 0,
                 vUpward.X, vUpward.Y, vUpward.Z, 0,
                 0, 0, 0, 1);
             var det = m.Determinant();
 
-            SharpDX.Matrix mx = new Matrix(d, vForward.Y, vForward.Z, 0,
+            var mx = new Matrix(d, vForward.Y, vForward.Z, 0,
                 h, vRight.Y, vRight.Z, 0,
                 s, vUpward.Y, vUpward.Z, 0,
                 0, 0, 0, 1);
             var detx = mx.Determinant();
 
-            SharpDX.Matrix my = new Matrix(vForward.X, d, vForward.Z, 0,
+            var my = new Matrix(vForward.X, d, vForward.Z, 0,
                 vRight.X, h, vRight.Z, 0,
                 vUpward.X, s, vUpward.Z, 0,
                 0, 0, 0, 1);
             var dety = my.Determinant();
 
-            SharpDX.Matrix mz = new Matrix(vForward.X, vForward.Y, d, 0,
+            var mz = new Matrix(vForward.X, vForward.Y, d, 0,
                 vRight.X, vRight.Y, h, 0,
                 vUpward.X, vUpward.Y, s, 0,
                 0, 0, 0, 1);
             var detz = mz.Determinant();
 
             var epsilon = 0.0000001;
-            if (!(Math.Abs(d) > epsilon)) return new Vector3(0, 0, 0);
+            if (!(Math.Abs(d) > epsilon))
+            {
+                return new Vector3();
+            }
 
-            var result = new Vector3(detx / det, dety / det, detz / det);
-               
-//                UI.ShowSubtitle("Result: " + Math.Round(result.X, 1) + " " + Math.Round(result.Y, 1) + " " + Math.Round(result.Z, 1) 
+            return new Vector3(detx / det, dety / det, detz / det);
+        }
+        public static void ScreenRelToWorld(Vector2 screenCoordsRel, out Vector3 camPoint, out Vector3 farPoint)
+	    {
+            var mView = Util.GetCameraMatrix();
+
+            camPoint = ViewMatrixToCamPos(mView);
+            farPoint = ScreenRelToWorld(mView, screenCoordsRel);
+
+            //UI.ShowSubtitle("Cam: " + Math.Round(camPoint.X, 1) + " " + Math.Round(camPoint.Y, 1) + " " +
+            //                Math.Round(camPoint.Z, 1)
+            //                + "\nResult: " + Math.Round(farPoint.X, 1) + " " + Math.Round(farPoint.Y, 1) + " " +
+            //                Math.Round(farPoint.Z, 1));
 
 //+ "\n Cam: " + Math.Round(mView.M11, 1) + " " + Math.Round(mView.M12, 1) + " " + Math.Round(mView.M13, 1) + " " + Math.Round(mView.M14, 1)
 //+ "\n " + Math.Round(mView.M21, 1) + " " + Math.Round(mView.M22, 1) + " " + Math.Round(mView.M23, 1) + " " + Math.Round(mView.M24, 1)
 //+ "\n " + Math.Round(mView.M31, 1) + " " + Math.Round(mView.M32, 1) + " " + Math.Round(mView.M33, 1) + " " + Math.Round(mView.M34, 1)
 //+ "\n " + Math.Round(mView.M41, 1) + " " + Math.Round(mView.M42, 1) + " " + Math.Round(mView.M43, 1) + " " + Math.Round(mView.M44, 1));
-
-            return result;
 	    }
 
 		public static RaycastResult Raycast(Vector3 source, Vector3 target, int options, Entity entity)

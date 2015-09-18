@@ -302,9 +302,10 @@ namespace Gta5EyeTracking
 			Vector3 shootMissileCoord;
 			Ped ped;
 		    Entity target;
-            FindGazeProjection(out shootCoord, out shootCoordSnap, out shootMissileCoord, out ped, out target);
+		    bool isSnapped;
+            FindGazeProjection(out shootCoord, out shootCoordSnap, out shootMissileCoord, out ped, out target, out isSnapped);
 
-			ProcessControls(shootCoord, shootCoordSnap, shootMissileCoord, ped, target);
+			ProcessControls(shootCoord, shootCoordSnap, shootMissileCoord, ped, target, isSnapped);
             
 			//TurnHead(ped, shootCoord);
 			_menuPool.ProcessMenus();
@@ -375,10 +376,11 @@ namespace Gta5EyeTracking
 			}
 		}
 
-        private void FindGazeProjection(out Vector3 shootCoord, out Vector3 shootCoordSnap, out Vector3 shootMissileCoord, out Ped ped, out Entity target)
+        private void FindGazeProjection(out Vector3 shootCoord, out Vector3 shootCoordSnap, out Vector3 shootMissileCoord, out Ped ped, out Entity target, out bool isSnapped)
         {
+            isSnapped = false;
             //debug
-           
+
             //var result = Geometry.ScreenRelToWorld(new Vector2(0.0f, 0.0f));
             //_debugOutput.DebugText1.Caption = "Point: " + Math.Round(result.X, 2) + " | " + Math.Round(result.Y, 2) +
             //                                  " | " + Math.Round(result.Z, 2);
@@ -430,7 +432,7 @@ namespace Gta5EyeTracking
 				if (_settings.SnapAtPedestriansEnabled)
 				{
 					shootCoord = shootCoordSnap;
-                    
+				    isSnapped = true;
 				}
 			}
 			else
@@ -474,7 +476,7 @@ namespace Gta5EyeTracking
 			}           
 		}
 
-		private void ProcessControls(Vector3 shootCoord, Vector3 shootCoordSnap, Vector3 shootMissileCoord, Ped ped, Entity target)
+		private void ProcessControls(Vector3 shootCoord, Vector3 shootCoordSnap, Vector3 shootMissileCoord, Ped ped, Entity target, bool isSnapped)
 		{
 			var controllerState = _controllerEmulation.ControllerState;
 
@@ -548,12 +550,27 @@ namespace Gta5EyeTracking
 					//Game.Player.Character.Rotation = new Vector3(Game.Player.Character.Rotation.X, Game.Player.Character.Rotation.Y, _headingToTarget);
 				}
 
-				Vector2 screenCoords;
-				if (Geometry.WorldToScreenRel(shootCoord, out screenCoords))
-				{
-					_aiming.MoveCrosshair(screenCoords);
-                   // _debugOutput.DebugText2.Caption = "1: " + Math.Round(screenCoords.X, 1) + " | " + Math.Round(screenCoords.Y, 1);
+			    if ((Game.Player.Character.IsInPlane || Game.Player.Character.IsInHeli)
+                         && target != null && Util.IsEntityAVehicle(target))
+                {
+                    Vector2 screenCoords;
+                    if (Geometry.WorldToScreenRel(target.Position, out screenCoords))
+                    {
+                        _aiming.MoveCrosshair(screenCoords);
+                        // _debugOutput.DebugText2.Caption = "1: " + Math.Round(screenCoords.X, 1) + " | " + Math.Round(screenCoords.Y, 1);
+                    }
                 }
+                else
+			    {
+                    Vector2 screenCoords;
+                    if (Geometry.WorldToScreenRel(shootCoord, out screenCoords))
+                    {
+                        _aiming.MoveCrosshair(screenCoords);
+                        // _debugOutput.DebugText2.Caption = "1: " + Math.Round(screenCoords.X, 1) + " | " + Math.Round(screenCoords.Y, 1);
+                    }
+                    //_aiming.MoveCrosshair(_gazePlusJoystickDelta);
+                }
+
                 //if (Geometry.WorldToScreenRel2(new Vector3(0, 0, 0), out screenCoords))
                 //{
                 //    _debugOutput.DebugText3.Caption = "2: " + Math.Round(screenCoords.X, 1) + " | " + Math.Round(screenCoords.Y, 1);
