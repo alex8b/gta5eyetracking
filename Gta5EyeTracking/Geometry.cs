@@ -150,7 +150,7 @@ namespace Gta5EyeTracking
 			foreach (var vehicle in vehs)
 			{
 				if ((Game.Player.Character.IsInVehicle()) && (vehicle.Handle == Game.Player.Character.CurrentVehicle.Handle)) continue; //you own veh
-				//if (vehicle.IsOccluded) continue;
+				if (vehicle.IsOccluded) continue;
 				var vehOffset = vehicle.Position;
 				Vector2 vehScreenCoords;
 			    

@@ -102,7 +102,7 @@ namespace Gta5EyeTracking
 
             _missileLockedStopwatch = new Stopwatch();
             _missileLockedStopwatch.Restart();
-            _missileLockedMinTime = TimeSpan.FromSeconds(1.5);
+            _missileLockedMinTime = TimeSpan.FromSeconds(0.75);
 
             _foregroundWindowWatcher = new ForegroundWindowWatcher();
 			_foregroundWindowWatcher.ForegroundWindowChanged += ForegroundWindowWatcherOnForegroundWindowChanged;
@@ -579,7 +579,6 @@ namespace Gta5EyeTracking
                     {
                         _aiming.MoveCrosshair(screenCoords);
                         _aiming.MissileLockedCrosshairVisible = true;
-                        // _debugOutput.DebugText2.Caption = "1: " + Math.Round(screenCoords.X, 1) + " | " + Math.Round(screenCoords.Y, 1);
                     }
                 }
                 else
@@ -589,16 +588,8 @@ namespace Gta5EyeTracking
                     {
                         _aiming.MoveCrosshair(screenCoords);
                         _aiming.MissileLockedCrosshairVisible = false;
-
-                        // _debugOutput.DebugText2.Caption = "1: " + Math.Round(screenCoords.X, 1) + " | " + Math.Round(screenCoords.Y, 1);
                     }
-                    //_aiming.MoveCrosshair(_gazePlusJoystickDelta);
                 }
-
-                //if (Geometry.WorldToScreenRel2(new Vector3(0, 0, 0), out screenCoords))
-                //{
-                //    _debugOutput.DebugText3.Caption = "2: " + Math.Round(screenCoords.X, 1) + " | " + Math.Round(screenCoords.Y, 1);
-                //}
 
                 if (_settings.AimWithGazeEnabled 
 					&& _isInVehicle
@@ -614,8 +605,6 @@ namespace Gta5EyeTracking
 						|| (User32.IsKeyPressed(VirtualKeyStates.VK_XBUTTON2))
 						|| (!_menuOpen && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.A))))
 				{
-                    //UI.ShowSubtitle("Inc " + Math.Round(shootCoordSnap.X, 1) + " | " + Math.Round(shootCoordSnap.Y, 1) + " | " + Math.Round(shootCoordSnap.Z, 1) 
-                    //    + "\nCam: " + Math.Round(GameplayCamera.Position.X, 1) + " | " + Math.Round(GameplayCamera.Position.Y, 1) + " | " + Math.Round(GameplayCamera.Position.Z, 1));
                     _aiming.Incinerate(shootCoordSnap);
 				}
 
