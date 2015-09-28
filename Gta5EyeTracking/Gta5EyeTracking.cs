@@ -57,7 +57,15 @@ namespace Gta5EyeTracking
 		private readonly ForegroundWindowWatcher _foregroundWindowWatcher;
 		private bool _isWindowForeground;
 
-		public Gta5EyeTracking()
+        private bool _shutDownRequestFlag;
+        private readonly ManualResetEvent _shutDownRequestedEvent;
+        private readonly DeadzoneEditor _deadzoneEditor;
+
+        private readonly Stopwatch _missileLockedStopwatch;
+	    private readonly TimeSpan _missileLockedMinTime;
+	    private Entity _missileTarget;
+
+	    public Gta5EyeTracking()
 		{
             Util.Log("Begin Initialize");
             _shutDownRequestedEvent = new ManualResetEvent(false);
@@ -92,7 +100,11 @@ namespace Gta5EyeTracking
 
 			_tickStopwatch = new Stopwatch();
 
-			_foregroundWindowWatcher = new ForegroundWindowWatcher();
+            _missileLockedStopwatch = new Stopwatch();
+            _missileLockedStopwatch.Restart();
+            _missileLockedMinTime = TimeSpan.FromSeconds(1.5);
+
+            _foregroundWindowWatcher = new ForegroundWindowWatcher();
 			_foregroundWindowWatcher.ForegroundWindowChanged += ForegroundWindowWatcherOnForegroundWindowChanged;
 			_isWindowForeground = _foregroundWindowWatcher.IsWindowForeground();
 
@@ -354,10 +366,6 @@ namespace Gta5EyeTracking
 			_lastControllerConnected = controllerConnected;
 		}
 
-	    private bool _shutDownRequestFlag;
-	    private readonly ManualResetEvent _shutDownRequestedEvent;
-	    private readonly DeadzoneEditor _deadzoneEditor;
-
 	    private void TurnHead(Ped ped, Vector3 shootCoord)
 		{
 			if (ped != null && ped.Handle != Game.Player.Character.Handle)
@@ -458,7 +466,19 @@ namespace Gta5EyeTracking
 				    _debugOutput.DebugText4.Caption = "veh " + vehicle.Handle;
 				}
 			}
-			var playerDistToGround = Game.Player.Character.Position.Z - World.GetGroundHeight(Game.Player.Character.Position);
+
+            if (target != null && target.IsAlive)
+            {
+                _missileTarget = target;
+                _missileLockedStopwatch.Restart();
+            }
+
+            if (_missileLockedStopwatch.Elapsed > _missileLockedMinTime)
+            {
+                _missileTarget = null;
+            }
+
+            var playerDistToGround = Game.Player.Character.Position.Z - World.GetGroundHeight(Game.Player.Character.Position);
 			var targetDir = shootMissileCoord - Game.Player.Character.Position;
 			targetDir.Normalize();
 			var justBeforeTarget = shootMissileCoord - targetDir;
@@ -550,13 +570,15 @@ namespace Gta5EyeTracking
 					//Game.Player.Character.Rotation = new Vector3(Game.Player.Character.Rotation.X, Game.Player.Character.Rotation.Y, _headingToTarget);
 				}
 
-			    if ((Game.Player.Character.IsInPlane || Game.Player.Character.IsInHeli)
-                         && target != null && Util.IsEntityAVehicle(target))
+			    if ((_settings.MissilesAtGazeEnabled
+                        && Game.Player.Character.IsInVehicle())
+                        && _missileTarget != null)
                 {
                     Vector2 screenCoords;
-                    if (Geometry.WorldToScreenRel(target.Position, out screenCoords))
+                    if (Geometry.WorldToScreenRel(_missileTarget.Position, out screenCoords))
                     {
                         _aiming.MoveCrosshair(screenCoords);
+                        _aiming.MissileLockedCrosshairVisible = true;
                         // _debugOutput.DebugText2.Caption = "1: " + Math.Round(screenCoords.X, 1) + " | " + Math.Round(screenCoords.Y, 1);
                     }
                 }
@@ -566,6 +588,8 @@ namespace Gta5EyeTracking
                     if (Geometry.WorldToScreenRel(shootCoord, out screenCoords))
                     {
                         _aiming.MoveCrosshair(screenCoords);
+                        _aiming.MissileLockedCrosshairVisible = false;
+
                         // _debugOutput.DebugText2.Caption = "1: " + Math.Round(screenCoords.X, 1) + " | " + Math.Round(screenCoords.Y, 1);
                     }
                     //_aiming.MoveCrosshair(_gazePlusJoystickDelta);
@@ -616,9 +640,9 @@ namespace Gta5EyeTracking
 					|| Game.IsKeyPressed(Keys.PageDown)
 					|| (!radialMenuActive && !_menuOpen && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.B))))
 				{
-				    if (target != null)
+				    if (_missileTarget != null)
 				    {
-				        _aiming.ShootMissile(target);
+				        _aiming.ShootMissile(_missileTarget);
 				    }
 				    else
 				    {
