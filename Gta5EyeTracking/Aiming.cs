@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics;
-using System.Drawing;
-using System.Windows.Forms;
+using Gta5EyeTracking.Crosshairs;
 using Gta5EyeTracking.HomingMissiles;
 using GTA;
 using GTA.Math;
@@ -13,45 +12,27 @@ namespace Gta5EyeTracking
 	public class Aiming: DisposableBase
 	{
     	public bool AlwaysShowCrosshair { get; set; }
+		public bool MissileLockedCrosshairVisible { get; set; }
 
-        private bool _missileLockedCrosshairVisible;
-        public bool MissileLockedCrosshairVisible
-	    {
-	        get { return _missileLockedCrosshairVisible; }
-	        set
-	        {
-	            _missileLockedCrosshairVisible = value;
-	            _uiContainerMissileLockedCrosshair.Enabled = value;
-	            _uiContainerCrosshair.Enabled = !value;
-	        }
-	    }
+		private readonly MissileLockCrosshair _missileLockCrosshair;
+		private readonly DotCrosshair _dotCrosshair;
 
-	    private readonly Stopwatch _shootStopWatch;
-		private UIContainer _uiContainerCrosshair;
-        private UIContainer _uiContainerMissileLockedCrosshair;
+		private readonly Stopwatch _shootStopWatch;
 
-        private bool _drawCrosshair;
+		private bool _drawCrosshair;
 		private Vector2 _crosshairPosition;
 		private readonly Settings _settings;
 	    private readonly HomingMissilesHelper _homingMissilesHelper;
 
-        private int _missileLockedCrosshairColorDelta;
-        private readonly Stopwatch _missileLockedCrosshairAnimateStopwatch;
-	    private TimeSpan _missileLockedCrosshairAnimateFrameTime;
-
-	    public Aiming(Settings settings)
+		public Aiming(Settings settings)
 		{
 			_settings = settings;
 			_shootStopWatch = new Stopwatch();
 			_shootStopWatch.Restart();
 
-            _missileLockedCrosshairAnimateStopwatch = new Stopwatch();
-            _missileLockedCrosshairAnimateStopwatch.Restart();
-            _missileLockedCrosshairAnimateFrameTime = TimeSpan.FromSeconds(0.02);
-
-            _homingMissilesHelper = new HomingMissilesHelper();
-			CreateCrosshair();
-	        CreateMissileLockedCrosshair();
+			_homingMissilesHelper = new HomingMissilesHelper();
+			_missileLockCrosshair = new MissileLockCrosshair();
+			_dotCrosshair = new DotCrosshair();
 		}
 
 	    protected override void DisposeManagedResources()
@@ -59,76 +40,7 @@ namespace Gta5EyeTracking
 	        _homingMissilesHelper.Dispose();
 	    }
 
-	    private void CreateCrosshair()
-		{
-			_uiContainerCrosshair = new UIContainer(new Point(0, 0), new Size(4, 4), Color.FromArgb(0, 0, 0, 0));
-			var crosshair1 = new UIRectangle(new Point(0, 0), new Size(4, 4), Color.FromArgb(220, 0, 0, 0));
-			_uiContainerCrosshair.Items.Add(crosshair1);
-			var crosshair2 = new UIRectangle(new Point(1, 1), new Size(2, 2), Color.FromArgb(220, 255, 255, 255));
-			_uiContainerCrosshair.Items.Add(crosshair2);
-		}
-
-        private void CreateMissileLockedCrosshair()
-        {
-            _uiContainerMissileLockedCrosshair = new UIContainer(new Point(0, 0), new Size(40, 40), Color.FromArgb(0, 0, 0, 0));
-            var color = Color.FromArgb(220, 255, 50, 50);
-            var crosshair1 = new UIRectangle(new Point(0, 0), new Size(5, 2), color);
-            _uiContainerMissileLockedCrosshair.Items.Add(crosshair1);
-            var crosshair2 = new UIRectangle(new Point(0, 38), new Size(5, 2), color);
-            _uiContainerMissileLockedCrosshair.Items.Add(crosshair2);
-            var crosshair3 = new UIRectangle(new Point(0, 2), new Size(2, 3), color);
-            _uiContainerMissileLockedCrosshair.Items.Add(crosshair3);
-            var crosshair4 = new UIRectangle(new Point(38, 2), new Size(2, 3), color);
-            _uiContainerMissileLockedCrosshair.Items.Add(crosshair4);
-
-            var crosshair5 = new UIRectangle(new Point(35, 0), new Size(5, 2), color);
-            _uiContainerMissileLockedCrosshair.Items.Add(crosshair5);
-            var crosshair6 = new UIRectangle(new Point(35, 38), new Size(5, 2), color);
-            _uiContainerMissileLockedCrosshair.Items.Add(crosshair6);
-            var crosshair7= new UIRectangle(new Point(0, 35), new Size(2, 3), color);
-            _uiContainerMissileLockedCrosshair.Items.Add(crosshair7);
-            var crosshair8 = new UIRectangle(new Point(38, 35), new Size(2, 3), color);
-            _uiContainerMissileLockedCrosshair.Items.Add(crosshair8);
-        }
-        
-        private void AnimateMissileLockedCrosshair()
-        {
-            var color1 = Color.FromArgb(220, 255, 50, 50);
-            var color2 = Color.FromArgb(220, 255, 205, 0);
-            var delta = 0.0;
-
-            if (_missileLockedCrosshairAnimateStopwatch.Elapsed > _missileLockedCrosshairAnimateFrameTime)
-            {
-                _missileLockedCrosshairColorDelta++;
-                _missileLockedCrosshairAnimateStopwatch.Restart();
-            }
-
-            if (_missileLockedCrosshairColorDelta > 200)
-            {
-                _missileLockedCrosshairColorDelta = 0;
-                delta = _missileLockedCrosshairColorDelta * 0.01;
-            }
-            else if (_missileLockedCrosshairColorDelta > 100)
-            {
-                delta = (200 - _missileLockedCrosshairColorDelta)*0.01;
-            }
-            else
-            {
-                delta = _missileLockedCrosshairColorDelta * 0.01;
-            }
-
-            var a = color1.A + (color2.A - color1.A)*delta;
-            var r = color1.R + (color2.R - color1.R) * delta;
-            var g = color1.G + (color2.G - color1.G) * delta;
-            var b = color1.B + (color2.B - color1.B) * delta;
-            var color = Color.FromArgb((int) a, (int) r, (int) g, (int) b);
-            foreach (var el in _uiContainerMissileLockedCrosshair.Items)
-            {
-                el.Color = color;
-            }
-        }
-
-        public void Shoot(Vector3 target)
+		public void Shoot(Vector3 target)
 		{
 			_drawCrosshair = true;
 			var weaponPos = Game.Player.Character.Position;
@@ -245,15 +157,17 @@ namespace Gta5EyeTracking
 				_drawCrosshair = true;
 			}
 
-			if (_drawCrosshair)
+			if (_drawCrosshair
+				&& !MissileLockedCrosshairVisible)
 			{
-				_uiContainerCrosshair.Draw();
-            }
+				_dotCrosshair.Render();
+			}
 
-		    if (_settings.MissilesAtGazeEnabled && Game.Player.Character.IsInVehicle())
+		    if (_settings.MissilesAtGazeEnabled 
+				&& Game.Player.Character.IsInVehicle()
+				&& MissileLockedCrosshairVisible)
 		    {
-                _uiContainerMissileLockedCrosshair.Draw();
-                AnimateMissileLockedCrosshair();
+			    _missileLockCrosshair.Render();
             }
 		    
             _homingMissilesHelper.Process();
@@ -270,8 +184,8 @@ namespace Gta5EyeTracking
 			_crosshairPosition = new Vector2(_crosshairPosition.X + (crosshairPosition.X - _crosshairPosition.X) * w,
 				_crosshairPosition.Y + (crosshairPosition.Y - _crosshairPosition.Y) * w);
 
-			_uiContainerCrosshair.Position = new Point((int)_crosshairPosition.X - _uiContainerCrosshair.Size.Width / 2, (int)_crosshairPosition.Y - -_uiContainerCrosshair.Size.Height / 2);
-            _uiContainerMissileLockedCrosshair.Position = new Point((int)_crosshairPosition.X - _uiContainerMissileLockedCrosshair.Size.Width / 2, (int)_crosshairPosition.Y - _uiContainerMissileLockedCrosshair.Size.Height / 2);
-        }
+		    _dotCrosshair.Move(_crosshairPosition);
+		    _missileLockCrosshair.Move(_crosshairPosition);
+		}
 	}
 }

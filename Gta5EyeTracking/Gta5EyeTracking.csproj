@@ -84,6 +84,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Aiming.cs" />
+    <Compile Include="Crosshairs\Crosshair.cs" />
+    <Compile Include="Crosshairs\DotCrosshair.cs" />
     <Compile Include="Deadzones\Deadzone.cs" />
     <Compile Include="Deadzones\DeadzoneEditor.cs" />
     <Compile Include="DebugOutput.cs" />
@@ -99,6 +101,7 @@
     <Compile Include="HidEmulation\MouseEmulation.cs" />
     <Compile Include="HidEmulation\MouseApi.cs" />
     <Compile Include="GazeVisualization.cs" />
+    <Compile Include="Crosshairs\MissileLockCrosshair.cs" />
     <Compile Include="PedestrianInteraction\PedestrianInteraction.cs" />
     <Compile Include="PedestrianInteraction\PedInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
