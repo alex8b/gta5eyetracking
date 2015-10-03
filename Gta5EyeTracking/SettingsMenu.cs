@@ -42,7 +42,7 @@ namespace Gta5EyeTracking
             CreateThirdPersonFreelookMenu();
             CreateFirstPersonFreelookMenu();
             CreateDeadzoneMenu();
-		    _freelookDevice = new UIMenuListItem("Freelook Device", _freelookDevices, (int)_settings.FreelookDevice, "Device to use for freelook");
+		    _freelookDevice = new UIMenuListItem("Freelook Device", _freelookDevices, (int)_settings.FreelookDevice, "Device to use for freelook. We recommend using XBOX 360 Controller or any other XInput compatible.");
 			_freelookDevice.OnListChanged += (sender, args) => { _settings.FreelookDevice = (FeeelookDevice)_freelookDevice.Index; };
 			_mainMenu.AddItem(_freelookDevice);
 
@@ -62,7 +62,7 @@ namespace Gta5EyeTracking
 			aimingSensitivitySlider.OnListChanged += (sender, args) => { _settings.AimingSensitivity = aimingSensitivitySlider.IndexToItem(aimingSensitivitySlider.Index); };
 			_mainMenu.AddItem(aimingSensitivitySlider);
 
-			var aimWithGaze = new UIMenuCheckboxItem("Aim With Gaze", _settings.AimWithGazeEnabled, "Aim with gaze");
+			var aimWithGaze = new UIMenuCheckboxItem("Aim With Gaze", _settings.AimWithGazeEnabled, "Your gun will shoot where you look. Use the RIGHT JOYSTICK while HOLDING LEFT THUMB to fine adjust the crosshair around your gaze point while shooting.");
 			aimWithGaze.CheckboxEvent += (sender, args) => { _settings.AimWithGazeEnabled = aimWithGaze.Checked; };
 			_mainMenu.AddItem(aimWithGaze);
 
@@ -70,27 +70,27 @@ namespace Gta5EyeTracking
 			snapAtPedestrians.CheckboxEvent += (sender, args) => { _settings.SnapAtPedestriansEnabled = snapAtPedestrians.Checked; };
 			_mainMenu.AddItem(snapAtPedestrians);
 
-			var gazeFilteringSlider = new UIMenuListItem("Gaze Filter", _values0To1, (int)Math.Round(_settings.GazeFiltering / 0.1), "Filter gaze data");
+			var gazeFilteringSlider = new UIMenuListItem("Gaze Filter", _values0To1, (int)Math.Round(_settings.GazeFiltering / 0.1), "Filter gaze data. Higher values lead to a more stable crosshair, but higher latency.");
 			gazeFilteringSlider.OnListChanged += (sender, args) => { _settings.GazeFiltering = gazeFilteringSlider.IndexToItem(gazeFilteringSlider.Index); };
 			_mainMenu.AddItem(gazeFilteringSlider);
 
-			var incinerateAtGaze = new UIMenuCheckboxItem("Incinerate At Gaze", _settings.IncinerateAtGazeEnabled, "Incinerate at gaze");
+			var incinerateAtGaze = new UIMenuCheckboxItem("Incinerate At Gaze", _settings.IncinerateAtGazeEnabled, "Use A button to incinerate at gaze");
 			incinerateAtGaze.CheckboxEvent += (sender, args) => { _settings.IncinerateAtGazeEnabled = incinerateAtGaze.Checked; };
 			_mainMenu.AddItem(incinerateAtGaze);
 
-			var taseAtGaze = new UIMenuCheckboxItem("Tase At Gaze", _settings.TaseAtGazeEnabled, "Tase at gaze");
+			var taseAtGaze = new UIMenuCheckboxItem("Tase At Gaze", _settings.TaseAtGazeEnabled, "Use RB to use tase people remotely with your eyes");
 			taseAtGaze.CheckboxEvent += (sender, args) => { _settings.TaseAtGazeEnabled = taseAtGaze.Checked; };
 			_mainMenu.AddItem(taseAtGaze);
 
-			var missilesAtGaze = new UIMenuCheckboxItem("Launch Missiles At Gaze", _settings.MissilesAtGazeEnabled, "Launch missiles at gaze");
+			var missilesAtGaze = new UIMenuCheckboxItem("Launch Missiles At Gaze", _settings.MissilesAtGazeEnabled, "Use B button to launch missiles at gaze");
 			missilesAtGaze.CheckboxEvent += (sender, args) => { _settings.MissilesAtGazeEnabled = missilesAtGaze.Checked; };
 			_mainMenu.AddItem(missilesAtGaze);
 
-			var pedestrianIntreraction = new UIMenuCheckboxItem("Pedestrian Interaction", _settings.PedestrianInteractionEnabled, "Pedestrians talk to you");
+			var pedestrianIntreraction = new UIMenuCheckboxItem("Pedestrian Interaction", _settings.PedestrianInteractionEnabled, "Pedestrians will talk to you if you stare at them for too long");
 			pedestrianIntreraction.CheckboxEvent += (sender, args) => { _settings.PedestrianInteractionEnabled = pedestrianIntreraction.Checked; };
 			_mainMenu.AddItem(pedestrianIntreraction);
 
-			var dontFallFromBikes = new UIMenuCheckboxItem("Don't Fall From Bikes", _settings.DontFallFromBikesEnabled, "Never fall from bikes");
+			var dontFallFromBikes = new UIMenuCheckboxItem("Don't Fall From Bikes", _settings.DontFallFromBikesEnabled, "You won't fall from a bike when you crash");
 			dontFallFromBikes.CheckboxEvent += (sender, args) => { _settings.DontFallFromBikesEnabled = dontFallFromBikes.Checked; };
 			_mainMenu.AddItem(dontFallFromBikes);
 
