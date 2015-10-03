@@ -66,7 +66,7 @@ namespace Gta5EyeTracking
 			aimWithGaze.CheckboxEvent += (sender, args) => { _settings.AimWithGazeEnabled = aimWithGaze.Checked; };
 			_mainMenu.AddItem(aimWithGaze);
 
-			var snapAtPedestrians = new UIMenuCheckboxItem("Snap At Pedestrians", _settings.SnapAtPedestriansEnabled, "Snap aim at pedestrians");
+			var snapAtPedestrians = new UIMenuCheckboxItem("Snap At Pedestrians", _settings.SnapAtPedestriansEnabled, "Snap crosshair at pedestrians. Makes it less challenging to aim with gaze.");
 			snapAtPedestrians.CheckboxEvent += (sender, args) => { _settings.SnapAtPedestriansEnabled = snapAtPedestrians.Checked; };
 			_mainMenu.AddItem(snapAtPedestrians);
 
@@ -74,15 +74,15 @@ namespace Gta5EyeTracking
 			gazeFilteringSlider.OnListChanged += (sender, args) => { _settings.GazeFiltering = gazeFilteringSlider.IndexToItem(gazeFilteringSlider.Index); };
 			_mainMenu.AddItem(gazeFilteringSlider);
 
-			var incinerateAtGaze = new UIMenuCheckboxItem("Incinerate At Gaze", _settings.IncinerateAtGazeEnabled, "Push A button to incinerate at gaze");
+			var incinerateAtGaze = new UIMenuCheckboxItem("Incinerate At Gaze", _settings.IncinerateAtGazeEnabled, "Push A button to burn things where you look. This feature replaces the default command for A button.");
 			incinerateAtGaze.CheckboxEvent += (sender, args) => { _settings.IncinerateAtGazeEnabled = incinerateAtGaze.Checked; };
 			_mainMenu.AddItem(incinerateAtGaze);
 
-			var taseAtGaze = new UIMenuCheckboxItem("Tase At Gaze", _settings.TaseAtGazeEnabled, "Push RB to use tase people remotely with your eyes");
+			var taseAtGaze = new UIMenuCheckboxItem("Tase At Gaze", _settings.TaseAtGazeEnabled, "Push RB to tase people remotely with your eyes. Doesn't work in aircrafts. This feature replaces the default command for RB.");
 			taseAtGaze.CheckboxEvent += (sender, args) => { _settings.TaseAtGazeEnabled = taseAtGaze.Checked; };
 			_mainMenu.AddItem(taseAtGaze);
 
-			var missilesAtGaze = new UIMenuCheckboxItem("Launch Missiles At Gaze", _settings.MissilesAtGazeEnabled, "Push B button to launch missiles at gaze");
+			var missilesAtGaze = new UIMenuCheckboxItem("Launch Missiles At Gaze", _settings.MissilesAtGazeEnabled, "Push B button to launch missiles at gaze. This feature replaces the default command for B button.");
 			missilesAtGaze.CheckboxEvent += (sender, args) => { _settings.MissilesAtGazeEnabled = missilesAtGaze.Checked; };
 			_mainMenu.AddItem(missilesAtGaze);
 
