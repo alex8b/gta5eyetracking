@@ -91,6 +91,7 @@
     <Compile Include="DebugOutput.cs" />
     <Compile Include="ForegroundWindowWatcher.cs" />
     <Compile Include="Freelook.cs" />
+    <Compile Include="GazeProjector.cs" />
     <Compile Include="Geometry.cs" />
     <Compile Include="Gta5EyeTracking.cs" />
     <Compile Include="HidEmulation\ControllerEmulation.cs" />

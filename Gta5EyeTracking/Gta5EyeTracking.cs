@@ -32,16 +32,14 @@ namespace Gta5EyeTracking
 		private readonly MouseEmulation _mouseEmulation;
 		private readonly ControllerEmulation _controllerEmulation;
 
-		private Settings _settings;
+		private readonly Settings _settings;
 		private readonly DotCrosshair _gazeVisualization;
 		private readonly PedestrianInteraction _pedestrianInteraction;
 		private readonly DebugOutput _debugOutput;
 		private bool _isPaused;
 		private bool _isInVehicle;
 		private bool _isInAircraft;
-		private Vector2 _gazePointDelta;
-		private Vector2 _gazePlusJoystickDelta;
-		private Vector2 _unfilteredgazePlusJoystickDelta;
+
 		private float _headingToTarget;
 
 		private readonly MenuPool _menuPool;
@@ -60,11 +58,10 @@ namespace Gta5EyeTracking
         private readonly ManualResetEvent _shutDownRequestedEvent;
         private readonly DeadzoneEditor _deadzoneEditor;
 
-        private readonly Stopwatch _missileLockedStopwatch;
-	    private readonly TimeSpan _missileLockedMinTime;
-	    private Entity _missileTarget;
+
 		private readonly SettingsStorage _settingsStorage;
 		private bool _showGazeVisualization;
+		private readonly GazeProjector _gazeProjector;
 
 		public Gta5EyeTracking()
 		{
@@ -79,6 +76,7 @@ namespace Gta5EyeTracking
 			_menuPool = new MenuPool();
 
 			_settingsStorage = new SettingsStorage();
+			_settings = _settingsStorage.LoadSettings();
 			_settingsMenu = new SettingsMenu(_menuPool, _settings);
 		    _deadzoneEditor = new DeadzoneEditor(_settings,_settingsMenu);
 		    
@@ -101,13 +99,11 @@ namespace Gta5EyeTracking
 
 			_tickStopwatch = new Stopwatch();
 
-            _missileLockedStopwatch = new Stopwatch();
-            _missileLockedStopwatch.Restart();
-            _missileLockedMinTime = TimeSpan.FromSeconds(0.75);
-
             _foregroundWindowWatcher = new ForegroundWindowWatcher();
 			_foregroundWindowWatcher.ForegroundWindowChanged += ForegroundWindowWatcherOnForegroundWindowChanged;
 			_isWindowForeground = _foregroundWindowWatcher.IsWindowForeground();
+
+			_gazeProjector = new GazeProjector(_settings);
 
 			KeyDown += OnKeyDown;
 
@@ -171,9 +167,9 @@ namespace Gta5EyeTracking
                 if (_controllerEmulation != null)
                 {
                     _controllerEmulation.Enabled = false;
-                    //_controllerEmulation.OnModifyState -= OnModifyControllerState;
+                    _controllerEmulation.OnModifyState -= OnModifyControllerState;
                     //_controllerEmulation.Dispose();
-                    //TODO:crash!
+                    //TODO: Crash!
                 }
                 if (_settingsMenu != null)
                 {
@@ -230,7 +226,7 @@ namespace Gta5EyeTracking
 
 			_lastNormalizedCenterDelta = new Vector2(normalizedCenterDeltaX, normalizedCenterDeltaY);
 			_gazeVisualization.Move(_lastNormalizedCenterDelta);
-			_gazeStopwatch.Restart();
+            _gazeStopwatch.Restart();
 		}
 
 		public void OnTick(object sender, EventArgs e)
@@ -264,10 +260,27 @@ namespace Gta5EyeTracking
 			Vector3 shootMissileCoord;
 			Ped ped;
 		    Entity target;
-		    bool isSnapped;
-            FindGazeProjection(out shootCoord, out shootCoordSnap, out shootMissileCoord, out ped, out target, out isSnapped);
+			Entity missileTarget;
+			bool isSnapped;
 
-			ProcessControls(shootCoord, shootCoordSnap, shootMissileCoord, ped, target, isSnapped);
+			var controllerState = _controllerEmulation.ControllerState;
+			const float joystickRadius = 0.1f;
+
+			var joystickDelta = new Vector2(controllerState.Gamepad.RightThumbX, -controllerState.Gamepad.RightThumbY) *
+								(1.0f / 32768.0f) * joystickRadius;
+
+			_gazeProjector.FindGazeProjection(
+				_lastNormalizedCenterDelta,
+				joystickDelta,
+                out shootCoord, 
+				out shootCoordSnap, 
+				out shootMissileCoord, 
+				out ped, 
+				out target, 
+				out missileTarget, 
+				out isSnapped);
+
+			ProcessControls(shootCoord, shootCoordSnap, shootMissileCoord, ped, target, missileTarget, isSnapped);
             
 			//TurnHead(ped, shootCoord);
 			_menuPool.ProcessMenus();
@@ -334,119 +347,9 @@ namespace Gta5EyeTracking
 			}
 		}
 
-        private void FindGazeProjection(out Vector3 shootCoord, out Vector3 shootCoordSnap, out Vector3 shootMissileCoord, out Ped ped, out Entity target, out bool isSnapped)
-        {
-            isSnapped = false;
-            //debug
+        
 
-            //var result = Geometry.ScreenRelToWorld(new Vector2(0.0f, 0.0f));
-            //_debugOutput.DebugText1.Caption = "Point: " + Math.Round(result.X, 2) + " | " + Math.Round(result.Y, 2) +
-            //                                  " | " + Math.Round(result.Z, 2);
-            //_debugOutput.DebugText2.Caption = "Cam: " + Math.Round(GameplayCamera.Position.X, 2) + " | " + Math.Round(GameplayCamera.Position.Y, 2) +
-            //                                  " | " + Math.Round(GameplayCamera.Position.Z, 2);
-
-
-            target = null;
-			const float joystickRadius = 0.1f;
-
-			var controllerState = _controllerEmulation.ControllerState;
-
-			var joystickDelta = new Vector2(controllerState.Gamepad.RightThumbX, -controllerState.Gamepad.RightThumbY)*
-								(1.0f/32768.0f)*joystickRadius;
-            
-
-			var w = (float)(1 - _settings.GazeFiltering * 0.9);
-			_gazePointDelta = new Vector2(_gazePointDelta.X + (_lastNormalizedCenterDelta.X - _gazePointDelta.X) * w,
-				_gazePointDelta.Y + (_lastNormalizedCenterDelta.Y - _gazePointDelta.Y) * w);
-
-			_gazePlusJoystickDelta = _gazePointDelta + joystickDelta;
-			_unfilteredgazePlusJoystickDelta = _lastNormalizedCenterDelta;
-
-            Entity unfilteredEntity;
-            Entity filteredEntity;
-            var hitUnfiltered = Geometry.ConecastPedsAndVehicles(_unfilteredgazePlusJoystickDelta, out unfilteredEntity);
-			shootMissileCoord = hitUnfiltered;
-			shootCoordSnap = hitUnfiltered;
-
-
-            var hitFiltered = Geometry.RaycastEverything(_gazePlusJoystickDelta, out filteredEntity, true);
-			shootCoord = hitFiltered;
-
-            if (unfilteredEntity != null
-                && Util.IsEntityAPed(unfilteredEntity))
-            {
-                ped = unfilteredEntity as Ped;
-            }
-            else
-            {
-                ped = Geometry.SearchPed(_unfilteredgazePlusJoystickDelta);
-            }
-            		
-			if ((ped != null)
-				&& (ped.Handle != Game.Player.Character.Handle))
-			{
-				shootCoordSnap = ped.GetBoneCoord(Bone.SKEL_L_Clavicle);
-                target = ped;
-				if (_settings.SnapAtPedestriansEnabled)
-				{
-					shootCoord = shootCoordSnap;
-				    isSnapped = true;
-				}
-			}
-			else
-			{
-			    Vehicle vehicle;
-			    if (unfilteredEntity != null
-			        && Util.IsEntityAPed(unfilteredEntity))
-			    {
-			        vehicle = unfilteredEntity as Vehicle;
-			    }
-			    else
-			    {
-			        vehicle = Geometry.SearchVehicle(_unfilteredgazePlusJoystickDelta);
-			    }
-                _debugOutput.DebugText5.Caption = "raycasing veh " + DateTime.Now;
-				if (vehicle != null
-					&& !((Game.Player.Character.IsInVehicle())
-						&& (vehicle.Handle == Game.Player.Character.CurrentVehicle.Handle)))
-				{
-					shootCoordSnap = vehicle.Position + vehicle.Velocity * 0.06f;
-					shootMissileCoord = shootCoordSnap;
-				    target = vehicle;
-				    _debugOutput.DebugText4.Caption = "veh " + vehicle.Handle;
-				}
-			}
-
-            if (target != null && target.IsAlive)
-            {
-                _missileTarget = target;
-                _missileLockedStopwatch.Restart();
-            }
-
-            if (_missileLockedStopwatch.Elapsed > _missileLockedMinTime)
-            {
-                _missileTarget = null;
-            }
-
-            var playerDistToGround = Game.Player.Character.Position.Z - World.GetGroundHeight(Game.Player.Character.Position);
-			var targetDir = shootMissileCoord - Game.Player.Character.Position;
-			targetDir.Normalize();
-			var justBeforeTarget = shootMissileCoord - targetDir;
-			var targetDistToGround = shootMissileCoord.Z - World.GetGroundHeight(justBeforeTarget);
-			var distToTarget = (Game.Player.Character.Position - shootMissileCoord).Length();
-			if ((playerDistToGround < 2) && (playerDistToGround >= -0.5)) //on the ground 
-			{
-				
-				if (((targetDistToGround < 2) && (targetDistToGround >= -0.5)) //shoot too low
-					|| ((targetDistToGround < 5) && (targetDistToGround >= -0.5) && (distToTarget > 70.0))) //far away add near the ground
-				{
-					shootMissileCoord.Z = World.GetGroundHeight(justBeforeTarget) //ground level at target
-						+ playerDistToGround; //offset
-				}
-			}           
-		}
-
-		private void ProcessControls(Vector3 shootCoord, Vector3 shootCoordSnap, Vector3 shootMissileCoord, Ped ped, Entity target, bool isSnapped)
+		private void ProcessControls(Vector3 shootCoord, Vector3 shootCoordSnap, Vector3 shootMissileCoord, Ped ped, Entity target, Entity missileTarget, bool isSnapped)
 		{
 			var controllerState = _controllerEmulation.ControllerState;
 
@@ -522,10 +425,10 @@ namespace Gta5EyeTracking
 
 			    if ((_settings.MissilesAtGazeEnabled
                         && Game.Player.Character.IsInVehicle())
-                        && _missileTarget != null)
+                        && missileTarget != null)
                 {
                     Vector2 screenCoords;
-                    if (Geometry.WorldToScreenRel(_missileTarget.Position, out screenCoords))
+                    if (Geometry.WorldToScreenRel(missileTarget.Position, out screenCoords))
                     {
                         _aiming.MoveCrosshair(screenCoords);
                         _aiming.MissileLockedCrosshairVisible = true;
@@ -579,9 +482,9 @@ namespace Gta5EyeTracking
 					|| Game.IsKeyPressed(Keys.PageDown)
 					|| (!radialMenuActive && !_menuOpen && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.B))))
 				{
-				    if (_missileTarget != null)
+				    if (missileTarget != null)
 				    {
-				        _aiming.ShootMissile(_missileTarget);
+				        _aiming.ShootMissile(missileTarget);
 				    }
 				    else
 				    {
