@@ -294,7 +294,11 @@ namespace Gta5EyeTracking
 
 			_aiming.Process();
 
-			_debugGazeVisualization.Render();
+			if (_showDebugGazeVisualization)
+			{
+				_debugGazeVisualization.Render();
+			}
+			
 			_debugOutput.Process();
 
 			_pedestrianInteraction.Process(ped, _tickStopwatch.Elapsed);

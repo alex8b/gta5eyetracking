@@ -42,7 +42,7 @@ namespace Gta5EyeTracking
             CreateThirdPersonFreelookMenu();
             CreateFirstPersonFreelookMenu();
             CreateDeadzoneMenu();
-		    _freelookDevice = new UIMenuListItem("Freelook Device", _freelookDevices, (int)_settings.FreelookDevice, "Device to use for freelook. We recommend using XBOX 360 Controller or any other XInput compatible.");
+		    _freelookDevice = new UIMenuListItem("Freelook Device", _freelookDevices, (int)_settings.FreelookDevice, "Device to use for freelook. We recommend using XBOX 360 Controller or any other XInput compatible one.");
 			_freelookDevice.OnListChanged += (sender, args) => { _settings.FreelookDevice = (FeeelookDevice)_freelookDevice.Index; };
 			_mainMenu.AddItem(_freelookDevice);
 
@@ -58,11 +58,11 @@ namespace Gta5EyeTracking
             _mainMenu.AddItem(deadzoneSettings);
             _mainMenu.BindMenuToItem(DeadzoneMenu, deadzoneSettings);
 
-		    var aimingSensitivitySlider = new UIMenuListItem("Aiming Sensitivity", _values0To1, (int)Math.Round(_settings.AimingSensitivity / 0.1), "Freelok sensitivity while aiming");
+		    var aimingSensitivitySlider = new UIMenuListItem("Aiming Sensitivity", _values0To1, (int)Math.Round(_settings.AimingSensitivity / 0.1), "Freelook sensitivity while aiming");
 			aimingSensitivitySlider.OnListChanged += (sender, args) => { _settings.AimingSensitivity = aimingSensitivitySlider.IndexToItem(aimingSensitivitySlider.Index); };
 			_mainMenu.AddItem(aimingSensitivitySlider);
 
-			var aimWithGaze = new UIMenuCheckboxItem("Aim With Gaze", _settings.AimWithGazeEnabled, "Your gun will shoot where you look. Use the RIGHT JOYSTICK while HOLDING LEFT THUMB to fine adjust the crosshair around your gaze point while shooting.");
+			var aimWithGaze = new UIMenuCheckboxItem("Aim With Gaze", _settings.AimWithGazeEnabled, "Your gun will shoot where you look. Move the RIGHT JOYSTICK while HOLDING LEFT THUMB to fine adjust the crosshair around your gaze point while shooting.");
 			aimWithGaze.CheckboxEvent += (sender, args) => { _settings.AimWithGazeEnabled = aimWithGaze.Checked; };
 			_mainMenu.AddItem(aimWithGaze);
 
@@ -70,19 +70,19 @@ namespace Gta5EyeTracking
 			snapAtPedestrians.CheckboxEvent += (sender, args) => { _settings.SnapAtPedestriansEnabled = snapAtPedestrians.Checked; };
 			_mainMenu.AddItem(snapAtPedestrians);
 
-			var gazeFilteringSlider = new UIMenuListItem("Gaze Filter", _values0To1, (int)Math.Round(_settings.GazeFiltering / 0.1), "Filter gaze data. Higher values lead to a more stable crosshair, but higher latency.");
+			var gazeFilteringSlider = new UIMenuListItem("Gaze Filter", _values0To1, (int)Math.Round(_settings.GazeFiltering / 0.1), "Filter gaze data. Higher values will make crosshair movements smoother, but will increase the latency.");
 			gazeFilteringSlider.OnListChanged += (sender, args) => { _settings.GazeFiltering = gazeFilteringSlider.IndexToItem(gazeFilteringSlider.Index); };
 			_mainMenu.AddItem(gazeFilteringSlider);
 
-			var incinerateAtGaze = new UIMenuCheckboxItem("Incinerate At Gaze", _settings.IncinerateAtGazeEnabled, "Use A button to incinerate at gaze");
+			var incinerateAtGaze = new UIMenuCheckboxItem("Incinerate At Gaze", _settings.IncinerateAtGazeEnabled, "Push A button to incinerate at gaze");
 			incinerateAtGaze.CheckboxEvent += (sender, args) => { _settings.IncinerateAtGazeEnabled = incinerateAtGaze.Checked; };
 			_mainMenu.AddItem(incinerateAtGaze);
 
-			var taseAtGaze = new UIMenuCheckboxItem("Tase At Gaze", _settings.TaseAtGazeEnabled, "Use RB to use tase people remotely with your eyes");
+			var taseAtGaze = new UIMenuCheckboxItem("Tase At Gaze", _settings.TaseAtGazeEnabled, "Push RB to use tase people remotely with your eyes");
 			taseAtGaze.CheckboxEvent += (sender, args) => { _settings.TaseAtGazeEnabled = taseAtGaze.Checked; };
 			_mainMenu.AddItem(taseAtGaze);
 
-			var missilesAtGaze = new UIMenuCheckboxItem("Launch Missiles At Gaze", _settings.MissilesAtGazeEnabled, "Use B button to launch missiles at gaze");
+			var missilesAtGaze = new UIMenuCheckboxItem("Launch Missiles At Gaze", _settings.MissilesAtGazeEnabled, "Push B button to launch missiles at gaze");
 			missilesAtGaze.CheckboxEvent += (sender, args) => { _settings.MissilesAtGazeEnabled = missilesAtGaze.Checked; };
 			_mainMenu.AddItem(missilesAtGaze);
 
@@ -90,7 +90,7 @@ namespace Gta5EyeTracking
 			pedestrianIntreraction.CheckboxEvent += (sender, args) => { _settings.PedestrianInteractionEnabled = pedestrianIntreraction.Checked; };
 			_mainMenu.AddItem(pedestrianIntreraction);
 
-			var dontFallFromBikes = new UIMenuCheckboxItem("Don't Fall From Bikes", _settings.DontFallFromBikesEnabled, "You won't fall from a bike when you crash");
+			var dontFallFromBikes = new UIMenuCheckboxItem("Don't Fall From Bikes", _settings.DontFallFromBikesEnabled, "You won't fall from a bike when you crash into something");
 			dontFallFromBikes.CheckboxEvent += (sender, args) => { _settings.DontFallFromBikesEnabled = dontFallFromBikes.Checked; };
 			_mainMenu.AddItem(dontFallFromBikes);
 
