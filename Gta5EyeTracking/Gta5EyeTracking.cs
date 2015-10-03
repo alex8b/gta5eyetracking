@@ -17,93 +17,106 @@ namespace Gta5EyeTracking
 {
 	public class Gta5EyeTracking: Script
 	{
+		//General
+		private readonly Stopwatch _tickStopwatch;
+		private readonly GazeProjector _gazeProjector;
+		private readonly ControlsProcessor _controlsProcessor;
+
+		//Settings
+		private readonly Settings _settings;
+		private readonly SettingsStorage _settingsStorage;
+
+		//Gaze
 		private readonly EyeXHost _host;
 		private readonly GazePointDataStream _lightlyFilteredGazePointDataProvider;
-
 		private readonly Stopwatch _gazeStopwatch;
-		private readonly Stopwatch _tickStopwatch;
-
 		private Vector2 _lastNormalizedCenterDelta;
+		private double _aspectRatio;
 
+		//Features
 		private readonly Aiming _aiming;
 		private readonly Freelook _freelook;
+		private readonly RadialMenu _radialMenu;
+		private readonly PedestrianInteraction _pedestrianInteraction;
 
+		//Hids
 		private readonly MouseEmulation _mouseEmulation;
 		private readonly ControllerEmulation _controllerEmulation;
-
-		private readonly Settings _settings;
-		private readonly DotCrosshair _debugGazeVisualization;
-		private readonly PedestrianInteraction _pedestrianInteraction;
-		private readonly DebugOutput _debugOutput;
-
-		private readonly MenuPool _menuPool;
-		private bool _menuOpen;
-		private readonly SettingsMenu _settingsMenu;
-		private double _aspectRatio;
-		private readonly RadialMenu _radialMenu;
-		
 		private bool _lastControllerConnected;
 		private bool _controllerEverConnected;
 
+		//Debug
+		private readonly DotCrosshair _debugGazeVisualization;
+		private readonly DebugOutput _debugOutput;
+		private bool _showDebugGazeVisualization;
+
+		//Menu
+		private readonly MenuPool _menuPool;
+		private bool _menuOpen;
+		private readonly SettingsMenu _settingsMenu;
+		private readonly DeadzoneEditor _deadzoneEditor;
+
+		//Window
 		private readonly ForegroundWindowWatcher _foregroundWindowWatcher;
 		private bool _isWindowForeground;
 
+		//Disposing
         private bool _shutDownRequestFlag;
         private readonly ManualResetEvent _shutDownRequestedEvent;
-        private readonly DeadzoneEditor _deadzoneEditor;
-
-
-		private readonly SettingsStorage _settingsStorage;
-		private bool _showGazeVisualization;
-		private readonly GazeProjector _gazeProjector;
-		private readonly ControlsProcessor _controlsProcessor;
 
 		public Gta5EyeTracking()
 		{
             Util.Log("Begin Initialize");
+			//Disposing
             _shutDownRequestedEvent = new ManualResetEvent(false);
+
+			//Settings
+			_settingsStorage = new SettingsStorage();
+			_settings = _settingsStorage.LoadSettings();
+
+			//Gaze
 			_aspectRatio = 1;
 			_host = new EyeXHost();
 			_host.Start();
 			_lightlyFilteredGazePointDataProvider = _host.CreateGazePointDataStream(GazePointDataMode.LightlyFiltered);
 			_lightlyFilteredGazePointDataProvider.Next += NewGazePoint;
-
-			_menuPool = new MenuPool();
-
-			_settingsStorage = new SettingsStorage();
-			_settings = _settingsStorage.LoadSettings();
-			_settingsMenu = new SettingsMenu(_menuPool, _settings);
-		    _deadzoneEditor = new DeadzoneEditor(_settings,_settingsMenu);
-		    
-            _settingsMenu.ShutDownRequested += SettingsMenuOnShutDownRequested;
-
-			_debugGazeVisualization = new DotCrosshair(Color.FromArgb(220, 255, 0, 0), Color.FromArgb(220, 0, 255, 255));
-			_debugOutput = new DebugOutput();
-
-			_aiming = new Aiming(_settings);
-
-			_mouseEmulation = new MouseEmulation();
-			_controllerEmulation = new ControllerEmulation();
-			
-			_freelook = new Freelook(_controllerEmulation, _mouseEmulation, _settings);
-			_pedestrianInteraction = new PedestrianInteraction();
-			_radialMenu = new RadialMenu(_controllerEmulation);
-
 			_gazeStopwatch = new Stopwatch();
 			_gazeStopwatch.Restart();
 
-			_tickStopwatch = new Stopwatch();
+			//Menu
+			_menuPool = new MenuPool();
+			_settingsMenu = new SettingsMenu(_menuPool, _settings);
+		    _deadzoneEditor = new DeadzoneEditor(_settings,_settingsMenu);
+			_settingsMenu.ShutDownRequested += SettingsMenuOnShutDownRequested;
 
-            _foregroundWindowWatcher = new ForegroundWindowWatcher();
+			//Debug
+			_debugGazeVisualization = new DotCrosshair(Color.FromArgb(220, 255, 0, 0), Color.FromArgb(220, 0, 255, 255));
+			_debugOutput = new DebugOutput();
+
+			//Hids
+			_mouseEmulation = new MouseEmulation();
+			_controllerEmulation = new ControllerEmulation();
+
+			//Features
+			_aiming = new Aiming(_settings);
+			_freelook = new Freelook(_controllerEmulation, _mouseEmulation, _settings);
+			_radialMenu = new RadialMenu(_controllerEmulation);
+			_pedestrianInteraction = new PedestrianInteraction(_settings);
+
+			//Window
+			_foregroundWindowWatcher = new ForegroundWindowWatcher();
 			_foregroundWindowWatcher.ForegroundWindowChanged += ForegroundWindowWatcherOnForegroundWindowChanged;
 			_isWindowForeground = _foregroundWindowWatcher.IsWindowForeground();
 
+			//General
+			_tickStopwatch = new Stopwatch();
 			_gazeProjector = new GazeProjector(_settings);
 			_controlsProcessor = new ControlsProcessor(_settings,_controllerEmulation,_aiming,_freelook,_radialMenu,_settingsMenu, _menuPool, _tickStopwatch);
-			KeyDown += OnKeyDown;
 
+			KeyDown += OnKeyDown;
 			Tick += OnTick;
-            Util.Log("End Initialize");
+
+			Util.Log("End Initialize");
 		}
 
 	    private void SettingsMenuOnShutDownRequested(object sender, EventArgs eventArgs)
@@ -121,7 +134,7 @@ namespace Gta5EyeTracking
 			if (e.KeyCode == Keys.K)
 			{
 				_debugOutput.Visible = !_debugOutput.Visible;
-				_showGazeVisualization = !_showGazeVisualization;
+				_showDebugGazeVisualization = !_showDebugGazeVisualization;
 			}
 
 			if (e.KeyCode == Keys.L)
@@ -159,22 +172,33 @@ namespace Gta5EyeTracking
                 Util.Log("Begin ShutDown");
 				_settingsStorage.SaveSettings(_settings);
 
+				//General
 	            if (_controlsProcessor != null)
 	            {
 		            _controlsProcessor.Dispose();
 	            }
 
-                if (_controllerEmulation != null)
+				//Window
+				if (_foregroundWindowWatcher != null)
+				{
+					_foregroundWindowWatcher.Dispose();
+				}
+
+				//Hids
+				if (_controllerEmulation != null)
                 {
                     _controllerEmulation.Enabled = false;
                     //_controllerEmulation.Dispose();
                     //TODO: Crash!
                 }
+
+				//Menu
                 if (_settingsMenu != null)
                 {
                     _settingsMenu.ShutDownRequested -= SettingsMenuOnShutDownRequested;
                 }
 
+				//Gaze
                 if (_lightlyFilteredGazePointDataProvider != null)
                 {
                     _lightlyFilteredGazePointDataProvider.Next -= NewGazePoint;
@@ -186,11 +210,7 @@ namespace Gta5EyeTracking
                     _host.Dispose();
                 }
 
-                if (_foregroundWindowWatcher != null)
-                {
-                    _foregroundWindowWatcher.Dispose();
-                }
-
+				//Features
                 if (_aiming != null)
                 {
                     _aiming.Dispose();
@@ -237,16 +257,10 @@ namespace Gta5EyeTracking
 
 			CheckFreelookDevice();
 
-			var lastMenuOpen = _menuOpen;
-			_menuOpen = _menuPool.IsAnyMenuOpen();
+			SaveSettingsOnMenuClosed();
 
-			if (lastMenuOpen && !_menuOpen)
-			{
-				_settingsStorage.SaveSettings(_settings);
-			}
-
-			
 			Game.Player.Character.CanBeKnockedOffBike = _settings.DontFallFromBikesEnabled; //Bug in Script hook
+
 			CheckUserPresense();
 
 			if (Game.IsPaused) return;
@@ -287,24 +301,28 @@ namespace Gta5EyeTracking
 			_debugGazeVisualization.Render();
 			_debugOutput.Process();
 
-			if (_settings.PedestrianInteractionEnabled)
-			{
-				if (ped != null && ped.Handle != Game.Player.Character.Handle)
-				{
-					_pedestrianInteraction.ProcessLookingAtPedestrion(ped, _tickStopwatch.Elapsed);
-				}
-
-				_pedestrianInteraction.Process();
-			}
+			_pedestrianInteraction.Process(ped, _tickStopwatch.Elapsed);
 
             _deadzoneEditor.Process();
 
 			_mouseEmulation.ProcessInput();
 			_tickStopwatch.Restart();
+
 		    if (_shutDownRequestFlag)
 		    {
                 _shutDownRequestedEvent.Set();		        
 		    }
+		}
+
+		private void SaveSettingsOnMenuClosed()
+		{
+			var lastMenuOpen = _menuOpen;
+			_menuOpen = _menuPool.IsAnyMenuOpen();
+
+			if (lastMenuOpen && !_menuOpen)
+			{
+				_settingsStorage.SaveSettings(_settings);
+			}
 		}
 
 		private void CheckFreelookDevice()

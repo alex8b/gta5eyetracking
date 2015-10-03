@@ -100,6 +100,13 @@ namespace Gta5EyeTracking
 				}
 			}
 
+			ProcessMissileLock(target);
+
+			missileTarget = _missileTarget;
+		}
+
+		private void ProcessMissileLock(Entity target)
+		{
 			if (target != null && target.IsAlive)
 			{
 				_missileTarget = target;
@@ -110,25 +117,6 @@ namespace Gta5EyeTracking
 			{
 				_missileTarget = null;
 			}
-
-			var playerDistToGround = Game.Player.Character.Position.Z - World.GetGroundHeight(Game.Player.Character.Position);
-			var targetDir = shootMissileCoord - Game.Player.Character.Position;
-			targetDir.Normalize();
-			var justBeforeTarget = shootMissileCoord - targetDir;
-			var targetDistToGround = shootMissileCoord.Z - World.GetGroundHeight(justBeforeTarget);
-			var distToTarget = (Game.Player.Character.Position - shootMissileCoord).Length();
-			if ((playerDistToGround < 2) && (playerDistToGround >= -0.5)) //on the ground 
-			{
-
-				if (((targetDistToGround < 2) && (targetDistToGround >= -0.5)) //shoot too low
-					|| ((targetDistToGround < 5) && (targetDistToGround >= -0.5) && (distToTarget > 70.0))) //far away add near the ground
-				{
-					shootMissileCoord.Z = World.GetGroundHeight(justBeforeTarget) //ground level at target
-						+ playerDistToGround; //offset
-				}
-			}
-
-			missileTarget = _missileTarget;
 		}
 	}
 }

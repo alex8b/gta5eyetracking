@@ -7,12 +7,13 @@ namespace Gta5EyeTracking
 {
 	public class PedestrianInteraction
 	{
+		private readonly Settings _settings;
 		private Ped _lastPed;
 		private Dictionary<int, PedInfo> _pedInfos = new Dictionary<int, PedInfo>();
 
-		public PedestrianInteraction()
+		public PedestrianInteraction(Settings settings)
 		{
-
+			_settings = settings;
 		}
 
 		public void MindControl(int handle)
@@ -69,8 +70,16 @@ namespace Gta5EyeTracking
 			_pedInfos[handle].Pedestrian.Task.ChatTo(Game.Player.Character);
 		}
 
-		public void Process()
+		public void Process(Ped ped, TimeSpan timeSinceLastTick)
 		{
+			if (!_settings.PedestrianInteractionEnabled) return;
+
+
+			if (ped != null && ped.Handle != Game.Player.Character.Handle)
+			{
+				ProcessLookingAtPedestrion(ped, timeSinceLastTick);
+			}
+
 			var now = DateTime.UtcNow;
 			var maxTime = TimeSpan.FromSeconds(5);
 			_pedInfos = _pedInfos.Where(pair => (now - pair.Value.LastLookTime) < maxTime)

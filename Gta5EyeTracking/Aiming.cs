@@ -91,7 +91,8 @@ namespace Gta5EyeTracking
 
 		public void ShootMissile(Vector3 target)
 		{
-		    _drawCrosshair = true;
+			target = PutAboveGround(target);
+			_drawCrosshair = true;
 			var weaponPos = Game.Player.Character.Position;
 
 			//take velocity into account
@@ -109,8 +110,28 @@ namespace Gta5EyeTracking
 				_shootStopWatch.Restart();
 			}
 		}
+		private static Vector3 PutAboveGround(Vector3 shootMissileCoord)
+		{
+			var playerDistToGround = Game.Player.Character.Position.Z - World.GetGroundHeight(Game.Player.Character.Position);
+			var targetDir = shootMissileCoord - Game.Player.Character.Position;
+			targetDir.Normalize();
+			var justBeforeTarget = shootMissileCoord - targetDir;
+			var targetDistToGround = shootMissileCoord.Z - World.GetGroundHeight(justBeforeTarget);
+			var distToTarget = (Game.Player.Character.Position - shootMissileCoord).Length();
+			if ((playerDistToGround < 2) && (playerDistToGround >= -0.5)) //on the ground 
+			{
+				if (((targetDistToGround < 2) && (targetDistToGround >= -0.5)) //shoot too low
+					|| ((targetDistToGround < 5) && (targetDistToGround >= -0.5) && (distToTarget > 70.0)))
+				//far away add near the ground
+				{
+					shootMissileCoord.Z = World.GetGroundHeight(justBeforeTarget) //ground level at target
+										  + playerDistToGround; //offset
+				}
+			}
+			return shootMissileCoord;
+		}
 
-        public void ShootMissile(Entity target)
+		public void ShootMissile(Entity target)
         {
             var weaponPos = Game.Player.Character.Position;
 
