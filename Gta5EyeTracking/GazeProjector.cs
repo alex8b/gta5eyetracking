@@ -76,7 +76,7 @@ namespace Gta5EyeTracking
 			{
 				Vehicle vehicle;
 				if (unfilteredEntity != null
-					&& Util.IsEntityAPed(unfilteredEntity))
+					&& Util.IsEntityAVehicle(unfilteredEntity))
 				{
 					vehicle = unfilteredEntity as Vehicle;
 				}
