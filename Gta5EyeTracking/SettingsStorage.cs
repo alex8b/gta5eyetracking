@@ -7,11 +7,6 @@ namespace Gta5EyeTracking
 	{
 		private const string SettingsFileName = "settings.xml";
 
-		public SettingsStorage()
-		{
-			LoadSettings();
-		}
-
 		public Settings LoadSettings()
 		{
 			var result = new Settings();

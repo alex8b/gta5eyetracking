@@ -149,6 +149,24 @@ namespace Gta5EyeTracking
 			}
 		}
 
+		private void TurnHead(Ped ped, Vector3 shootCoord)
+		{
+			if (ped != null && ped.Handle != Game.Player.Character.Handle)
+			{
+				if (!Geometry.IsFirstPersonCameraActive())
+				{
+					Game.Player.Character.Task.LookAt(ped);
+				}
+			}
+			else
+			{
+				if (!Geometry.IsFirstPersonCameraActive())
+				{
+					Game.Player.Character.Task.LookAt(shootCoord);
+				}
+			}
+		}
+
 		public void Process()
 		{
 			if ((_settings.AimWithGazeEnabled && (GameplayCamera.IsAimCamActive))
