@@ -30,14 +30,10 @@ namespace Gta5EyeTracking
 			out Vector3 shootCoordSnap, 
 			out Vector3 shootMissileCoord, 
 			out Ped ped, 
-			out Entity target, 
-			out Entity missileTarget, 
-			out bool isSnapped
+			out Entity missileTarget
 			)
 		{
-			isSnapped = false;
-
-			target = null;
+			Entity target = null;
 			
 			var w = (float)(1 - _settings.GazeFiltering * 0.9);
 			_filteredGazePoint = new Vector2(_filteredGazePoint.X + (gazePoint.X - _filteredGazePoint.X) * w,
@@ -74,7 +70,6 @@ namespace Gta5EyeTracking
 				if (_settings.SnapAtPedestriansEnabled)
 				{
 					shootCoord = shootCoordSnap;
-					isSnapped = true;
 				}
 			}
 			else

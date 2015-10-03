@@ -270,9 +270,7 @@ namespace Gta5EyeTracking
 			Vector3 shootCoordSnap;
 			Vector3 shootMissileCoord;
 			Ped ped;
-		    Entity target;
 			Entity missileTarget;
-			bool isSnapped;
 
 			var controllerState = _controllerEmulation.ControllerState;
 			const float joystickRadius = 0.1f;
@@ -287,11 +285,9 @@ namespace Gta5EyeTracking
 				out shootCoordSnap, 
 				out shootMissileCoord, 
 				out ped, 
-				out target, 
-				out missileTarget, 
-				out isSnapped);
+				out missileTarget);
 
-			_controlsProcessor.Process(_lastNormalizedCenterDelta, _aspectRatio, shootCoord, shootCoordSnap, shootMissileCoord, ped, target, missileTarget, isSnapped);
+			_controlsProcessor.Process(_lastNormalizedCenterDelta, _aspectRatio, shootCoord, shootCoordSnap, shootMissileCoord, ped, missileTarget);
             
 			//_aiming.TurnHead(ped, shootCoord);
 			_menuPool.ProcessMenus();

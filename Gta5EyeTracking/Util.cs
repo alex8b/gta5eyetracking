@@ -14,15 +14,7 @@ namespace Gta5EyeTracking
 
 		public static void SetPedShootsAtCoord(Ped ped, Vector3 target)
 		{
-			Function.Call(Hash.SET_PED_SHOOTS_AT_COORD, new InputArgument[5]
-				  {
-					new InputArgument(ped),
-					new InputArgument(target.X),
-					new InputArgument(target.Y),
-					new InputArgument(target.Z),
-					new InputArgument(true)
-				  }
-			);
+			Function.Call(Hash.SET_PED_SHOOTS_AT_COORD, ped, target.X, target.Y, target.Z, true);
 		}
 
 

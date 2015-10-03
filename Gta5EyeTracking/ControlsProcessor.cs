@@ -59,7 +59,7 @@ namespace Gta5EyeTracking
 			}
 		}
 
-		public void Process(Vector2 gazePoint, double aspectRatio, Vector3 shootCoord, Vector3 shootCoordSnap, Vector3 shootMissileCoord, Ped ped, Entity target, Entity missileTarget, bool isSnapped)
+		public void Process(Vector2 gazePoint, double aspectRatio, Vector3 shootCoord, Vector3 shootCoordSnap, Vector3 shootMissileCoord, Ped ped, Entity missileTarget)
 		{
 			_isPaused = Game.IsPaused;
 			_isInVehicle = Game.Player.Character.IsInVehicle();
