@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows.Forms;
 using Gta5EyeTracking.HidEmulation;
 using GTA;
 using GTA.Math;
+using NativeUI;
 using SharpDX.XInput;
 using Tobii.EyeX.Client;
 
@@ -12,14 +14,39 @@ namespace Gta5EyeTracking
 	{
 		private readonly Settings _settings;
 		private readonly ControllerEmulation _controllerEmulation;
+		private readonly Aiming _aiming;
+		private readonly Freelook _freelook;
+		private readonly RadialMenu _radialMenu;
+		private readonly SettingsMenu _settingsMenu;
+		private readonly MenuPool _menuPool;
+		private readonly Stopwatch _tickStopwatch;
 
-		public ControlsProcessor(
-			Settings settings,
-			ControllerEmulation controllerEmulation
-			)
+
+		private bool _isPaused;
+		private bool _isInVehicle;
+		private bool _isInAircraft;
+
+		private int _injectRightTrigger;
+		private bool _menuOpen;
+		private bool _shutDownRequestFlag;
+
+		public ControlsProcessor(Settings settings, 
+			ControllerEmulation controllerEmulation, 
+			Aiming aiming, 
+			Freelook freelook, 
+			RadialMenu radialMenu, 
+			SettingsMenu settingsMenu, 
+			MenuPool menuPool, 
+			Stopwatch tickStopwatch)
 		{
 			_settings = settings;
 			_controllerEmulation = controllerEmulation;
+			_aiming = aiming;
+			_freelook = freelook;
+			_radialMenu = radialMenu;
+			_settingsMenu = settingsMenu;
+			_menuPool = menuPool;
+			_tickStopwatch = tickStopwatch;
 			_controllerEmulation.OnModifyState += OnModifyControllerState;
 		}
 
@@ -27,12 +54,19 @@ namespace Gta5EyeTracking
 		{
 			if (_controllerEmulation != null)
 			{
-				_controllerEmulation.OnModifyState -= OnModifyControllerState;
+				_shutDownRequestFlag = true;
+                _controllerEmulation.OnModifyState -= OnModifyControllerState;
 			}
 		}
 
-		public void Process(Vector3 shootCoord, Vector3 shootCoordSnap, Vector3 shootMissileCoord, Ped ped, Entity target, Entity missileTarget, bool isSnapped)
+		public void Process(Vector2 gazePoint, double aspectRatio, Vector3 shootCoord, Vector3 shootCoordSnap, Vector3 shootMissileCoord, Ped ped, Entity target, Entity missileTarget, bool isSnapped)
 		{
+			_isPaused = Game.IsPaused;
+			_isInVehicle = Game.Player.Character.IsInVehicle();
+			_isInAircraft = Game.Player.Character.IsInPlane || Game.Player.Character.IsInHeli;
+
+			_menuOpen = _menuPool.IsAnyMenuOpen();
+
 			var controllerState = _controllerEmulation.ControllerState;
 
 			if (!_menuOpen
@@ -43,11 +77,11 @@ namespace Gta5EyeTracking
 			}
 			else if (!_isInVehicle && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder))
 			{
-				_radialMenu.Process(_lastNormalizedCenterDelta, _aspectRatio);
+				_radialMenu.Process(gazePoint, aspectRatio);
 			}
 			else
 			{
-				_freelook.Process(_lastNormalizedCenterDelta, ped, _aspectRatio);
+				_freelook.Process(gazePoint, ped, aspectRatio);
 			}
 
 			var radialMenuActive = (!Game.Player.Character.IsInVehicle()

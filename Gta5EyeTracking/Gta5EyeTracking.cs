@@ -32,21 +32,16 @@ namespace Gta5EyeTracking
 		private readonly ControllerEmulation _controllerEmulation;
 
 		private readonly Settings _settings;
-		private readonly DotCrosshair _gazeVisualization;
+		private readonly DotCrosshair _debugGazeVisualization;
 		private readonly PedestrianInteraction _pedestrianInteraction;
 		private readonly DebugOutput _debugOutput;
-		private bool _isPaused;
-		private bool _isInVehicle;
-		private bool _isInAircraft;
-
-		private float _headingToTarget;
 
 		private readonly MenuPool _menuPool;
 		private bool _menuOpen;
 		private readonly SettingsMenu _settingsMenu;
 		private double _aspectRatio;
 		private readonly RadialMenu _radialMenu;
-		private int _injectRightTrigger;
+		
 		private bool _lastControllerConnected;
 		private bool _controllerEverConnected;
 
@@ -82,7 +77,7 @@ namespace Gta5EyeTracking
 		    
             _settingsMenu.ShutDownRequested += SettingsMenuOnShutDownRequested;
 
-			_gazeVisualization = new DotCrosshair(Color.FromArgb(220, 255, 0, 0), Color.FromArgb(220, 0, 255, 255));
+			_debugGazeVisualization = new DotCrosshair(Color.FromArgb(220, 255, 0, 0), Color.FromArgb(220, 0, 255, 255));
 			_debugOutput = new DebugOutput();
 
 			_aiming = new Aiming(_settings);
@@ -104,7 +99,7 @@ namespace Gta5EyeTracking
 			_isWindowForeground = _foregroundWindowWatcher.IsWindowForeground();
 
 			_gazeProjector = new GazeProjector(_settings);
-			_controlsProcessor = new ControlsProcessor(_settings,_controllerEmulation);
+			_controlsProcessor = new ControlsProcessor(_settings,_controllerEmulation,_aiming,_freelook,_radialMenu,_settingsMenu, _menuPool, _tickStopwatch);
 			KeyDown += OnKeyDown;
 
 			Tick += OnTick;
@@ -156,7 +151,8 @@ namespace Gta5EyeTracking
         private void ShutDown()
         {
             _shutDownRequestFlag = true;
-            Tick -= OnTick;
+	        KeyDown -= OnKeyDown;
+			Tick -= OnTick;
             Task.Run(() =>
             {
                 _shutDownRequestedEvent.WaitOne(1000);
@@ -228,7 +224,7 @@ namespace Gta5EyeTracking
 			if (float.IsNaN(normalizedCenterDeltaX) || float.IsNaN(normalizedCenterDeltaY)) return;
 
 			_lastNormalizedCenterDelta = new Vector2(normalizedCenterDeltaX, normalizedCenterDeltaY);
-			_gazeVisualization.Move(_lastNormalizedCenterDelta);
+			_debugGazeVisualization.Move(_lastNormalizedCenterDelta);
             _gazeStopwatch.Restart();
 		}
 
@@ -249,14 +245,12 @@ namespace Gta5EyeTracking
 				_settingsStorage.SaveSettings(_settings);
 			}
 
-			_isPaused = Game.IsPaused;
+			
 			Game.Player.Character.CanBeKnockedOffBike = _settings.DontFallFromBikesEnabled; //Bug in Script hook
 			CheckUserPresense();
 
 			if (Game.IsPaused) return;
 			
-			_isInVehicle = Game.Player.Character.IsInVehicle();
-			_isInAircraft = Game.Player.Character.IsInPlane|| Game.Player.Character.IsInHeli;
 
 			Vector3 shootCoord;
 			Vector3 shootCoordSnap;
@@ -283,14 +277,14 @@ namespace Gta5EyeTracking
 				out missileTarget, 
 				out isSnapped);
 
-			_controlsProcessor.Process(shootCoord, shootCoordSnap, shootMissileCoord, ped, target, missileTarget, isSnapped);
+			_controlsProcessor.Process(_lastNormalizedCenterDelta, _aspectRatio, shootCoord, shootCoordSnap, shootMissileCoord, ped, target, missileTarget, isSnapped);
             
 			//_aiming.TurnHead(ped, shootCoord);
 			_menuPool.ProcessMenus();
 
 			_aiming.Process();
 
-			_gazeVisualization.Render();
+			_debugGazeVisualization.Render();
 			_debugOutput.Process();
 
 			if (_settings.PedestrianInteractionEnabled)

@@ -84,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Aiming.cs" />
+    <Compile Include="ControlsProcessor.cs" />
     <Compile Include="Crosshairs\Crosshair.cs" />
     <Compile Include="Crosshairs\DotCrosshair.cs" />
     <Compile Include="Deadzones\Deadzone.cs" />
