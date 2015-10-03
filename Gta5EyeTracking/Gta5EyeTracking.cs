@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using EyeXFramework;
+using Gta5EyeTracking.Crosshairs;
 using Gta5EyeTracking.Deadzones;
 using Gta5EyeTracking.HidEmulation;
 using GTA;
@@ -31,7 +33,7 @@ namespace Gta5EyeTracking
 		private readonly ControllerEmulation _controllerEmulation;
 
 		private Settings _settings;
-		private readonly GazeVisualization _gazeVisualization;
+		private readonly DotCrosshair _gazeVisualization;
 		private readonly PedestrianInteraction _pedestrianInteraction;
 		private readonly DebugOutput _debugOutput;
 		private bool _isPaused;
@@ -62,6 +64,7 @@ namespace Gta5EyeTracking
 	    private readonly TimeSpan _missileLockedMinTime;
 	    private Entity _missileTarget;
 		private readonly SettingsStorage _settingsStorage;
+		private bool _showGazeVisualization;
 
 		public Gta5EyeTracking()
 		{
@@ -81,7 +84,7 @@ namespace Gta5EyeTracking
 		    
             _settingsMenu.ShutDownRequested += SettingsMenuOnShutDownRequested;
 
-			_gazeVisualization = new GazeVisualization();
+			_gazeVisualization = new DotCrosshair(Color.FromArgb(220, 255, 0, 0), Color.FromArgb(220, 0, 255, 255));
 			_debugOutput = new DebugOutput();
 
 			_aiming = new Aiming(_settings);
@@ -127,7 +130,7 @@ namespace Gta5EyeTracking
 			if (e.KeyCode == Keys.K)
 			{
 				_debugOutput.Visible = !_debugOutput.Visible;
-				_gazeVisualization.Visible = !_gazeVisualization.Visible;
+				_showGazeVisualization = !_showGazeVisualization;
 			}
 
 			if (e.KeyCode == Keys.L)
@@ -188,11 +191,6 @@ namespace Gta5EyeTracking
                     _host.Dispose();
                 }
 
-                if (_gazeVisualization != null)
-                {
-                    _gazeVisualization.Dispose();
-                }
-
                 if (_foregroundWindowWatcher != null)
                 {
                     _foregroundWindowWatcher.Dispose();
@@ -231,7 +229,7 @@ namespace Gta5EyeTracking
 			if (float.IsNaN(normalizedCenterDeltaX) || float.IsNaN(normalizedCenterDeltaY)) return;
 
 			_lastNormalizedCenterDelta = new Vector2(normalizedCenterDeltaX, normalizedCenterDeltaY);
-			_gazeVisualization.MovePoint(_lastNormalizedCenterDelta);
+			_gazeVisualization.Move(_lastNormalizedCenterDelta);
 			_gazeStopwatch.Restart();
 		}
 
@@ -276,7 +274,7 @@ namespace Gta5EyeTracking
 
 			_aiming.Process();
 
-			_gazeVisualization.Process();
+			_gazeVisualization.Render();
 			_debugOutput.Process();
 
 			if (_settings.PedestrianInteractionEnabled)

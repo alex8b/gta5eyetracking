@@ -100,7 +100,6 @@
     <Compile Include="IComparableExtensions.cs" />
     <Compile Include="HidEmulation\MouseEmulation.cs" />
     <Compile Include="HidEmulation\MouseApi.cs" />
-    <Compile Include="GazeVisualization.cs" />
     <Compile Include="Crosshairs\MissileLockCrosshair.cs" />
     <Compile Include="PedestrianInteraction\PedestrianInteraction.cs" />
     <Compile Include="PedestrianInteraction\PedInfo.cs" />
