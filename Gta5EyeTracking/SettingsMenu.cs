@@ -507,6 +507,9 @@ namespace Gta5EyeTracking
 		public void CloseMenu()
 		{
 			_mainMenu.Visible = false;
+			DeadzoneMenu.Visible = false;
+			FirstPersonFreelookMenu.Visible = false;
+			ThirdPersonFreelookMenu.Visible = false;
 		}
 
 		public void ReloadSettings()
