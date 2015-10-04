@@ -22,6 +22,7 @@ namespace Gta5EyeTracking
 		private readonly SettingsMenu _settingsMenu;
 		private readonly MenuPool _menuPool;
 		private readonly Stopwatch _tickStopwatch;
+		private readonly DebugOutput _debugOutput;
 
 
 		private bool _isPaused;
@@ -39,7 +40,8 @@ namespace Gta5EyeTracking
 			RadialMenu radialMenu, 
 			SettingsMenu settingsMenu, 
 			MenuPool menuPool, 
-			Stopwatch tickStopwatch)
+			Stopwatch tickStopwatch,
+			DebugOutput debugOutput)
 		{
 			_settings = settings;
 			_controllerEmulation = controllerEmulation;
@@ -49,6 +51,7 @@ namespace Gta5EyeTracking
 			_settingsMenu = settingsMenu;
 			_menuPool = menuPool;
 			_tickStopwatch = tickStopwatch;
+			_debugOutput = debugOutput;
 			_controllerEmulation.OnModifyState += OnModifyControllerState;
 		}
 
@@ -313,6 +316,31 @@ namespace Gta5EyeTracking
 			}
 
 			modifyStateEventArgs.State = state;
+		}
+
+		public void KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.K)
+			{
+				_debugOutput.Visible = !_debugOutput.Visible;
+			}
+
+			if (e.KeyCode == Keys.L)
+			{
+				_aiming.AlwaysShowCrosshair = !_aiming.AlwaysShowCrosshair;
+			}
+
+			if (e.KeyCode == Keys.F8)
+			{
+				if (!_menuPool.IsAnyMenuOpen())
+				{
+					_settingsMenu.OpenMenu();
+				}
+				else
+				{
+					_settingsMenu.CloseMenu();
+				}
+			}
 		}
 	}
 }

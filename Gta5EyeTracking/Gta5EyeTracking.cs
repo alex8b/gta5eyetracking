@@ -55,7 +55,6 @@ namespace Gta5EyeTracking
 		//Debug
 		private readonly DotCrosshair _debugGazeVisualization;
 		private readonly DebugOutput _debugOutput;
-		private bool _showDebugGazeVisualization;
 
 		//Menu
 		private readonly MenuPool _menuPool;
@@ -128,7 +127,7 @@ namespace Gta5EyeTracking
 			//General
 			_tickStopwatch = new Stopwatch();
 			_gazeProjector = new GazeProjector(_settings);
-			_controlsProcessor = new ControlsProcessor(_settings,_controllerEmulation,_aiming,_freelook,_radialMenu,_settingsMenu, _menuPool, _tickStopwatch);
+			_controlsProcessor = new ControlsProcessor(_settings,_controllerEmulation,_aiming,_freelook,_radialMenu,_settingsMenu, _menuPool, _tickStopwatch, _debugOutput);
 
 			KeyDown += OnKeyDown;
 			Tick += OnTick;
@@ -148,28 +147,7 @@ namespace Gta5EyeTracking
 
 		private void OnKeyDown(object sender, KeyEventArgs e)
 		{
-			if (e.KeyCode == Keys.K)
-			{
-				_debugOutput.Visible = !_debugOutput.Visible;
-				_showDebugGazeVisualization = !_showDebugGazeVisualization;
-			}
-
-			if (e.KeyCode == Keys.L)
-			{
-				_aiming.AlwaysShowCrosshair = !_aiming.AlwaysShowCrosshair;
-			}
-
-			if (e.KeyCode == Keys.F8) 
-			{
-				if (!_menuPool.IsAnyMenuOpen())
-				{
-					_settingsMenu.OpenMenu();
-				}
-				else
-				{
-					_settingsMenu.CloseMenu();
-				}
-			}
+			_controlsProcessor.KeyDown(sender, e);
 		}
 
 	    protected override void Dispose(bool disposing)
@@ -324,7 +302,7 @@ namespace Gta5EyeTracking
 
 			_aiming.Process();
 
-			if (_showDebugGazeVisualization)
+			if (_debugOutput.Visible)
 			{
 				_debugGazeVisualization.Render();
 			}
@@ -351,7 +329,15 @@ namespace Gta5EyeTracking
 			_googleAnalyticsApi.TrackEvent("gamesession", "started", "Game Session Started");
 			var trackingActive = (_host.EyeTrackingDeviceStatus.IsValid &&
 			                    _host.EyeTrackingDeviceStatus.Value == EyeTrackingDeviceStatus.Tracking);
-			_googleAnalyticsApi.TrackEvent("gamesession", "devicestatus", "Device Status", trackingActive ? 1 : 0);
+			if (trackingActive)
+			{
+				_googleAnalyticsApi.TrackEvent("gamesession", "devicesconnected", "Device Connected", 1);
+			}
+			else
+			{
+				_googleAnalyticsApi.TrackEvent("gamesession", "devicesdisconnected", "Device Disconnected", 1);
+			}
+			
 			_gameSessionStartedRecorded = true;
 		}
 
