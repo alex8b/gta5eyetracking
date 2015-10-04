@@ -21,17 +21,23 @@ namespace Gta5EyeTracking.Menu
 
 		private void CreateMenu()
 		{
-			_userAgreement = new UIMenu("Tobii Eye Tracking", "~b~USER AGREEMENT");
-			_userAgreement.SetMenuWidthOffset(400);
+			_userAgreement = new UIMenu("Tobii Eye Tracking", "~b~PRIVACY POLICY");
+			_userAgreement.SetMenuWidthOffset(50);
 			//_userAgreement.ControlDisablingEnabled = false;
 			_menuPool.Add(_userAgreement);
 
-			var eulaText = "Here be dragons.";
+			const string privacyPolicyText = "By selecting to send usage statistics you agree that your usage statistics, such as a game session time, " +
+			                                 "mod settings and mod features you use will be collected by the mod developers. The data will be collected " +
+			                                 "anonymously and processed on Google Analytics service.";
+				//"The mod is licensed under Creative Commons " +
+			    //"Attribution-NonCommercial-ShareAlike 4.0 International license. The full text of the license is available " +
+			    //"at http://creativecommons.org/licenses/by-nc-sa/4.0/legalcode and included in the mod package. By clicking " +
+			    //"Accept you verify that you have read and accepted the terms of the license agreement.";
 
-			var sendUsageStatistics = new UIMenuCheckboxItem("Send Usage Statistics", true, eulaText);
+			var sendUsageStatistics = new UIMenuCheckboxItem("Send Usage Statistics", true, privacyPolicyText);
 			_userAgreement.AddItem(sendUsageStatistics);
 
-			var accept = new UIMenuItem("Accept", eulaText);
+			var accept = new UIMenuItem("Close", privacyPolicyText);
 			accept.Activated += (sender, item) =>
 			{
 				_settings.SendUsageStatistics = sendUsageStatistics.Checked;
@@ -40,14 +46,14 @@ namespace Gta5EyeTracking.Menu
 			};
 			_userAgreement.AddItem(accept);
 
-			var decline = new UIMenuItem("Decline", eulaText);
-			decline.Activated += (sender, item) =>
-			{
-				_settings.UserAgreementAccepted = false;
-				CloseMenu();
-				ShutDownRequested(this, new EventArgs());
-			};
-			_userAgreement.AddItem(decline);
+			//var decline = new UIMenuItem("Decline", privacyPolicyText);
+			//decline.Activated += (sender, item) =>
+			//{
+			//	_settings.UserAgreementAccepted = false;
+			//	CloseMenu();
+			//	ShutDownRequested(this, new EventArgs());
+			//};
+			//_userAgreement.AddItem(decline);
 
 			_userAgreement.RefreshIndex();
 		}
