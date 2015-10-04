@@ -113,6 +113,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="Menu\SettingsMenu.cs" />
     <Compile Include="SettingsStorage.cs" />
+    <Compile Include="Tutorial.cs" />
     <Compile Include="User32.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>
