@@ -23,7 +23,7 @@ namespace Gta5EyeTracking
 		//General
 		private readonly Stopwatch _tickStopwatch;
 		private readonly GazeProjector _gazeProjector;
-		private readonly ControlsProcessor _controlsProcessor;
+		private ControlsProcessor _controlsProcessor;
 
 		//Statistics
 		private readonly GoogleAnalyticsApi _googleAnalyticsApi;
@@ -34,21 +34,21 @@ namespace Gta5EyeTracking
 		private readonly SettingsStorage _settingsStorage;
 
 		//Gaze
-		private readonly EyeXHost _host;
-		private readonly GazePointDataStream _lightlyFilteredGazePointDataProvider;
+		private EyeXHost _host;
+		private GazePointDataStream _lightlyFilteredGazePointDataProvider;
 		private readonly Stopwatch _gazeStopwatch;
 		private Vector2 _lastNormalizedCenterDelta;
 		private double _aspectRatio;
 
 		//Features
-		private readonly Aiming _aiming;
+		private Aiming _aiming;
 		private readonly Freelook _freelook;
 		private readonly RadialMenu _radialMenu;
 		private readonly PedestrianInteraction _pedestrianInteraction;
 
 		//Hids
 		private readonly MouseEmulation _mouseEmulation;
-		private readonly ControllerEmulation _controllerEmulation;
+		private ControllerEmulation _controllerEmulation;
 		private bool _lastControllerConnected;
 		private bool _controllerEverConnected;
 
@@ -60,12 +60,12 @@ namespace Gta5EyeTracking
 		//Menu
 		private readonly MenuPool _menuPool;
 		private bool _menuOpen;
-		private readonly SettingsMenu _settingsMenu;
+		private SettingsMenu _settingsMenu;
 		private readonly DeadzoneEditor _deadzoneEditor;
 		private readonly IntroScreen _introScreen;
 
 		//Window
-		private readonly ForegroundWindowWatcher _foregroundWindowWatcher;
+		private ForegroundWindowWatcher _foregroundWindowWatcher;
 		private bool _isWindowForeground;
 
 		//Disposing
@@ -174,66 +174,73 @@ namespace Gta5EyeTracking
 
 	    protected override void Dispose(bool disposing)
 	    {
-	        base.Dispose();
-	        ShutDown();
-	    }
+			Util.Log("Begin Dispose");
+			ShutDown();
+			Util.Log("End Dispose");
+		}
 
         private void ShutDown()
         {
             _shutDownRequestFlag = true;
 	        KeyDown -= OnKeyDown;
 			Tick -= OnTick;
-            Task.Run(() =>
+
+			_shutDownRequestedEvent.WaitOne(100);
+            Util.Log("Begin ShutDown");
+			_settingsStorage.SaveSettings(_settings);
+
+			//General
+			RecordGameSessionEnded();
+
+            if (_controlsProcessor != null)
+	        {
+		        _controlsProcessor.Dispose();
+		        _controlsProcessor = null;
+	        }
+
+			//Window
+			if (_foregroundWindowWatcher != null)
+			{
+				_foregroundWindowWatcher.Dispose();
+				_foregroundWindowWatcher = null;
+			}
+
+			//Menu
+            if (_settingsMenu != null)
             {
-                _shutDownRequestedEvent.WaitOne(1000);
-                Util.Log("Begin ShutDown");
-				_settingsStorage.SaveSettings(_settings);
+                _settingsMenu.ShutDownRequested -= SettingsMenuOnShutDownRequested;
+	            _settingsMenu = null;
+            }
 
-				//General
-	            if (_controlsProcessor != null)
-	            {
-		            _controlsProcessor.Dispose();
-	            }
+			//Gaze
+            if (_lightlyFilteredGazePointDataProvider != null)
+            {
+                _lightlyFilteredGazePointDataProvider.Next -= NewGazePoint;
+                _lightlyFilteredGazePointDataProvider.Dispose();
+	            _lightlyFilteredGazePointDataProvider = null;
+            }
 
-				//Window
-				if (_foregroundWindowWatcher != null)
-				{
-					_foregroundWindowWatcher.Dispose();
-				}
+            if (_host != null)
+            {
+                _host.Dispose();
+	            _host = null;
+            }
 
-				//Hids
-				if (_controllerEmulation != null)
-                {
-                    _controllerEmulation.Enabled = false;
-                    //_controllerEmulation.Dispose();
-                    //TODO: Crash!
-                }
+			//Features
+            if (_aiming != null)
+            {
+                _aiming.Dispose();
+	            _aiming = null;
+            }
 
-				//Menu
-                if (_settingsMenu != null)
-                {
-                    _settingsMenu.ShutDownRequested -= SettingsMenuOnShutDownRequested;
-                }
-
-				//Gaze
-                if (_lightlyFilteredGazePointDataProvider != null)
-                {
-                    _lightlyFilteredGazePointDataProvider.Next -= NewGazePoint;
-                    _lightlyFilteredGazePointDataProvider.Dispose();
-                }
-
-                if (_host != null)
-                {
-                    _host.Dispose();
-                }
-
-				//Features
-                if (_aiming != null)
-                {
-                    _aiming.Dispose();
-                }
-                Util.Log("End ShutDown");
-            });
+			//Hids
+			if (_controllerEmulation != null)
+			{
+				_controllerEmulation.Enabled = false;
+				_controllerEmulation.RemoveHooks();
+				_controllerEmulation = null;
+			}
+			Util.Log("End ShutDown");
 		}
 
 		private void NewGazePoint(object sender, GazePointEventArgs gazePointEventArgs)
@@ -346,6 +353,12 @@ namespace Gta5EyeTracking
 			                    _host.EyeTrackingDeviceStatus.Value == EyeTrackingDeviceStatus.Tracking);
 			_googleAnalyticsApi.TrackEvent("gamesession", "devicestatus", "Device Status", trackingActive ? 1 : 0);
 			_gameSessionStartedRecorded = true;
+		}
+
+		private void RecordGameSessionEnded()
+		{
+			if (!_settings.UserAgreementAccepted || !_settings.SendUsageStatistics) return;
+			_googleAnalyticsApi.TrackEvent("gamesession", "ended", "Game Session Ended");
 		}
 
 		private void SaveSettingsOnMenuClosed()

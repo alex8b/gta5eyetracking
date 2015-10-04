@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Threading;
 using EasyHook;
 using SharpDX.XInput;
 using Tobii.EyeX.Client;
@@ -17,7 +19,7 @@ namespace Gta5EyeTracking.HidEmulation
 		}
 	}
 
-	public class ControllerEmulation: DisposableBase
+	public class ControllerEmulation
 	{
 		public event EventHandler<ModifyStateEventArgs> OnModifyState = delegate {  };
 		public double DeltaX { get; set; }
@@ -58,31 +60,29 @@ namespace Gta5EyeTracking.HidEmulation
             Util.Log("End CreateHooks");
 		}
 
-		protected override void Dispose(bool disposing)
-		{
-			base.Dispose();
-		    RemoveHooks();
-		}
-
 	    public void RemoveHooks()
 	    {
-            if (_hooks == null) return;
+			Util.Log("Begin RemoveHooks");
+			Thread.Sleep(100);
+			if (_hooks == null) return;
             foreach (var hook in _hooks)
             {
                 if (hook != null)
                 {
                     try
                     {
-                        //hook.Dispose();
-                        //crashes
+                        hook.Dispose();
                     }
                     catch
                     {
-                        Util.Log("Disposing hooks failed.");
+                        Util.Log("Disposing hook failed.");
                     }
                 }
             }
-	    }
+			_hooks.Clear();
+			NativeAPI.LhWaitForPendingRemovals();
+			Util.Log("End RemoveHooks");
+		}
 
 
 		private void HookXInput()
@@ -92,10 +92,13 @@ namespace Gta5EyeTracking.HidEmulation
 				var module = NativeAPI.GetModuleHandle("xinput1_3.dll");
 				if (IntPtr.Zero == module) return;
 
+				//LocalHook.EnableRIPRelocation();
 
-				_hooks.Add(LocalHook.Create(LocalHook.GetProcAddress("xinput1_3.dll", "XInputGetState"),
+				var hook = LocalHook.Create(LocalHook.GetProcAddress("xinput1_3.dll", "XInputGetState"),
 					new DXInputGetState(XInputGetState_Hooked),
-					this));
+					this);
+				
+                _hooks.Add(hook);
                 //_hooks.Add(LocalHook.Create(LocalHook.GetProcAddress("xinput1_3.dll", "XInputEnable"), 
                 //    new DXInputEnable(XInputEnable_Hooked), 
                 //    this));

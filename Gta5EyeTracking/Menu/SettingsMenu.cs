@@ -103,13 +103,12 @@ namespace Gta5EyeTracking.Menu
 			_sendUsageStatistics.CheckboxEvent += (sender, args) => { _settings.SendUsageStatistics = _sendUsageStatistics.Checked; };
 			_mainMenu.AddItem(_sendUsageStatistics);
 
-			var shutDown = new UIMenuItem("Shut Down", "Unload the mod");
-		    shutDown.Activated += (sender, item) =>
-		    {
-		        ShutDownRequested(this, new EventArgs());
-		    };
-            
-            _mainMenu.AddItem(shutDown);
+			//var shutDown = new UIMenuItem("Shut Down", "Unload the mod");
+			//shutDown.Activated += (sender, item) =>
+			//{
+			//	ShutDownRequested(this, new EventArgs());
+			//};
+			//_mainMenu.AddItem(shutDown);
 
 			_mainMenu.RefreshIndex();
 		}
