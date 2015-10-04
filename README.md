@@ -2,7 +2,7 @@
 
 Dependencies:
 
-1.	EasyHook – http://easyhook.codeplex.com/
+1.	EasyHook – https://github.com/EasyHook/EasyHook/
 
 2.	SharpDx – http://sharpdx.org/
 
@@ -21,7 +21,7 @@ If any skilled mod developers want to help me working on this mod then Tobii wil
 You need to have one of these eye trackers to use it:
 - Tobii EyeX DevKit
 http://www.tobii.com/en/eye-experience/buy/
-$139
+$139 / €99
  
 - SteelSeries Sentry Gaming Eye Tracker
 http://steelseries.com/gaming-controllers/sentry-gaming-eye-tracker
