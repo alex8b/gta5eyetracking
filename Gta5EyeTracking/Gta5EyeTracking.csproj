@@ -72,6 +72,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -94,6 +95,7 @@
     <Compile Include="Freelook.cs" />
     <Compile Include="GazeProjector.cs" />
     <Compile Include="Geometry.cs" />
+    <Compile Include="GoogleAnalyticsApi.cs" />
     <Compile Include="Gta5EyeTracking.cs" />
     <Compile Include="HidEmulation\ControllerEmulation.cs" />
     <Compile Include="HidEmulation\IHidEmulation.cs" />
@@ -103,6 +105,7 @@
     <Compile Include="HidEmulation\MouseEmulation.cs" />
     <Compile Include="HidEmulation\MouseApi.cs" />
     <Compile Include="Crosshairs\MissileLockCrosshair.cs" />
+    <Compile Include="IntroScreen.cs" />
     <Compile Include="PedestrianInteraction\PedestrianInteraction.cs" />
     <Compile Include="PedestrianInteraction\PedInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

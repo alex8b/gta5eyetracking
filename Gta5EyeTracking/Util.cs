@@ -169,7 +169,7 @@ namespace Gta5EyeTracking
 
 			    try
 			    {
-				    sw.Write("[" + now.ToString("HH:mm:ss") + "] ");
+				    sw.Write("[" + now.ToString("dd.MM.yyyy HH:mm:ss") + "] ");
 
 					sw.Write(message);
 

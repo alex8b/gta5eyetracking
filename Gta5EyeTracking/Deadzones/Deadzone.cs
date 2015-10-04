@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Xml.Serialization;
 using GTA.Math;
 
 namespace Gta5EyeTracking.Deadzones
@@ -7,8 +8,12 @@ namespace Gta5EyeTracking.Deadzones
 	{
 		public PointF Position { get; set; }
 		public SizeF Size { get; set; }
-
 		public Color Color { get; set; }
+
+		public Deadzone() : this(0, 0, 0, 0)
+		{
+			
+		}
 
 		public Deadzone(float posX, float posY, float width, float height)
 			: this(new PointF(posX, posY), new SizeF(width, height))

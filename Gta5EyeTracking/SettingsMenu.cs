@@ -10,8 +10,11 @@ namespace Gta5EyeTracking
 		public UIMenu DeadzoneMenu;
         public UIMenu ThirdPersonFreelookMenu;
         public UIMenu FirstPersonFreelookMenu;
+
 		private UIMenu _mainMenu;
-		private readonly MenuPool _menuPool;
+		private UIMenuCheckboxItem _sendUsageStatistics;
+
+        private readonly MenuPool _menuPool;
 		private readonly Settings _settings;
 		private UIMenuListItem _freelookDevice;
 
@@ -27,8 +30,6 @@ namespace Gta5EyeTracking
 			_settings = settings;
 
 			CreateMenu();
-
-            _menuPool.DisableInstructionalButtons = true;
         }
 
 		private void CreateMenu()
@@ -94,7 +95,11 @@ namespace Gta5EyeTracking
 			dontFallFromBikes.CheckboxEvent += (sender, args) => { _settings.DontFallFromBikesEnabled = dontFallFromBikes.Checked; };
 			_mainMenu.AddItem(dontFallFromBikes);
 
-            var shutDown = new UIMenuItem("Shut Down", "Unload the mod");
+			_sendUsageStatistics = new UIMenuCheckboxItem("Send Usage Statistics", _settings.SendUsageStatistics, "Anonymously collect and send usage statistics to the mod developers to improve the experience");
+			_sendUsageStatistics.CheckboxEvent += (sender, args) => { _settings.SendUsageStatistics = _sendUsageStatistics.Checked; };
+			_mainMenu.AddItem(_sendUsageStatistics);
+
+			var shutDown = new UIMenuItem("Shut Down", "Unload the mod");
 		    shutDown.Activated += (sender, item) =>
 		    {
 		        ShutDownRequested(this, new EventArgs());
@@ -500,8 +505,9 @@ namespace Gta5EyeTracking
 	    }
 
 	    public void OpenMenu()
-		{
-			_mainMenu.Visible = true;
+	    {
+		    _sendUsageStatistics.Checked = _settings.SendUsageStatistics;
+            _mainMenu.Visible = true;
 		}
 
 		public void CloseMenu()

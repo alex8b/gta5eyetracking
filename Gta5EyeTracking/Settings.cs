@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using Gta5EyeTracking.Deadzones;
 
 namespace Gta5EyeTracking
@@ -64,7 +66,11 @@ namespace Gta5EyeTracking
 		public bool MissilesAtGazeEnabled { get; set; }
 		public bool PedestrianInteractionEnabled { get; set; }
 		public bool DontFallFromBikesEnabled { get; set; }
+		public bool SendUsageStatistics { get; set; }
+		public bool UserAgreementAccepted { get; set; }
+		public string UserGuid { get; set; }
 
+		[XmlArray("Deadzones"), XmlArrayItem(typeof(Deadzone), ElementName = "Deadzone")]
 		public List<Deadzone> Deadzones { get; set; }
 
 		public Settings()
@@ -125,6 +131,11 @@ namespace Gta5EyeTracking
 			DontFallFromBikesEnabled = true;
 
 			Deadzones = new List<Deadzone>();
-		}
+
+			SendUsageStatistics = false;
+			UserAgreementAccepted = false;
+
+			UserGuid = Guid.NewGuid().ToString();
+        }
 	}
 }

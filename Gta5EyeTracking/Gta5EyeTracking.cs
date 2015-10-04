@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -21,6 +22,10 @@ namespace Gta5EyeTracking
 		private readonly Stopwatch _tickStopwatch;
 		private readonly GazeProjector _gazeProjector;
 		private readonly ControlsProcessor _controlsProcessor;
+
+		//Statistics
+		private readonly GoogleAnalyticsApi _googleAnalyticsApi;
+		private bool _gameSessionStartedRecorded;
 
 		//Settings
 		private readonly Settings _settings;
@@ -55,6 +60,7 @@ namespace Gta5EyeTracking
 		private bool _menuOpen;
 		private readonly SettingsMenu _settingsMenu;
 		private readonly DeadzoneEditor _deadzoneEditor;
+		private readonly IntroScreen _introScreen;
 
 		//Window
 		private readonly ForegroundWindowWatcher _foregroundWindowWatcher;
@@ -67,12 +73,18 @@ namespace Gta5EyeTracking
 		public Gta5EyeTracking()
 		{
             Util.Log("Begin Initialize");
+
 			//Disposing
-            _shutDownRequestedEvent = new ManualResetEvent(false);
+			_shutDownRequestedEvent = new ManualResetEvent(false);
 
 			//Settings
 			_settingsStorage = new SettingsStorage();
 			_settings = _settingsStorage.LoadSettings();
+
+			//Statistics
+			var version = Assembly.GetExecutingAssembly().GetName().Version;
+			var versionString = version.Major + "." + version.Minor + "." + version.Build;
+			_googleAnalyticsApi = new GoogleAnalyticsApi("UA-68420530-1", _settings.UserGuid, "GTA V Eye Tracking Mod", "gta5eyetracking", versionString);
 
 			//Gaze
 			_aspectRatio = 1;
@@ -88,6 +100,9 @@ namespace Gta5EyeTracking
 			_settingsMenu = new SettingsMenu(_menuPool, _settings);
 		    _deadzoneEditor = new DeadzoneEditor(_settings,_settingsMenu);
 			_settingsMenu.ShutDownRequested += SettingsMenuOnShutDownRequested;
+
+			_introScreen = new IntroScreen(_menuPool, _settings);
+			_introScreen.ShutDownRequested += SettingsMenuOnShutDownRequested;
 
 			//Debug
 			_debugGazeVisualization = new DotCrosshair(Color.FromArgb(220, 255, 0, 0), Color.FromArgb(220, 0, 255, 255));
@@ -115,7 +130,7 @@ namespace Gta5EyeTracking
 
 			KeyDown += OnKeyDown;
 			Tick += OnTick;
-
+			
 			Util.Log("End Initialize");
 		}
 
@@ -264,7 +279,13 @@ namespace Gta5EyeTracking
 			CheckUserPresense();
 
 			if (Game.IsPaused) return;
-			
+
+			if (!_settings.UserAgreementAccepted)
+			{
+				_introScreen.OpenMenu();
+            }
+
+			RecordGameSessionStarted();
 
 			Vector3 shootCoord;
 			Vector3 shootCoordSnap;
@@ -312,6 +333,15 @@ namespace Gta5EyeTracking
 		    {
                 _shutDownRequestedEvent.Set();		        
 		    }
+		}
+
+		private void RecordGameSessionStarted()
+		{
+			if (!_settings.UserAgreementAccepted || !_settings.SendUsageStatistics || _gameSessionStartedRecorded) return;
+
+			
+			_googleAnalyticsApi.TrackEvent("gamesession", "started", "Game Session Started");
+			_gameSessionStartedRecorded = true;
 		}
 
 		private void SaveSettingsOnMenuClosed()
