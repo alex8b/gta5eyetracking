@@ -27,8 +27,8 @@ namespace Gta5EyeTracking.Menu
 			_menuPool.Add(_userAgreement);
 
 			const string privacyPolicyText = "By selecting to send usage statistics you agree that your usage statistics, such as a game session time, " +
-			                                 "mod settings and mod features you use will be collected by the mod developers. The data will be collected " +
-			                                 "anonymously and processed on Google Analytics service.";
+			                                 "mod settings and mod features you use will be collected by the developer. The data will be collected " +
+											 "anonymously, processed on Google Analytics and used solely to enhance user experience.";
 				//"The mod is licensed under Creative Commons " +
 			    //"Attribution-NonCommercial-ShareAlike 4.0 International license. The full text of the license is available " +
 			    //"at http://creativecommons.org/licenses/by-nc-sa/4.0/legalcode and included in the mod package. By clicking " +

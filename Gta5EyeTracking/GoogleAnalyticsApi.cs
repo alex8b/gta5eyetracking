@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Reflection;
 using System.Text;
 using System.Web;
 
@@ -91,7 +90,6 @@ namespace Gta5EyeTracking
 					{
 						Util.Log("Google Analytics tracking did not return OK 200");
 					}
-					Util.Log("Statistics recorded: " + postDataString);
 					webResponse.Close();
                 } 
 				

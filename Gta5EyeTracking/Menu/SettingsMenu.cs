@@ -96,8 +96,9 @@ namespace Gta5EyeTracking.Menu
 			_mainMenu.AddItem(dontFallFromBikes);
 
 			const string privacyPolicyText = "By selecting to send usage statistics you agree that your usage statistics, such as a game session time, " +
-			                                 "mod settings and mod features you use will be collected by the mod developers. The data will be collected " +
-			                                 "anonymously and processed on Google Analytics service.";
+											 "mod settings and mod features you use will be collected by the developer. The data will be collected " +
+											 "anonymously, processed on Google Analytics and used solely to enhance user experience.";
+
 			_sendUsageStatistics = new UIMenuCheckboxItem("Send Usage Statistics", _settings.SendUsageStatistics, privacyPolicyText);
 			_sendUsageStatistics.CheckboxEvent += (sender, args) => { _settings.SendUsageStatistics = _sendUsageStatistics.Checked; };
 			_mainMenu.AddItem(_sendUsageStatistics);
