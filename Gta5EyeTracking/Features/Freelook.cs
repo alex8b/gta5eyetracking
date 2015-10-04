@@ -7,7 +7,7 @@ using GTA;
 using GTA.Math;
 using NativeUI;
 
-namespace Gta5EyeTracking
+namespace Gta5EyeTracking.Features
 {
 	public class Freelook
 	{

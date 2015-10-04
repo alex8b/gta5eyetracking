@@ -7,7 +7,7 @@ using GTA.Math;
 using GTA.Native;
 using Tobii.EyeX.Client;
 
-namespace Gta5EyeTracking
+namespace Gta5EyeTracking.Features
 {
 	public class Aiming: DisposableBase
 	{

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Windows.Forms;
+using Gta5EyeTracking.Features;
 using Gta5EyeTracking.HidEmulation;
+using Gta5EyeTracking.Menu;
 using GTA;
 using GTA.Math;
 using NativeUI;

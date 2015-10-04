@@ -3,7 +3,7 @@ using System.Diagnostics;
 using Gta5EyeTracking.HidEmulation;
 using GTA.Math;
 
-namespace Gta5EyeTracking
+namespace Gta5EyeTracking.Features
 {
 	public class RadialMenu
 	{

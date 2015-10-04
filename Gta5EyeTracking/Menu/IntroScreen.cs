@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Reflection;
 using NativeUI;
 
-namespace Gta5EyeTracking
+namespace Gta5EyeTracking.Menu
 {
 	public class IntroScreen
 	{
