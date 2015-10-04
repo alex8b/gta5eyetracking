@@ -340,9 +340,11 @@ namespace Gta5EyeTracking
 		private void RecordGameSessionStarted()
 		{
 			if (!_settings.UserAgreementAccepted || !_settings.SendUsageStatistics || _gameSessionStartedRecorded) return;
-
 			
 			_googleAnalyticsApi.TrackEvent("gamesession", "started", "Game Session Started");
+			var trackingActive = (_host.EyeTrackingDeviceStatus.IsValid &&
+			                    _host.EyeTrackingDeviceStatus.Value == EyeTrackingDeviceStatus.Tracking);
+			_googleAnalyticsApi.TrackEvent("gamesession", "devicestatus", "Device Status", trackingActive ? 1 : 0);
 			_gameSessionStartedRecorded = true;
 		}
 
