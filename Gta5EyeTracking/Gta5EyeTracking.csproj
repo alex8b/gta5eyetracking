@@ -147,8 +147,6 @@ xcopy "$(ProjectDir)bin\x64\Release\SharpDX.dll" "$(SolutionDir)bin\scripts\"
 xcopy "$(ProjectDir)bin\x64\Release\SharpDX.XInput.dll" "$(SolutionDir)bin\scripts\"
 
 xcopy "$(SolutionDir)lib\ScriptHookVDotNet\ScriptHookVDotNet.asi" "$(SolutionDir)bin\bundle\"
-xcopy "$(SolutionDir)lib\ScriptHookVDotNet\ScriptHookVDotNet.dll" "$(SolutionDir)bin\bundle\"
-xcopy "$(SolutionDir)lib\ScriptHookVDotNet\ScriptHookVDotNet.dll.metagen" "$(SolutionDir)bin\bundle\"
 
 xcopy "$(SolutionDir)lib\ScriptHookV\bin\NativeTrainer.asi" "$(SolutionDir)bin\bundle\"
 xcopy "$(SolutionDir)lib\ScriptHookV\bin\ScriptHookV.dll" "$(SolutionDir)bin\bundle\"
