@@ -20,7 +20,7 @@ If any skilled mod developers want to help me working on this mod then Tobii wil
 
 You need to have one of these eye trackers to use it:
 - Tobii EyeX DevKit
-http://www.tobii.com/en/eye-experience/buy/
+http://www.tobii.com/xperience/products/buy/
 $139 / €99
  
 - SteelSeries Sentry Gaming Eye Tracker
