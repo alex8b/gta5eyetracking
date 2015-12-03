@@ -10,20 +10,38 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gta5EyeTracking", "Gta5EyeT
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MemoryAccess", "MemoryAccess\MemoryAccess.vcxproj", "{3B6ACFED-0B3C-4E64-B419-F8651FD42E9F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gta5EyeTrackingModUpdater", "Gta5EyeTrackingModUpdater\Gta5EyeTrackingModUpdater.csproj", "{47BE85E9-3420-4B93-BF48-0E69C1A00386}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9585ABAB-B222-40B4-A9F7-AC8BE027DFAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9585ABAB-B222-40B4-A9F7-AC8BE027DFAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9585ABAB-B222-40B4-A9F7-AC8BE027DFAF}.Debug|x64.ActiveCfg = Debug|x64
 		{9585ABAB-B222-40B4-A9F7-AC8BE027DFAF}.Debug|x64.Build.0 = Debug|x64
+		{9585ABAB-B222-40B4-A9F7-AC8BE027DFAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9585ABAB-B222-40B4-A9F7-AC8BE027DFAF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9585ABAB-B222-40B4-A9F7-AC8BE027DFAF}.Release|x64.ActiveCfg = Release|x64
 		{9585ABAB-B222-40B4-A9F7-AC8BE027DFAF}.Release|x64.Build.0 = Release|x64
+		{3B6ACFED-0B3C-4E64-B419-F8651FD42E9F}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{3B6ACFED-0B3C-4E64-B419-F8651FD42E9F}.Debug|x64.ActiveCfg = Debug|x64
 		{3B6ACFED-0B3C-4E64-B419-F8651FD42E9F}.Debug|x64.Build.0 = Debug|x64
+		{3B6ACFED-0B3C-4E64-B419-F8651FD42E9F}.Release|Any CPU.ActiveCfg = Release|Win32
 		{3B6ACFED-0B3C-4E64-B419-F8651FD42E9F}.Release|x64.ActiveCfg = Release|x64
 		{3B6ACFED-0B3C-4E64-B419-F8651FD42E9F}.Release|x64.Build.0 = Release|x64
+		{47BE85E9-3420-4B93-BF48-0E69C1A00386}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47BE85E9-3420-4B93-BF48-0E69C1A00386}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47BE85E9-3420-4B93-BF48-0E69C1A00386}.Debug|x64.ActiveCfg = Debug|x64
+		{47BE85E9-3420-4B93-BF48-0E69C1A00386}.Debug|x64.Build.0 = Debug|x64
+		{47BE85E9-3420-4B93-BF48-0E69C1A00386}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47BE85E9-3420-4B93-BF48-0E69C1A00386}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47BE85E9-3420-4B93-BF48-0E69C1A00386}.Release|x64.ActiveCfg = Release|x64
+		{47BE85E9-3420-4B93-BF48-0E69C1A00386}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
