@@ -4,6 +4,8 @@ using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.IO.Compression;
+using System.Linq;
+using System.Reflection;
 using System.Xml;
 
 namespace Gta5EyeTrackingModUpdater
@@ -17,7 +19,13 @@ namespace Gta5EyeTrackingModUpdater
 		{
 			_updaterNotifyIcon = updaterNotifyIcon;
 
-			ShowNotification("Start");
+			CheckForUpdates();
+		}
+
+		public void CheckForUpdates()
+		{
+			ShowNotification("Checking for updates");
+			SelfUpdate();
 			UpdateModBundle();
 			UpdateScriptHookV();
 		}
@@ -66,7 +74,7 @@ namespace Gta5EyeTrackingModUpdater
 				}
 			}
 
-			if (installedScriptHookVVersion != availableScriptHookVVersion)
+			if (("v" + installedScriptHookVVersion).ToUpperInvariant() != availableScriptHookVVersion.ToUpperInvariant())
 			{
 				DownloadScriptHookV(scriptHookVDownloadUrlAddress);
 				if (!InstallScriptHookV())
@@ -185,8 +193,12 @@ namespace Gta5EyeTrackingModUpdater
 			try
 			{
 				var zipFile = ZipFile.Open(localFilePath, ZipArchiveMode.Read);
-
+				
 				var extractPath = Path.Combine(Util.GetDownloadsPath(), "scripthookv");
+				if (Directory.Exists(extractPath))
+				{
+					Directory.Delete(extractPath,true);
+				}
 				zipFile.ExtractToDirectory(extractPath);
 
 				var scriptHookVDllPath = Path.Combine(extractPath, "bin", "ScriptHookV.dll");
@@ -194,11 +206,11 @@ namespace Gta5EyeTrackingModUpdater
 				var nativeTrainerAsiPath = Path.Combine(extractPath, "bin", "NativeTrainer.asi");
 
 				var gtaPath = GetGtaInstallPath();
-				File.Copy(scriptHookVDllPath, gtaPath);
-				File.Copy(dinput8DllPath, gtaPath);
-				File.Copy(nativeTrainerAsiPath, gtaPath);
+				File.Copy(scriptHookVDllPath, Path.Combine(gtaPath, Path.GetFileName(scriptHookVDllPath)), true);
+				File.Copy(dinput8DllPath, Path.Combine(gtaPath, Path.GetFileName(dinput8DllPath)), true);
+				File.Copy(nativeTrainerAsiPath, Path.Combine(gtaPath, Path.GetFileName(nativeTrainerAsiPath)), true);
 			}
-			catch
+			catch(Exception e)
 			{
 				return false;
 				//Failed to install
@@ -247,7 +259,7 @@ namespace Gta5EyeTrackingModUpdater
 			string updaterDownloadUrl;
 			if (!TryParseModInfoWebPage(out availableModVersion, out modBundleDownloadUrl, out blockScriptHookV, out availableUpdaterVersion, out updaterDownloadUrl))
 			{
-				// Failed to read or parse web page
+				//Failed to read or parse web page
 			}
 
 			if (installedModVersion >= availableModVersion)
@@ -273,9 +285,13 @@ namespace Gta5EyeTrackingModUpdater
 				var zipFile = ZipFile.Open(localFilePath, ZipArchiveMode.Read);
 
 				var extractPath = Path.Combine(Util.GetDownloadsPath(), "gta5eyetracking_bundle");
+				if (Directory.Exists(extractPath))
+				{
+					Directory.Delete(extractPath, true);
+				}
 				zipFile.ExtractToDirectory(extractPath);
-				Util.DirectoryCopy(extractPath, GetGtaInstallPath(), true);
-				//todo: skip script hook files
+				Util.DirectoryCopy(extractPath, GetGtaInstallPath(), true, true);
+				//todo: skip script hook v files
 			}
 			catch
 			{
@@ -309,7 +325,7 @@ namespace Gta5EyeTrackingModUpdater
 
 			var modVersionNode = xmlDoc.SelectSingleNode("Update/ModVersion");
 
-			if (!((modVersionNode != null) && (Version.TryParse(modVersionNode.Value, out modVersion))))
+			if (!((modVersionNode != null) && (Version.TryParse(modVersionNode.InnerText, out modVersion))))
 			{
 				return false;
 			}
@@ -317,7 +333,7 @@ namespace Gta5EyeTrackingModUpdater
 			var modBundleDownloadUrlNode = xmlDoc.SelectSingleNode("Update/ModBundleDownloadUrl");
 			if (modBundleDownloadUrlNode != null)
 			{
-				modBundleDownloadUrl = modBundleDownloadUrlNode.Value;
+				modBundleDownloadUrl = modBundleDownloadUrlNode.InnerText;
 			}
 			else
 			{
@@ -325,14 +341,14 @@ namespace Gta5EyeTrackingModUpdater
 			}
 
 			var blockNode = xmlDoc.SelectSingleNode("Update/Block");
-			if (!((blockNode != null) && (bool.TryParse(blockNode.Value, out block))))
+			if (!((blockNode != null) && (bool.TryParse(blockNode.InnerText, out block))))
 			{
 				return false;
 			}
 
 			var updaterVersionNode = xmlDoc.SelectSingleNode("Update/UpdaterVersion");
 
-			if (!((updaterVersionNode != null) && (Version.TryParse(updaterVersionNode.Value, out updaterVersion))))
+			if (!((updaterVersionNode != null) && (Version.TryParse(updaterVersionNode.InnerText, out updaterVersion))))
 			{
 				return false;
 			}
@@ -340,7 +356,7 @@ namespace Gta5EyeTrackingModUpdater
 			var updaterDownloadUrlNode = xmlDoc.SelectSingleNode("Update/UpdaterDownloadUrl");
 			if (updaterDownloadUrlNode != null)
 			{
-				updaterDownloadUrl = updaterDownloadUrlNode.Value;
+				updaterDownloadUrl = updaterDownloadUrlNode.InnerText;
 			}
 			else
 			{
@@ -350,10 +366,63 @@ namespace Gta5EyeTrackingModUpdater
 			return true;
 		}
 
+		public void SelfUpdate()
+		{
+			var installedUpdaterVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            Version availableModVersion;
+			string modBundleDownloadUrl;
+			bool blockScriptHookV;
+			Version availableUpdaterVersion;
+			string updaterDownloadUrl;
+			if (!TryParseModInfoWebPage(out availableModVersion, out modBundleDownloadUrl, out blockScriptHookV, out availableUpdaterVersion, out updaterDownloadUrl))
+			{
+				// Failed to read or parse web page
+				return;
+			}
 
+			if (installedUpdaterVersion >= availableUpdaterVersion)
+			{
+				//Updater is up to date
+				return;
+			}
 
+			DownloadModUpdater(updaterDownloadUrl);
+			if (!InstallModUpdater())
+			{
+				ShowNotification("Failed to auto-update");
+			}
 
+		}
 
+		private void DownloadModUpdater(string downloadUrlAddress)
+		{
+			var wc = new WebClient();
+			var localFilePath = Path.Combine(Util.GetDownloadsPath(), "gta5eyetrackingmodupdater_installer.exe");
+			wc.DownloadFile(downloadUrlAddress, localFilePath);
+		}
+
+		private bool InstallModUpdater()
+		{
+			try
+			{
+				var exePath = Assembly.GetEntryAssembly().Location;
+				var bakPath = exePath + ".bak";
+				if (File.Exists(bakPath))
+				{
+					File.Delete(bakPath);
+				}
+				File.Move(exePath, bakPath);
+				File.Copy(bakPath, exePath, true);
+
+				var installerPath = Path.Combine(Util.GetDownloadsPath(), "gta5eyetrackingmodupdater_installer.exe");
+				Process.Start(installerPath, "/VERYSILENT");
+			}
+			catch
+			{
+				return false;
+			}
+			return true;
+		}
 
 
 		private string GetGtaInstallPath()
@@ -372,18 +441,6 @@ namespace Gta5EyeTrackingModUpdater
 		private void ShowNotification(string text)
 		{
 			_updaterNotifyIcon.ShowNotification(text);
-		}
-
-
-
-
-		public void SelfUpdate()
-		{
-			//if there's a file in a "update folder"
-			//if file version is higher than the assembly version
-			//exit app start self update in silent mode
-
-			//installer should start the app when finished
 		}
 	}
 }
