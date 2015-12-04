@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.IO.Compression;
+using System.Xml;
 
 namespace Gta5EyeTrackingModUpdater
 {
@@ -240,11 +241,13 @@ namespace Gta5EyeTrackingModUpdater
 			}
 
 			Version availableModVersion;
-			string downloadUrlAddress;
-			bool modActive;
-			if (!TryParseModInfoWebPage(out downloadUrlAddress, out availableModVersion, out modActive))
+			string modBundleDownloadUrl;
+			bool blockScriptHookV;
+			Version availableUpdaterVersion;
+			string updaterDownloadUrl;
+			if (!TryParseModInfoWebPage(out availableModVersion, out modBundleDownloadUrl, out blockScriptHookV, out availableUpdaterVersion, out updaterDownloadUrl))
 			{
-				// Failed to read web page
+				// Failed to read or parse web page
 			}
 
 			if (installedModVersion >= availableModVersion)
@@ -253,10 +256,10 @@ namespace Gta5EyeTrackingModUpdater
 				return;
 			}
 
-			DownloadModBundle(downloadUrlAddress);
+			DownloadModBundle(modBundleDownloadUrl);
 			if (!InstallModBundle())
 			{
-				ShowNotification("Failed to update Gta V Eye tracking Mod");
+				ShowNotification("Failed to update Gta V Eye Tracking Mod");
 			}
 		}
 
@@ -290,11 +293,59 @@ namespace Gta5EyeTrackingModUpdater
 		}
 
 
-		private bool TryParseModInfoWebPage(out string downloadUrlAddress, out Version version, out bool active)
+		private bool TryParseModInfoWebPage(out Version modVersion, out string modBundleDownloadUrl, out bool block, out Version updaterVersion, out string updaterDownloadUrl)
 		{
-			downloadUrlAddress = null;
-			version = new Version(0, 0);
-			active = true;
+			modVersion = new Version(0, 0);
+			modBundleDownloadUrl = null;
+			block = true;
+			updaterVersion = new Version(0, 0);
+			updaterDownloadUrl = null;
+
+			var xmlText = Util.ReadWebPageContent("https://raw.githubusercontent.com/alex8b/gta5eyetracking/updater/update.xml");
+
+			var xmlDoc = new XmlDocument();
+			xmlDoc.LoadXml(xmlText);
+
+
+			var modVersionNode = xmlDoc.SelectSingleNode("Update/ModVersion");
+
+			if (!((modVersionNode != null) && (Version.TryParse(modVersionNode.Value, out modVersion))))
+			{
+				return false;
+			}
+
+			var modBundleDownloadUrlNode = xmlDoc.SelectSingleNode("Update/ModBundleDownloadUrl");
+			if (modBundleDownloadUrlNode != null)
+			{
+				modBundleDownloadUrl = modBundleDownloadUrlNode.Value;
+			}
+			else
+			{
+				return false;
+			}
+
+			var blockNode = xmlDoc.SelectSingleNode("Update/Block");
+			if (!((blockNode != null) && (bool.TryParse(blockNode.Value, out block))))
+			{
+				return false;
+			}
+
+			var updaterVersionNode = xmlDoc.SelectSingleNode("Update/UpdaterVersion");
+
+			if (!((updaterVersionNode != null) && (Version.TryParse(updaterVersionNode.Value, out updaterVersion))))
+			{
+				return false;
+			}
+
+			var updaterDownloadUrlNode = xmlDoc.SelectSingleNode("Update/UpdaterDownloadUrl");
+			if (updaterDownloadUrlNode != null)
+			{
+				updaterDownloadUrl = updaterDownloadUrlNode.Value;
+			}
+			else
+			{
+				return false;
+			}
 
 			return true;
 		}
