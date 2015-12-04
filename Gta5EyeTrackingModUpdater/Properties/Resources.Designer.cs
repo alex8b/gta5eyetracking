@@ -61,6 +61,16 @@ namespace Gta5EyeTrackingModUpdater.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon ApplicationIcon {
+            get {
+                object obj = ResourceManager.GetObject("ApplicationIcon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Gta V Eye Tracking Mod.
         /// </summary>
         internal static string ApplicationName {

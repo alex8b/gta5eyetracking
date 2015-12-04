@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,15 +21,39 @@ namespace Gta5EyeTrackingModUpdater
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private UpdaterNotifyIcon _icon;
+		private UpdaterNotifyIcon _updaterNotifyIcon;
 		private Updater _updater;
 
 		public MainWindow()
 		{
 			InitializeComponent();
-
-			_icon = new UpdaterNotifyIcon();
-            _updater = new Updater(_icon);
+			this.Closing += OnClosing;
+			_updaterNotifyIcon = new UpdaterNotifyIcon();
+            _updater = new Updater(_updaterNotifyIcon);
+			_updaterNotifyIcon.QuitMenuItemClick += UpdaterNotifyIconOnQuitMenuItemClick;
+			_updaterNotifyIcon.CheckForUpdateMenuItemClick += UpdaterNotifyIconOnCheckForUpdateMenuItemClick;
+			//todo: ui - versions, install, uninstall, check for update, autostart
+			//todo: close program if new instance is running
 		}
+
+		private void UpdaterNotifyIconOnCheckForUpdateMenuItemClick(object sender, EventArgs e)
+		{
+			_updater.CheckForUpdates();
+        }
+
+		private void OnClosing(object sender, CancelEventArgs cancelEventArgs)
+		{
+			_updaterNotifyIcon.QuitMenuItemClick -= UpdaterNotifyIconOnQuitMenuItemClick;
+			_updaterNotifyIcon.CheckForUpdateMenuItemClick -= UpdaterNotifyIconOnCheckForUpdateMenuItemClick;
+			_updater.Close();
+			_updaterNotifyIcon = null;
+			_updater = null;
+		}
+
+		private void UpdaterNotifyIconOnQuitMenuItemClick(object sender, EventArgs eventArgs)
+		{
+			Close();
+		}
+
 	}
 }

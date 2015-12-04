@@ -20,7 +20,7 @@ namespace Gta5EyeTrackingModUpdater
 		public UpdaterNotifyIcon()
 		{
 			_notifyIcon = new NotifyIcon();
-			//_notifyIcon.Icon = Resources.ApplicationIcon;
+			_notifyIcon.Icon = Resources.ApplicationIcon;
 			_notifyIcon.Visible = true;
 			_notifyIcon.ContextMenu = new ContextMenu();
 			_notifyIcon.Text = Resources.ApplicationName;

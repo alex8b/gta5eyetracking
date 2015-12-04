@@ -4,8 +4,8 @@ using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.IO.Compression;
-using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Xml;
 
 namespace Gta5EyeTrackingModUpdater
@@ -13,21 +13,36 @@ namespace Gta5EyeTrackingModUpdater
 	public class Updater
 	{
 		private readonly UpdaterNotifyIcon _updaterNotifyIcon;
+		private readonly object _lock = new object();
+		private bool _enabled = true;
 		public const string SettingsPath = "Gta5EyeTracking";
 
 		public Updater(UpdaterNotifyIcon updaterNotifyIcon)
 		{
 			_updaterNotifyIcon = updaterNotifyIcon;
+		}
 
+		private void UpdaterNotifyIconOnCheckForUpdateMenuItemClick(object sender, EventArgs eventArgs)
+		{
 			CheckForUpdates();
 		}
 
 		public void CheckForUpdates()
 		{
-			ShowNotification("Checking for updates");
-			SelfUpdate();
-			UpdateModBundle();
-			UpdateScriptHookV();
+			if (!_enabled) return;
+			if (!Monitor.TryEnter(_lock)) return;
+			try
+			{
+				ShowNotification("Checking for updates");
+				SelfUpdate();
+				UpdateModBundle();
+				UpdateScriptHookV();
+			}
+			catch
+			{
+				//Failed to update
+			}
+			Monitor.Exit(_lock);
 		}
 
 		public void UpdateScriptHookV()
@@ -74,6 +89,7 @@ namespace Gta5EyeTrackingModUpdater
 				}
 			}
 
+			//todo: parse version with a,b,c,d,e, remove v in the begining
 			if (("v" + installedScriptHookVVersion).ToUpperInvariant() != availableScriptHookVVersion.ToUpperInvariant())
 			{
 				DownloadScriptHookV(scriptHookVDownloadUrlAddress);
@@ -441,6 +457,13 @@ namespace Gta5EyeTrackingModUpdater
 		private void ShowNotification(string text)
 		{
 			_updaterNotifyIcon.ShowNotification(text);
+		}
+
+		public void Close()
+		{
+			_enabled = false;
+			Monitor.Enter(_lock);
+			Monitor.Exit(_lock);
 		}
 	}
 }
