@@ -27,13 +27,21 @@ namespace Gta5EyeTrackingModUpdater
 		public MainWindow()
 		{
 			InitializeComponent();
+			Hide();
 			this.Closing += OnClosing;
 			_updaterNotifyIcon = new UpdaterNotifyIcon();
             _updater = new Updater(_updaterNotifyIcon);
 			_updaterNotifyIcon.QuitMenuItemClick += UpdaterNotifyIconOnQuitMenuItemClick;
 			_updaterNotifyIcon.CheckForUpdateMenuItemClick += UpdaterNotifyIconOnCheckForUpdateMenuItemClick;
+			_updaterNotifyIcon.OpenWindowMenuItemClick += UpdaterNotifyIconOnOpenWindowMenuItemClick;
+			_updaterNotifyIcon.DoubleClick += UpdaterNotifyIconOnOpenWindowMenuItemClick;
 			//todo: ui - versions, install, uninstall, check for update, autostart
 			//todo: close program if new instance is running
+		}
+
+		private void UpdaterNotifyIconOnOpenWindowMenuItemClick(object sender, EventArgs eventArgs)
+		{
+			this.Show();
 		}
 
 		private void UpdaterNotifyIconOnCheckForUpdateMenuItemClick(object sender, EventArgs e)
@@ -43,17 +51,27 @@ namespace Gta5EyeTrackingModUpdater
 
 		private void OnClosing(object sender, CancelEventArgs cancelEventArgs)
 		{
-			_updaterNotifyIcon.QuitMenuItemClick -= UpdaterNotifyIconOnQuitMenuItemClick;
-			_updaterNotifyIcon.CheckForUpdateMenuItemClick -= UpdaterNotifyIconOnCheckForUpdateMenuItemClick;
-			_updater.Close();
-			_updaterNotifyIcon = null;
-			_updater = null;
+			cancelEventArgs.Cancel = true;
+			this.Hide();
 		}
 
 		private void UpdaterNotifyIconOnQuitMenuItemClick(object sender, EventArgs eventArgs)
 		{
-			Close();
+			Shutdown();
 		}
 
+
+		public void Shutdown()
+		{
+			_updaterNotifyIcon.QuitMenuItemClick -= UpdaterNotifyIconOnQuitMenuItemClick;
+			_updaterNotifyIcon.CheckForUpdateMenuItemClick -= UpdaterNotifyIconOnCheckForUpdateMenuItemClick;
+			_updaterNotifyIcon.OpenWindowMenuItemClick -= UpdaterNotifyIconOnOpenWindowMenuItemClick;
+			_updaterNotifyIcon.DoubleClick -= UpdaterNotifyIconOnOpenWindowMenuItemClick;
+			_updater.Close();
+			_updaterNotifyIcon.Dispose();
+			_updaterNotifyIcon = null;
+			_updater = null;
+			Application.Current.Shutdown();
+		}
 	}
 }

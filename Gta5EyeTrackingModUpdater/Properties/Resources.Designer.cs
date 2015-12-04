@@ -71,7 +71,7 @@ namespace Gta5EyeTrackingModUpdater.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Gta V Eye Tracking Mod.
+        ///   Looks up a localized string similar to Gta V Eye Tracking Mod Updater.
         /// </summary>
         internal static string ApplicationName {
             get {
