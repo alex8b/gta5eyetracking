@@ -1,6 +1,9 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 
@@ -83,7 +86,7 @@ namespace Gta5EyeTrackingModUpdater
 		}
 
 
-		public static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs, bool overwrite)
+		public static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs, bool overwrite, IEnumerable<string> skipFiles)
 		{
 			// Get the subdirectories for the specified directory.
 			DirectoryInfo dir = new DirectoryInfo(sourceDirName);
@@ -107,6 +110,8 @@ namespace Gta5EyeTrackingModUpdater
 			foreach (FileInfo file in files)
 			{
 				string temppath = Path.Combine(destDirName, file.Name);
+				if ((skipFiles != null) &&
+					(skipFiles.Any(fileName => fileName.Equals(file.Name, StringComparison.OrdinalIgnoreCase)))) continue;
 				file.CopyTo(temppath, overwrite);
 			}
 
@@ -116,7 +121,7 @@ namespace Gta5EyeTrackingModUpdater
 				foreach (DirectoryInfo subdir in dirs)
 				{
 					string temppath = Path.Combine(destDirName, subdir.Name);
-					DirectoryCopy(subdir.FullName, temppath, copySubDirs, overwrite);
+					DirectoryCopy(subdir.FullName, temppath, copySubDirs, overwrite, skipFiles);
 				}
 			}
 		}
