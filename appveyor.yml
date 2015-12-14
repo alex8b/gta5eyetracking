@@ -63,8 +63,12 @@ artifacts:
   name: Gta5EyeTracking_bundle
 - path: bin/scripts/
   name: Gta5EyeTracking
+- path: bin/updater/
+  name: Gta5EyeTrackingModUpdater  
+- path: bin/installer/Gta5EyeTrackingModUpdater.msi
+  name: Gta5EyeTrackingModUpdaterInstaller
 - path: bin/installer/Gta5EyeTrackingModUpdater_bundle.exe
-  name: installer
+  name: Gta5EyeTrackingModUpdaterInstaller_bundle
 deploy:
 - provider: GitHub
   tag: $(appveyor_repo_tag_name)
