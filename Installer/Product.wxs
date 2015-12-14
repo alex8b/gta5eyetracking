@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+		 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+	<Product Id="*"
+					 Name="GTA V Eye Tracking Mod"
+					 Language="1033"
+					 Version="0.1"
+					 Manufacturer="alex8b"
+					 UpgradeCode="916B8E72-0A18-44F2-A723-010338C54B22">
+		<Package InstallerVersion="200" 
+						 Compressed="yes" 
+						 InstallScope="perMachine"
+						 Platform="x64" />
+
+		<MajorUpgrade AllowSameVersionUpgrades="yes" DowngradeErrorMessage="A newer version of [ProductName] is already installed."/>
+		<MediaTemplate EmbedCab="yes"/>
+
+		<Icon Id="Gta5EyeTrackingModUpdaterIcon" SourceFile="Resources\gta5eyetracking.ico"/>
+
+		<Property Id="ARPPRODUCTICON" Value="Gta5EyeTrackingModUpdaterIcon"/>
+		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER"/>
+
+		<!-- Defining a value here defaults their UI checkboxes to true, not defining a value defaults to false... -->
+		<Property Id="INSTALLDESKTOPSHORTCUT" Value="1" Secure="yes"/>
+		<Property Id="LAUNCHONSTARTUP" Secure="yes"/>
+
+		<WixVariable Id="WixUILicenseRtf" Value="Resources\License.rtf"/>
+		<WixVariable Id="WixUIBannerBmp" Value="Resources\Banner.bmp"/>
+		<WixVariable Id="WixUIDialogBmp" Value="Resources\Dialog.bmp"/>
+
+		<CustomAction Id="LaunchApp" Directory="INSTALLFOLDER" Return="asyncNoWait" ExeCommand="[INSTALLFOLDER]Gta5EyeTrackingModUpdater.exe" />
+
+		<InstallExecuteSequence>
+			<Custom Action="LaunchApp" After="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>
+		</InstallExecuteSequence>
+
+		<util:CloseApplication Id="CloseLauncher" Target="Gta5EyeTrackingModUpdater.exe" ElevatedCloseMessage="yes" TerminateProcess="1" RebootPrompt="no" />
+
+		<Feature Id="Game" Title="Gta V Eye Tracking Mod" Description="Gta V Eye Tracking Mod" Level="1" ConfigurableDirectory="INSTALLFOLDER">
+			<ComponentRef Id="Program"/>
+			<ComponentRef Id="ProgramMenuItems"/>
+			<ComponentRef Id="MainExecutableIcon"/>
+			<ComponentRef Id="InstallPathRegKey"/>
+		</Feature>
+
+		<Feature Id="VCRedist2013x64" Title="Visual C++ 2013 x64 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+			<MergeRef Id="VCRedist2013x64"/>
+		</Feature>
+
+		<Feature Id="VCRedist2015x64" Title="Visual C++ 2015 x64 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+			<MergeRef Id="VCRedist2015x64"/>
+		</Feature>
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Merge Id="VCRedist2013x64" SourceFile="Microsoft_VC120_CRT_x64.msm" DiskId="1" Language="0"/>
+			<Merge Id="VCRedist2015x64" SourceFile="Microsoft_VC140_CRT_x64.msm" DiskId="1" Language="0"/>
+			<Directory Id="ProgramFiles64Folder">
+				<Directory Id="INSTALLFOLDER" Name="Gta5EyeTrackingMod"/>
+			</Directory>
+
+			<Directory Id="ProgramMenuFolder" Name="Programs">
+				<Directory Id="ProgramMenuGta5EyeTrackingModUpdaterFolder" Name="GTA V Eye Tracking Mod">
+					<Component Id="ProgramMenuItems" Guid="c3ab1bb0-4394-4c1c-955e-7cbd98777f4d">
+						<Shortcut Id="ExecutableProgramMenuShortcut"
+                      Directory="ProgramMenuGta5EyeTrackingModUpdaterFolder"
+                      Name="GTA V Eye Tracking Mod Updater"
+                      Description="Run GTA V Eye Tracking Mod Updater"
+                      Target="[INSTALLFOLDER]Gta5EyeTrackingModUpdater.exe"
+                      WorkingDirectory="INSTALLFOLDER"
+                      Icon="Gta5EyeTrackingModUpdaterIcon"
+                      IconIndex="0"/>
+						<RemoveFolder Id='ProgramMenuGta5EyeTrackingModUpdaterFolder' On='uninstall'/>
+						<RemoveFolder Id='INSTALLFOLDER' On='uninstall'/>
+						<RegistryValue Root="HKCU" Key="Software\Gta5EyeTrackingModUpdater" Name="InstalledProgramMenuShortcuts" Type="integer" Value="1" KeyPath="yes"/>
+					</Component>
+				</Directory>
+			</Directory>
+
+			<!-- 
+	      This shortcut currently causes a 1910 error and cannot delete the shortcut on machines with readonly desktop.ini file due to an NVidia driver update.
+		  See:
+		  http://social.msdn.microsoft.com/Forums/windows/en-US/09f72e05-f43f-4e7e-81b6-f81c1b60dc6c/warning-deleting-shortcuts-in-windows-8
+		  http://social.msdn.microsoft.com/Forums/windows/en-US/93b22821-ca04-42da-bb06-a559c95ce54e/warning-1910-for-my-desktop-shortcut-during-uninstallation
+	  -->
+			<Directory Id="DesktopFolder" Name="Desktop">
+				<Component Id="MainExecutableIcon" Guid="451839fc-5a21-4b39-8278-f93c815921ad" Win64="yes">
+					<Condition>INSTALLDESKTOPSHORTCUT</Condition>
+					<Shortcut Id="ExecutableDesktopShortcut"
+                    Directory="DesktopFolder"
+                    Name="GTA V Eye Tracking Mod Updater"
+                    Description="Run GTA V Eye Tracking Mod Updater"
+                    Target="[INSTALLFOLDER]Gta5EyeTrackingModUpdater.exe"
+                    WorkingDirectory="INSTALLFOLDER"
+                    Icon="Gta5EyeTrackingModUpdaterIcon"
+                    IconIndex="0"/>
+					<RegistryValue Root="HKCU" Key="Software\Gta5EyeTrackingModUpdater" Name="InstalledDesktopShortcut" Type="integer" Value="1" KeyPath="yes"/>
+				</Component>
+			</Directory>
+		</Directory>
+	</Fragment>
+
+	<Fragment>
+		<DirectoryRef Id="INSTALLFOLDER">
+			<Component Id="Program" Guid="DE9D2DC5-6FE6-4406-BD6E-12A82717E831" Win64="yes" >
+				<File Id="Manual" KeyPath="yes" Source="..\bin\updater\Gta5EyeTrackingModUpdater.exe"/>
+			</Component>
+		</DirectoryRef>
+	</Fragment>
+
+	<Fragment>
+		<DirectoryRef Id="INSTALLFOLDER">
+			<Component Id="InstallPathRegKey" Guid="8C4C99C5-9161-4228-BF53-E8FD6CFACC47" Win64="yes">
+				<RegistryValue Root="HKLM" Key="Software\Gta5EyeTrackingModUpdater" Name="InstallPath" Type="string" Value="[INSTALLFOLDER]Gta5EyeTrackingModUpdater.exe" KeyPath="yes"/>
+			</Component>
+		</DirectoryRef>
+	</Fragment>
+</Wix>

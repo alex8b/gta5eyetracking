@@ -13,6 +13,10 @@
         </Grid.ColumnDefinitions>
         <StackPanel Grid.ColumnSpan="2">
             <Label Content="Component versions"></Label>
+            <Button Content="Check for update"></Button>
+            <Button Content="Install the mod"></Button>
+            <Button Content="Remove the mod"></Button>
+			<CheckBox Content="Autostart on Windows startup"></CheckBox>
         </StackPanel>
     </Grid>
 </Window>

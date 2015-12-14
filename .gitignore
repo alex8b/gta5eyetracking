@@ -9,6 +9,10 @@ MemoryAccess/bin/
 MemoryAccess/obj/
 Gta5EyeTrackingModUpdater/bin/
 Gta5EyeTrackingModUpdater/obj/
+Installer/bin/
+Installer/obj/
+InstallerBundle/bin/
+InstallerBundle/obj/
 bin/
 lib/
 packages/

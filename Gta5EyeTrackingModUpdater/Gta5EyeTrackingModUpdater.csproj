@@ -127,6 +127,11 @@
     <None Include="Resources\ApplicationIcon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>rd /s /q "$(SolutionDir)bin\updater"
+xcopy "$(ProjectDir)bin\x64\Release\Gta5EyeTrackingModUpdater.exe" "$(SolutionDir)bin\updater\"
+</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

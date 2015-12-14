@@ -27,6 +27,7 @@ namespace Gta5EyeTrackingModUpdater
 		public MainWindow()
 		{
 			InitializeComponent();
+			//todo: Show if gta folder is not specified
 			Hide();
 			this.Closing += OnClosing;
 			_updaterNotifyIcon = new UpdaterNotifyIcon();
