@@ -7,7 +7,7 @@
 					 Version="0.1"
 					 Manufacturer="alex8b"
 					 UpgradeCode="916B8E72-0A18-44F2-A723-010338C54B22">
-		<Package InstallerVersion="200" 
+		<Package InstallerVersion="405" 
 						 Compressed="yes" 
 						 InstallScope="perMachine"
 						 Platform="x64" />
