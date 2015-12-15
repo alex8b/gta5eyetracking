@@ -39,10 +39,10 @@ namespace Gta5EyeTrackingModUpdater
 
 			//Init NotifyIcon
 			_updaterNotifyIcon = new UpdaterNotifyIcon();
-            _updater = new Updater(_updaterNotifyIcon, _settings);
+			_updater = new Updater(_updaterNotifyIcon, _settings);
 			_updater.ModInstalled += UpdaterOnModInstalled;
 			_updater.ScriptHookVInstalled += UpdaterOnScriptHookVInstalled;
-			_updater.ScriptHookVRemoved += UpdaterOnScriptHookVRemoved; 
+			_updater.ScriptHookVRemoved += UpdaterOnScriptHookVRemoved;
 
 			_updaterNotifyIcon.QuitMenuItemClick += UpdaterNotifyIconOnQuitMenuItemClick;
 			_updaterNotifyIcon.CheckForUpdateMenuItemClick += UpdaterNotifyIconOnCheckForUpdateMenuItemClick;
@@ -131,6 +131,8 @@ namespace Gta5EyeTrackingModUpdater
 			{
 				_model.GtaVersionText = "GTA V version: " + gtaVersion;
 			}
+
+			_model.Enabled = _updater.IsScriptHookVInstalled();
 		}
 
 		private void TimerOnTick(object sender, EventArgs eventArgs)
@@ -143,7 +145,10 @@ namespace Gta5EyeTrackingModUpdater
 
 		private void PreventMultipleProcess()
 		{
-			var processes = Process.GetProcesses().Where(pr => pr.ProcessName.Equals(Assembly.GetExecutingAssembly().GetName().Name, StringComparison.OrdinalIgnoreCase));
+			var processes =
+				Process.GetProcesses()
+					.Where(
+						pr => pr.ProcessName.Equals(Assembly.GetExecutingAssembly().GetName().Name, StringComparison.OrdinalIgnoreCase));
 			if (processes.Any())
 			{
 				Application.Current.Shutdown();
@@ -157,8 +162,12 @@ namespace Gta5EyeTrackingModUpdater
 
 		private void UpdaterNotifyIconOnCheckForUpdateMenuItemClick(object sender, EventArgs e)
 		{
-			_updater.CheckForUpdates();
-        }
+			_updaterNotifyIcon.ShowNotification("Checking for updates");
+			Task.Run(() =>
+			{
+				_updater.CheckForUpdates();
+			});
+		}
 
 		private void OnClosing(object sender, CancelEventArgs cancelEventArgs)
 		{
@@ -197,7 +206,7 @@ namespace Gta5EyeTrackingModUpdater
 
 		private void Browse_OnClick(object sender, RoutedEventArgs e)
 		{
-			var openFileDialog = new OpenFileDialog { DefaultExt = ".exe", Filter = "GTA5.exe|GTA5.exe" };
+			var openFileDialog = new OpenFileDialog {DefaultExt = ".exe", Filter = "GTA5.exe|GTA5.exe"};
 			var showDialog = openFileDialog.ShowDialog();
 
 			if (!showDialog.HasValue) return;
@@ -208,6 +217,44 @@ namespace Gta5EyeTrackingModUpdater
 				_settings.GtaPath = Path.GetDirectoryName(gtaExePath);
 				UpdateText();
 			}
+		}
+
+		private void CheckForUpdates_OnClick(object sender, RoutedEventArgs e)
+		{
+			_updaterNotifyIcon.ShowNotification("Checking for updates");
+
+			Task.Run(() =>
+			{
+				_updater.CheckForUpdates();
+			});
+		}
+
+		private void Enabled_OnChecked(object sender, RoutedEventArgs e)
+		{
+			Task.Run(() =>
+			{
+				_updater.CheckForUpdates();
+			});
+		}
+
+		private void Enabled_OnUnchecked(object sender, RoutedEventArgs e)
+		{
+			Task.Run(() =>
+			{
+				_updater.RemoveScriptHookV();
+			});
+		}
+
+		private void Autostart_OnChecked(object sender, RoutedEventArgs e)
+		{
+			_settings.Autostart = true;
+			_model.Autostart = true;
+		}
+
+		private void Autostart_OnUnchecked(object sender, RoutedEventArgs e)
+		{
+			_settings.Autostart = false;
+			_model.Autostart = false;
 		}
 	}
 }

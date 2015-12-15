@@ -11,6 +11,9 @@ namespace Gta5EyeTrackingModUpdater
 		private string _scriptHookVVersionText;
 		private string _gtaVersionText;
 		private string _modVersionText;
+		private bool _enabled;
+		private bool _autostart;
+
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void OnNotifyPropertyChanged([CallerMemberName] String propertyName = "")
 		{
@@ -70,6 +73,27 @@ namespace Gta5EyeTrackingModUpdater
 				OnNotifyPropertyChanged("ModVersionText");
 			}
 		}
+
+		public bool Enabled
+		{
+			get { return _enabled; }
+			set
+			{
+				_enabled = value;
+				OnNotifyPropertyChanged("Enabled");
+			}
+		}
+
+		public bool Autostart
+		{
+			get { return _autostart; }
+			set
+			{
+				_autostart = value;
+				OnNotifyPropertyChanged("Autostart");
+			}
+		}
+
 
 		public MainWindowModel()
 		{

@@ -127,7 +127,7 @@ namespace Gta5EyeTrackingModUpdater
 		}
 
 
-		private bool IsScriptHookVInstalled()
+		public bool IsScriptHookVInstalled()
 		{
 			var scriptHookVDllPath = Path.Combine(_settings.GtaPath, "ScriptHookV.dll");
 			var dinput8DllPath = Path.Combine(_settings.GtaPath, "dinput8.dll");
@@ -292,8 +292,10 @@ namespace Gta5EyeTrackingModUpdater
 			wc.DownloadFile(downloadUrlAddress, localFilePath);
 		}
 
-		private void RemoveScriptHookV()
+		public void RemoveScriptHookV()
 		{
+			if (!Monitor.TryEnter(_lock)) return;
+
 			var dinput8DllPath = Path.Combine(_settings.GtaPath, "dinput8.dll");
 			var scriptHookVDllPath = Path.Combine(_settings.GtaPath, "ScriptHookV.dll");
 			if (File.Exists(scriptHookVDllPath))

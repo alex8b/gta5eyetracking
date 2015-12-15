@@ -5,17 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Gta5EyeTrackingModUpdater"
         mc:Ignorable="d"
-        Title="{Binding WindowTitle}" Height="280.441" Width="409.069" ResizeMode="NoResize" Icon="Resources/ApplicationIcon.ico">
+        Title="{Binding WindowTitle}" Height="249.526" Width="409.069" ResizeMode="NoResize" Icon="Resources/ApplicationIcon.ico">
 	<Grid Margin="0,0,0,0">
 		<Button x:Name="browse" Content="Browse" HorizontalAlignment="Left" Margin="268,39,0,0" VerticalAlignment="Top" Width="114" Click="Browse_OnClick"/>
-		<Button x:Name="install" Content="Install" HorizontalAlignment="Left" Margin="10,165,0,0" VerticalAlignment="Top" Width="114"/>
-		<Button x:Name="uninstall" Content="Uninstall" HorizontalAlignment="Left" Margin="10,190,0,0" VerticalAlignment="Top" Width="114"/>
-		<CheckBox x:Name="autostart" Content="Autostart on Windows startup" HorizontalAlignment="Left" Margin="10,215,0,0" VerticalAlignment="Top"/>
-		<Button x:Name="checkForUpdates" Content="Check for updates" HorizontalAlignment="Left" Margin="10,140,0,0" VerticalAlignment="Top" Width="114"/>
+		<Button x:Name="checkForUpdates" Content="Check for updates" HorizontalAlignment="Left" Margin="10,140,0,0" VerticalAlignment="Top" Width="114" Click="CheckForUpdates_OnClick"/>
 		<Label x:Name="gtaPath" Content="{Binding GtaPathText, Mode=OneWay}" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.88,0.008" Width="253"/>
 		<Label x:Name="scriptHookVersion" Content="{Binding ScriptHookVVersionText, Mode=OneWay}" Margin="10,83,20,0" VerticalAlignment="Top" RenderTransformOrigin="0.88,0.008"/>
 		<Label x:Name="modVersion" Content="{Binding ModVersionText, Mode=OneWay}" Margin="10,109,20,0" VerticalAlignment="Top" RenderTransformOrigin="0.88,0.008"/>
 		<Label x:Name="gtaVersion" Content="{Binding GtaVersionText, Mode=OneWay}" Margin="10,60,20,0" VerticalAlignment="Top" RenderTransformOrigin="0.88,0.008"/>
 		<Label x:Name="gtaPathLabel" Content="GTA V installation path:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.88,0.008" Width="253"/>
+		<CheckBox x:Name="enabled" IsChecked="{Binding Enabled, Mode=OneWay}" Content="Enabled" HorizontalAlignment="Left" Margin="10,165,0,0" VerticalAlignment="Top" Checked="Enabled_OnChecked" Unchecked="Enabled_OnUnchecked"/>
+		<CheckBox x:Name="autostart" IsChecked="{Binding Autostart, Mode=OneWay}" Content="Autostart on Windows startup" HorizontalAlignment="Left" Margin="10,185,0,0" VerticalAlignment="Top" Checked="Autostart_OnChecked" Unchecked="Autostart_OnUnchecked"/>
+
 	</Grid>
 </Window>
