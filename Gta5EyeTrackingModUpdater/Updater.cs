@@ -235,14 +235,26 @@ namespace Gta5EyeTrackingModUpdater
 
 				if (File.Exists(scriptHookVDllPathDest))
 				{
+					if (File.Exists(scriptHookVDllPathDest + ".bak"))
+					{
+						File.Delete(scriptHookVDllPathDest + ".bak");
+					}
 					File.Move(scriptHookVDllPathDest, scriptHookVDllPathDest + ".bak");
 				}
 				if (File.Exists(dinput8DllPathDest))
 				{
+					if (File.Exists(dinput8DllPathDest + ".bak"))
+					{
+						File.Delete(dinput8DllPathDest + ".bak");
+					}
 					File.Move(dinput8DllPathDest, dinput8DllPathDest + ".bak");
 				}
 				if (File.Exists(nativeTrainerAsiPathDest))
 				{
+					if (File.Exists(nativeTrainerAsiPathDest + ".bak"))
+					{
+						File.Delete(nativeTrainerAsiPathDest + ".bak");
+					}
 					File.Move(nativeTrainerAsiPathDest, nativeTrainerAsiPathDest + ".bak");
 				}
 
@@ -486,7 +498,7 @@ namespace Gta5EyeTrackingModUpdater
 				File.Copy(bakPath, exePath, true);
 
 				var installerPath = Path.Combine(Util.GetDownloadsPath(), "gta5eyetrackingmodupdater_bundle.exe");
-				Process.Start(installerPath, "-quiet -update");
+				Process.Start(installerPath, "/quiet /install");
 			}
 			catch
 			{

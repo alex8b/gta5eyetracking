@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -24,11 +26,22 @@ namespace Gta5EyeTrackingModUpdater
 		private UpdaterNotifyIcon _updaterNotifyIcon;
 		private Updater _updater;
 
+		public string WindowName { get; set; }
+
 		public MainWindow()
 		{
+			PreventMultipleProcess();
+
+			WindowName = "GTA V Eye Tracking Mod Updater " + Assembly.GetExecutingAssembly().GetName().Version;
+			this.DataContext = this;
+
 			InitializeComponent();
+			var args = Environment.GetCommandLineArgs();
+			if (args.Contains("-hide"))
+			{
+				Hide();
+			}
 			//todo: Show if gta folder is not specified
-			Hide();
 			this.Closing += OnClosing;
 			_updaterNotifyIcon = new UpdaterNotifyIcon();
             _updater = new Updater(_updaterNotifyIcon);
@@ -38,6 +51,15 @@ namespace Gta5EyeTrackingModUpdater
 			_updaterNotifyIcon.DoubleClick += UpdaterNotifyIconOnOpenWindowMenuItemClick;
 			//todo: ui - versions, install, uninstall, check for update, autostart
 			//todo: close program if new instance is running
+		}
+
+		private void PreventMultipleProcess()
+		{
+			var processes = Process.GetProcesses().Where(pr => pr.ProcessName.Equals(Assembly.GetExecutingAssembly().GetName().Name, StringComparison.OrdinalIgnoreCase));
+			if (processes.Any())
+			{
+				Application.Current.Shutdown();
+			}
 		}
 
 		private void UpdaterNotifyIconOnOpenWindowMenuItemClick(object sender, EventArgs eventArgs)

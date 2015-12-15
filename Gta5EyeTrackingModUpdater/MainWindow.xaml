@@ -5,18 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Gta5EyeTrackingModUpdater"
         mc:Ignorable="d"
-        Title="GTA V Eye Tracking Mod Updater" Height="350" Width="525" ResizeMode="NoResize" Icon="Resources/ApplicationIcon.ico">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="320*"/>
-            <ColumnDefinition Width="199*"/>
-        </Grid.ColumnDefinitions>
-        <StackPanel Grid.ColumnSpan="2">
-            <Label Content="Component versions"></Label>
-            <Button Content="Check for update"></Button>
-            <Button Content="Install the mod"></Button>
-            <Button Content="Remove the mod"></Button>
-			<CheckBox Content="Autostart on Windows startup"></CheckBox>
-        </StackPanel>
-    </Grid>
+        Title="{Binding WindowName, Mode=OneWay}" Height="350" Width="327.366" ResizeMode="NoResize" Icon="Resources/ApplicationIcon.ico">
+	<Grid Margin="0,0,0,0">
+
+	</Grid>
 </Window>

@@ -116,6 +116,10 @@ namespace Gta5EyeTrackingModUpdater
 				{
 					if (File.Exists(temppath))
 					{
+						if (File.Exists(temppath + ".bak"))
+						{
+							File.Delete(temppath + ".bak");
+						}
 						File.Move(temppath, temppath + ".bak");
 					}
 				}
