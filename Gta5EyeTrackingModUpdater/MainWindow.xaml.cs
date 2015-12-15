@@ -149,7 +149,7 @@ namespace Gta5EyeTrackingModUpdater
 				Process.GetProcesses()
 					.Where(
 						pr => pr.ProcessName.Equals(Assembly.GetExecutingAssembly().GetName().Name, StringComparison.OrdinalIgnoreCase));
-			if (processes.Any())
+			if (processes.Count() > 1)
 			{
 				Application.Current.Shutdown();
 			}
