@@ -35,14 +35,14 @@ namespace Gta5EyeTrackingModUpdater
 			if (!Monitor.TryEnter(_lock)) return;
 			try
 			{
-				ShowNotification("Checking for updates");
+				Util.Log("Checking for updates");
 				SelfUpdate();
 				UpdateModBundle();
 				UpdateScriptHookV();
 			}
 			catch
 			{
-				ShowNotification("Failed to update");
+				Util.Log("Failed to update");
 			}
 			Monitor.Exit(_lock);
 		}
@@ -61,7 +61,7 @@ namespace Gta5EyeTrackingModUpdater
 			
 			if (installedGtaVersion == new Version(0,0))
 			{
-				ShowNotification("Failed to get GTA V version");
+				Util.Log("Failed to get GTA V version");
 				return;
 			}
 
@@ -79,7 +79,7 @@ namespace Gta5EyeTrackingModUpdater
 			if (installedGtaVersion > supportedGtaVersion)
 			{
 				RemoveScriptHookV();
-				ShowNotification("Script Hook V is temporarly disabled");
+				Util.Log("Script Hook V is temporarly disabled");
 				return;
 			}
 
@@ -90,14 +90,14 @@ namespace Gta5EyeTrackingModUpdater
 				DownloadScriptHookV(scriptHookVDownloadUrlAddress);
 				if (!InstallScriptHookV())
 				{
-					ShowNotification("Failed to update Script Hook V");
+					Util.Log("Failed to update Script Hook V");
 				}
 			}
 			else if (!IsScriptHookVInstalled())
 			{
 				if (!InstallScriptHookV())
 				{
-					ShowNotification("Failed to update Script Hook V");
+					Util.Log("Failed to update Script Hook V");
 				}
 			}
 		}
@@ -316,7 +316,7 @@ namespace Gta5EyeTrackingModUpdater
 				}
 				catch
 				{
-					ShowNotification("Failed to remove Script Hook V");
+					Util.Log("Failed to remove Script Hook V");
 				}
 			}
 			ScriptHookVRemoved(this, new EventArgs());
@@ -354,14 +354,14 @@ namespace Gta5EyeTrackingModUpdater
 
 			if (!InstallModBundle())
 			{
-				ShowNotification("Failed to update Gta V Eye Tracking Mod");
+				Util.Log("Failed to update Gta V Eye Tracking Mod");
 			}
 		}
 
 		private bool IsVersionLower(string installedScriptHookVVersion, string scriptHookVVersion)
 		{
 			return true;
-			//todo parse version + abcde
+			//todo: parse version + abcde
 		}
 
 		private bool InstallModBundle()
@@ -498,7 +498,7 @@ namespace Gta5EyeTrackingModUpdater
 			DownloadModUpdater(updaterDownloadUrl);
 			if (!InstallModUpdater())
 			{
-				ShowNotification("Failed to auto-update");
+				Util.Log("Failed to auto-update");
 			}
 
 		}

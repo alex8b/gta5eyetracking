@@ -77,13 +77,50 @@ namespace Gta5EyeTrackingModUpdater
 		public static string GetDownloadsPath()
 		{
 			var downloadsFolderName = "Downloads";
-			var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Util.SettingsPath,
+			var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), SettingsPath,
 				downloadsFolderName);
 			if (!Directory.Exists(path))
 			{
 				Directory.CreateDirectory(path);
 			}
 			return path;
+		}
+
+		public static void Log(string message)
+		{
+			var now = DateTime.Now;
+			var folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), SettingsPath);
+			if (!Directory.Exists(folderPath))
+			{
+				Directory.CreateDirectory(folderPath);
+			}
+
+
+			var logpath = Path.Combine(folderPath, "updaterlog.txt");
+
+			try
+			{
+				var fs = new FileStream(logpath, FileMode.Append, FileAccess.Write, FileShare.Read);
+				var sw = new StreamWriter(fs);
+
+				try
+				{
+					sw.Write("[" + now.ToString("dd.MM.yyyy HH:mm:ss") + "] ");
+
+					sw.Write(message);
+
+					sw.WriteLine();
+				}
+				finally
+				{
+					sw.Close();
+					fs.Close();
+				}
+			}
+			catch
+			{
+				return;
+			}
 		}
 
 

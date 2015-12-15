@@ -18,25 +18,24 @@ namespace Gta5EyeTrackingModUpdater
 		private readonly DispatcherTimer _timer;
 		private readonly TimeSpan _timerInterval;
 		private readonly Settings _settings;
-
-		public string GtaPathText { get; set; }
-
-		public string WindowName { get; set; }
-		public string ScriptHookVVersionText { get; set; }
-		public string GtaVersionText { get; set; }
-		public string ModVersionText { get; set; }
+		private readonly SettingsStorage _settingsStorage;
+		private readonly MainWindowModel _model;
 
 		public MainWindow()
 		{
 			PreventMultipleProcess();
 
-			WindowName = "GTA V Eye Tracking Mod Updater " + Assembly.GetExecutingAssembly().GetName().Version;
-			this.DataContext = this;
+			_model = new MainWindowModel();
 
 			this.Closing += OnClosing;
 
-			_settings = new Settings();
-			LoadSettings();
+			_settingsStorage = new SettingsStorage();
+			_settings = _settingsStorage.LoadSettings();
+
+			if (_settings.GtaPath == null)
+			{
+				_settings.GtaPath = "";
+			}
 
 			//Init NotifyIcon
 			_updaterNotifyIcon = new UpdaterNotifyIcon();
@@ -50,13 +49,13 @@ namespace Gta5EyeTrackingModUpdater
 			_updaterNotifyIcon.OpenWindowMenuItemClick += UpdaterNotifyIconOnOpenWindowMenuItemClick;
 			_updaterNotifyIcon.DoubleClick += UpdaterNotifyIconOnOpenWindowMenuItemClick;
 
-		
-			UpdateText();
-			
 			InitializeComponent();
+			this.DataContext = _model;
+			_model.WindowName = "GTA V Eye Tracking Mod Updater " + Assembly.GetExecutingAssembly().GetName().Version;
+			UpdateText();
 
 			var args = Environment.GetCommandLineArgs();
-			if (args.Contains("-hide") && GtaPathText != "")
+			if (args.Contains("-hide") && _settings.GtaPath != "")
 			{
 				Hide();
 			}
@@ -72,6 +71,13 @@ namespace Gta5EyeTrackingModUpdater
 			{
 				_updater.CheckForUpdates();
 			});
+
+			//todo: autostart
+			//todo: remove some notifications
+			//todo: not installed vs disabled vs not compatible
+			//todo: Status: Checking for update, up to date
+			//todo: log
+			//todo: sign
 		}
 
 		private void UpdaterOnScriptHookVRemoved(object sender, EventArgs eventArgs)
@@ -91,49 +97,39 @@ namespace Gta5EyeTrackingModUpdater
 			UpdateText();
 		}
 
-		private void LoadSettings()
-		{
-			_settings.GtaPath = Util.GetGtaInstallPathFromRegistry();
-			if (_settings.GtaPath == null)
-			{
-				_settings.GtaPath = "C:\\";
-			}
-			//read from config
-		}
-
 		private void UpdateText()
 		{
-			GtaPathText = _settings.GtaPath;
+			_model.GtaPathText = _settings.GtaPath;
 
 			var modVersion = _updater.GetModVersion();
 			if (modVersion == new Version(0, 0))
 			{
-				ModVersionText = "Mod is not installed";
+				_model.ModVersionText = "Mod is not installed";
 			}
 			else
 			{
-				ModVersionText = "Mod version: " + modVersion;
+				_model.ModVersionText = "Mod version: " + modVersion;
 			}
 
 			var scriptHookVVersion = _updater.GetInstalledScriptHookVVersion();
 			if (scriptHookVVersion == "")
 			{
-				ScriptHookVVersionText = "Script Hook V is not installed";
+				_model.ScriptHookVVersionText = "Script Hook V is not installed";
 			}
 			else
 			{
-				ScriptHookVVersionText = "Script Hook V version: " + scriptHookVVersion;
+				_model.ScriptHookVVersionText = "Script Hook V version: " + scriptHookVVersion;
 			}
 
 			var gtaVersion = _updater.GetGtaVersion();
-			if ((GtaPathText == "")
+			if ((_model.GtaPathText == "")
 				|| (gtaVersion == new Version(0, 0)))
 			{
-				GtaVersionText = "GTA V is not found in the provided path";
+				_model.GtaVersionText = "GTA V is not found in the provided path";
 			}
 			else
 			{
-				GtaVersionText = "GTA V version: " + gtaVersion;
+				_model.GtaVersionText = "GTA V version: " + gtaVersion;
 			}
 		}
 
@@ -194,6 +190,8 @@ namespace Gta5EyeTrackingModUpdater
 			_updaterNotifyIcon = null;
 
 			_updater = null;
+
+			_settingsStorage.SaveSettings(_settings);
 			Application.Current.Shutdown();
 		}
 
@@ -211,7 +209,5 @@ namespace Gta5EyeTrackingModUpdater
 				UpdateText();
 			}
 		}
-
-
 	}
 }
