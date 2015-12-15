@@ -335,6 +335,7 @@ namespace Gta5EyeTrackingModUpdater
 		private bool IsVersionLower(string installedScriptHookVVersion, string scriptHookVVersion)
 		{
 			return true;
+			//todo parse version + abcde
 		}
 
 		private bool InstallModBundle()

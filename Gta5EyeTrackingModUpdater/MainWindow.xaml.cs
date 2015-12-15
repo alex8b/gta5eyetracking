@@ -1,20 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace Gta5EyeTrackingModUpdater
 {
@@ -25,11 +16,15 @@ namespace Gta5EyeTrackingModUpdater
 	{
 		private UpdaterNotifyIcon _updaterNotifyIcon;
 		private Updater _updater;
+		private readonly DispatcherTimer _timer;
+		private TimeSpan _timerInterval;
 
 		public string WindowName { get; set; }
 
 		public MainWindow()
 		{
+			_timerInterval = TimeSpan.FromMinutes(5);
+			
 			PreventMultipleProcess();
 
 			WindowName = "GTA V Eye Tracking Mod Updater " + Assembly.GetExecutingAssembly().GetName().Version;
@@ -49,8 +44,26 @@ namespace Gta5EyeTrackingModUpdater
 			_updaterNotifyIcon.CheckForUpdateMenuItemClick += UpdaterNotifyIconOnCheckForUpdateMenuItemClick;
 			_updaterNotifyIcon.OpenWindowMenuItemClick += UpdaterNotifyIconOnOpenWindowMenuItemClick;
 			_updaterNotifyIcon.DoubleClick += UpdaterNotifyIconOnOpenWindowMenuItemClick;
+
+			_timer = new DispatcherTimer();
+			_timer.Tick += TimerOnTick;
+			_timer.Interval = _timerInterval;
+			_timer.Start();
+
+			Task.Run(() =>
+			{
+				_updater.CheckForUpdates();
+			});
+			
 			//todo: ui - versions, install, uninstall, check for update, autostart
-			//todo: close program if new instance is running
+		}
+
+		private void TimerOnTick(object sender, EventArgs eventArgs)
+		{
+			if (_updater != null)
+			{
+				_updater.CheckForUpdates();
+			}
 		}
 
 		private void PreventMultipleProcess()
@@ -86,6 +99,9 @@ namespace Gta5EyeTrackingModUpdater
 
 		public void Shutdown()
 		{
+			_timer.Tick -= TimerOnTick;
+			_timer.Stop();
+
 			_updaterNotifyIcon.QuitMenuItemClick -= UpdaterNotifyIconOnQuitMenuItemClick;
 			_updaterNotifyIcon.CheckForUpdateMenuItemClick -= UpdaterNotifyIconOnCheckForUpdateMenuItemClick;
 			_updaterNotifyIcon.OpenWindowMenuItemClick -= UpdaterNotifyIconOnOpenWindowMenuItemClick;
@@ -93,6 +109,7 @@ namespace Gta5EyeTrackingModUpdater
 			_updater.Close();
 			_updaterNotifyIcon.Dispose();
 			_updaterNotifyIcon = null;
+
 			_updater = null;
 			Application.Current.Shutdown();
 		}

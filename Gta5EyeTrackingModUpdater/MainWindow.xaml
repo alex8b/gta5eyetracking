@@ -5,8 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Gta5EyeTrackingModUpdater"
         mc:Ignorable="d"
-        Title="{Binding WindowName, Mode=OneWay}" Height="350" Width="327.366" ResizeMode="NoResize" Icon="Resources/ApplicationIcon.ico">
+        Title="{Binding WindowName, Mode=OneWay}" Height="280.441" Width="409.069" ResizeMode="NoResize" Icon="Resources/ApplicationIcon.ico">
 	<Grid Margin="0,0,0,0">
-
+		<Button x:Name="browse" Content="Browse" HorizontalAlignment="Left" Margin="268,39,0,0" VerticalAlignment="Top" Width="114"/>
+		<Button x:Name="install" Content="Install" HorizontalAlignment="Left" Margin="10,165,0,0" VerticalAlignment="Top" Width="114"/>
+		<Button x:Name="uninstall" Content="Uninstall" HorizontalAlignment="Left" Margin="10,190,0,0" VerticalAlignment="Top" Width="114"/>
+		<CheckBox x:Name="autostart" Content="Autostart on Windows startup" HorizontalAlignment="Left" Margin="10,215,0,0" VerticalAlignment="Top"/>
+		<Button x:Name="checkForUpdates" Content="Check for updates" HorizontalAlignment="Left" Margin="10,140,0,0" VerticalAlignment="Top" Width="114"/>
+		<Label x:Name="gtaPath" Content="D:\Games\GTAV\adsadasdsadasdasda asdas as da" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.88,0.008" Width="253"/>
+		<Label x:Name="scriptHookVersion" Content="Script hook version: 1.0.5.32a" HorizontalAlignment="Left" Margin="10,83,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.88,0.008" Width="168"/>
+		<Label x:Name="modVersion" Content="Mod version: 0.6.67" HorizontalAlignment="Left" Margin="10,109,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.88,0.008" Width="168"/>
+		<Label x:Name="gtaVersion" Content="GTA version: 1.0.5.32" HorizontalAlignment="Left" Margin="10,60,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.88,0.008" Width="168"/>
+		<Label x:Name="gtaPathLabel" Content="GTA V installation path:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.88,0.008" Width="253"/>
 	</Grid>
 </Window>
