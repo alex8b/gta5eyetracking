@@ -13,14 +13,20 @@ namespace Gta5EyeTrackingModUpdater
 {
 	public class Updater
 	{
+		public event EventHandler<EventArgs> ScriptHookVInstalled = delegate { };
+		public event EventHandler<EventArgs> ScriptHookVRemoved = delegate { };
+		public event EventHandler<EventArgs> ModInstalled = delegate { };
+
 		private readonly UpdaterNotifyIcon _updaterNotifyIcon;
+		private readonly Settings _settings;
 		private readonly object _lock = new object();
 		private bool _enabled = true;
-		public const string SettingsPath = "Gta5EyeTracking";
+		
 
-		public Updater(UpdaterNotifyIcon updaterNotifyIcon)
+		public Updater(UpdaterNotifyIcon updaterNotifyIcon, Settings settings)
 		{
 			_updaterNotifyIcon = updaterNotifyIcon;
+			_settings = settings;
 		}
 
 		public void CheckForUpdates()
@@ -41,12 +47,19 @@ namespace Gta5EyeTrackingModUpdater
 			Monitor.Exit(_lock);
 		}
 
+		public Version GetGtaVersion()
+		{
+			var installedGtaVersion = new Version(0, 0);
+			var gtaExeFilePath = Path.Combine(_settings.GtaPath, "GTA5.exe");
+			Util.TryGetFileVersion(gtaExeFilePath, ref installedGtaVersion);
+			return installedGtaVersion;
+		}
+
 		public void UpdateScriptHookV()
 		{
-			var gtaExeFilePath = Path.Combine(GetGtaInstallPath(), "GTA5.exe");
-
-			var installedGtaVersion = new Version(0, 0);
-			if (!Util.TryGetFileVersion(gtaExeFilePath, ref installedGtaVersion))
+			var installedGtaVersion = GetGtaVersion();
+			
+			if (installedGtaVersion == new Version(0,0))
 			{
 				ShowNotification("Failed to get GTA V version");
 				return;
@@ -89,9 +102,9 @@ namespace Gta5EyeTrackingModUpdater
 			}
 		}
 
-		private string GetInstalledScriptHookVVersion()
+		public string GetInstalledScriptHookVVersion()
 		{
-			var scriptHookVDllPath = Path.Combine(GetGtaInstallPath(), "ScriptHookV.dll");
+			var scriptHookVDllPath = Path.Combine(_settings.GtaPath, "ScriptHookV.dll");
 			return GetScriptHookVVersion(scriptHookVDllPath);
 		}
 
@@ -116,9 +129,8 @@ namespace Gta5EyeTrackingModUpdater
 
 		private bool IsScriptHookVInstalled()
 		{
-			var gtaPath = GetGtaInstallPath();
-			var scriptHookVDllPath = Path.Combine(gtaPath, "ScriptHookV.dll");
-			var dinput8DllPath = Path.Combine(gtaPath, "dinput8.dll");
+			var scriptHookVDllPath = Path.Combine(_settings.GtaPath, "ScriptHookV.dll");
+			var dinput8DllPath = Path.Combine(_settings.GtaPath, "dinput8.dll");
 
 			return (File.Exists(scriptHookVDllPath) && File.Exists(dinput8DllPath));
 		}
@@ -224,13 +236,12 @@ namespace Gta5EyeTrackingModUpdater
 				}
 				zipFile.ExtractToDirectory(extractPath);
 
-				var gtaPath = GetGtaInstallPath();
 				var scriptHookVDllPath = Path.Combine(extractPath, "bin", "ScriptHookV.dll");
-				var scriptHookVDllPathDest = Path.Combine(gtaPath,"ScriptHookV.dll");
+				var scriptHookVDllPathDest = Path.Combine(_settings.GtaPath, "ScriptHookV.dll");
 				var dinput8DllPath = Path.Combine(extractPath, "bin", "dinput8.dll");
-				var dinput8DllPathDest = Path.Combine(gtaPath, "dinput8.dll");
+				var dinput8DllPathDest = Path.Combine(_settings.GtaPath, "dinput8.dll");
 				var nativeTrainerAsiPath = Path.Combine(extractPath, "bin", "NativeTrainer.asi");
-				var nativeTrainerAsiPathDest = Path.Combine(gtaPath, "NativeTrainer.asi");
+				var nativeTrainerAsiPathDest = Path.Combine(_settings.GtaPath, "NativeTrainer.asi");
 
 
 				if (File.Exists(scriptHookVDllPathDest))
@@ -258,9 +269,9 @@ namespace Gta5EyeTrackingModUpdater
 					File.Move(nativeTrainerAsiPathDest, nativeTrainerAsiPathDest + ".bak");
 				}
 
-				File.Copy(scriptHookVDllPath, Path.Combine(gtaPath, Path.GetFileName(scriptHookVDllPath)), true);
-				File.Copy(dinput8DllPath, Path.Combine(gtaPath, Path.GetFileName(dinput8DllPath)), true);
-				File.Copy(nativeTrainerAsiPath, Path.Combine(gtaPath, Path.GetFileName(nativeTrainerAsiPath)), true);
+				File.Copy(scriptHookVDllPath, Path.Combine(_settings.GtaPath, Path.GetFileName(scriptHookVDllPath)), true);
+				File.Copy(dinput8DllPath, Path.Combine(_settings.GtaPath, Path.GetFileName(dinput8DllPath)), true);
+				File.Copy(nativeTrainerAsiPath, Path.Combine(_settings.GtaPath, Path.GetFileName(nativeTrainerAsiPath)), true);
 			}
 			catch(Exception e)
 			{
@@ -268,7 +279,7 @@ namespace Gta5EyeTrackingModUpdater
 				//Failed to install
 			}
 
-			ShowNotification("Installed Script Hook V");
+			ScriptHookVInstalled(this, new EventArgs());
 			return true;
 		}
 
@@ -283,29 +294,44 @@ namespace Gta5EyeTrackingModUpdater
 
 		private void RemoveScriptHookV()
 		{
-			var scriptHookVDllPath = Path.Combine(GetGtaInstallPath(), "ScriptHookV.dll");
+			var dinput8DllPath = Path.Combine(_settings.GtaPath, "dinput8.dll");
+			var scriptHookVDllPath = Path.Combine(_settings.GtaPath, "ScriptHookV.dll");
 			if (File.Exists(scriptHookVDllPath))
 			{
 				try
 				{
+					if (File.Exists(scriptHookVDllPath + ".bak"))
+					{
+						File.Delete(scriptHookVDllPath + ".bak");
+					}
 					File.Move(scriptHookVDllPath, scriptHookVDllPath + ".bak");
-					File.Delete(scriptHookVDllPath + ".bak");
+					File.Delete(scriptHookVDllPath);
+
+					if (File.Exists(dinput8DllPath + ".bak"))
+					{
+						File.Delete(dinput8DllPath + ".bak");
+					}
+					File.Move(dinput8DllPath, dinput8DllPath + ".bak");
+					File.Delete(dinput8DllPath);
 				}
 				catch
 				{
 					ShowNotification("Failed to remove Script Hook V");
 				}
 			}
+			ScriptHookVRemoved(this, new EventArgs());
+		}
+		public Version GetModVersion()
+		{
+			var installedModVersion = new Version(0, 0);
+			var modDllFilePath = Path.Combine(_settings.GtaPath, "scripts", "Gta5EyeTracking.dll");
+			Util.TryGetFileVersion(modDllFilePath, ref installedModVersion);
+			return installedModVersion;
 		}
 
 		private void UpdateModBundle()
 		{
-			var modDllFilePath = Path.Combine(GetGtaInstallPath(), "scripts", "Gta5EyeTracking.dll");
-			var installedModVersion = new Version(0, 0);
-			if (!Util.TryGetFileVersion(modDllFilePath, ref installedModVersion))
-			{
-				//Failed to get mod version
-			}
+			var installedModVersion = GetModVersion();
 
 			Version availableModVersion;
 			string modBundleDownloadUrl;
@@ -362,17 +388,16 @@ namespace Gta5EyeTrackingModUpdater
 
 				var scriptHookVVersion = GetScriptHookVVersion(Path.Combine(extractPath, "ScriptHookV.dll"));
 
-				var gtaPath = GetGtaInstallPath();
-				var scriptHookVDllPath = Path.Combine(gtaPath, "bin", "ScriptHookV.dll");
-				var dinput8DllPath = Path.Combine(gtaPath, "bin", "dinput8.dll");
-				var nativeTrainerAsiPath = Path.Combine(gtaPath, "bin", "NativeTrainer.asi");
+				var scriptHookVDllPath = Path.Combine(_settings.GtaPath, "bin", "ScriptHookV.dll");
+				var dinput8DllPath = Path.Combine(_settings.GtaPath, "bin", "dinput8.dll");
+				var nativeTrainerAsiPath = Path.Combine(_settings.GtaPath, "bin", "NativeTrainer.asi");
 
 				var skipScriptHook = File.Exists(scriptHookVDllPath)
 					&& File.Exists(dinput8DllPath)
 					&& File.Exists(nativeTrainerAsiPath)
 					&& IsVersionLower(scriptHookVVersion, GetInstalledScriptHookVVersion());
 
-				Util.DirectoryCopy(Path.Combine(extractPath), GetGtaInstallPath(), true, true, true,
+				Util.DirectoryCopy(Path.Combine(extractPath), _settings.GtaPath, true, true, true,
 					skipScriptHook ? scriptHookFiles : new List<string>());
 			}
 			catch
@@ -381,7 +406,7 @@ namespace Gta5EyeTrackingModUpdater
 				//Failed to install
 			}
 
-			ShowNotification("Installed Eye Tracking Mod");
+			ModInstalled(this, new EventArgs());
 			return true;
 		}
 
@@ -506,20 +531,6 @@ namespace Gta5EyeTrackingModUpdater
 				return false;
 			}
 			return true;
-		}
-
-
-		private string GetGtaInstallPath()
-		{
-			var folderPath = Util.GetGtaInstallPathFromRegistry();
-			if (folderPath != null)
-			{
-				var gtaExePath = Path.Combine(folderPath, "GTA5.exe");
-				if (File.Exists(gtaExePath)) return folderPath;
-			}
-
-			return @"d:\SteamLibrary\steamapps\common\Grand Theft Auto V\";
-			//todo: browse button
 		}
 
 		private void ShowNotification(string text)

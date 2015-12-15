@@ -79,6 +79,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Settings.cs" />
     <Compile Include="UpdaterNotifyIcon.cs" />
     <Compile Include="Util.cs" />
     <Page Include="MainWindow.xaml">

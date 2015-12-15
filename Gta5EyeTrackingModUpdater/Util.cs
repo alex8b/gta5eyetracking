@@ -11,6 +11,7 @@ namespace Gta5EyeTrackingModUpdater
 {
 	public static class Util
 	{
+		public const string SettingsPath = "Gta5EyeTracking";
 		public static string GetGtaInstallPathFromRegistry()
 		{
 			var regKey = new ApplicationUninstallRegistryKey("Grand Theft Auto V");
@@ -76,7 +77,7 @@ namespace Gta5EyeTrackingModUpdater
 		public static string GetDownloadsPath()
 		{
 			var downloadsFolderName = "Downloads";
-			var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Updater.SettingsPath,
+			var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Util.SettingsPath,
 				downloadsFolderName);
 			if (!Directory.Exists(path))
 			{
