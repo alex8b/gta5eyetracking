@@ -7,7 +7,7 @@ namespace Gta5EyeTrackingModUpdater
 	public class MainWindowModel : INotifyPropertyChanged
 	{
 		private string _gtaPathText;
-		private string _windowName;
+		private string _windowTitle;
 		private string _scriptHookVVersionText;
 		private string _gtaVersionText;
 		private string _modVersionText;
@@ -31,13 +31,13 @@ namespace Gta5EyeTrackingModUpdater
 			}
 		}
 
-		public string WindowName
+		public string WindowTitle
 		{
-			get { return _windowName; }
+			get { return _windowTitle; }
 			set
 			{
-				_windowName = value;
-				OnNotifyPropertyChanged("WindowName");
+				_windowTitle = value;
+				OnNotifyPropertyChanged("WindowTitle");
 			}
 		}
 
@@ -73,7 +73,6 @@ namespace Gta5EyeTrackingModUpdater
 
 		public MainWindowModel()
 		{
-			_gtaPathText = "adfsadasdasd";
 		}
 	}
 }

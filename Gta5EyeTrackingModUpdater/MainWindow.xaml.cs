@@ -51,7 +51,7 @@ namespace Gta5EyeTrackingModUpdater
 
 			InitializeComponent();
 			this.DataContext = _model;
-			_model.WindowName = "GTA V Eye Tracking Mod Updater " + Assembly.GetExecutingAssembly().GetName().Version;
+			_model.WindowTitle = "GTA V Eye Tracking Mod Updater " + Assembly.GetExecutingAssembly().GetName().Version;
 			UpdateText();
 
 			var args = Environment.GetCommandLineArgs();

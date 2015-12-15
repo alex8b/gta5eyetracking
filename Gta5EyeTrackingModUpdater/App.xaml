@@ -1,15 +1,9 @@
 ﻿<Application x:Class="Gta5EyeTrackingModUpdater.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:Gta5EyeTrackingModUpdater">
+             xmlns:local="clr-namespace:Gta5EyeTrackingModUpdater"
+             StartupUri="MainWindow.xaml">
     <Application.Resources>
          
     </Application.Resources>
-	<Application.MainWindow>
-		<local:MainWindow Visibility="Visible">
-			<local:MainWindow.DataContext>
-				<local:MainWindowModel />
-			</local:MainWindow.DataContext>
-		</local:MainWindow>
-	</Application.MainWindow>
 </Application>
