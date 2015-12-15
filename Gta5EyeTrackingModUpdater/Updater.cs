@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using System.IO.Compression;
 using System.Reflection;
 using System.Threading;
-using System.Windows.Documents;
 using System.Xml;
 
 namespace Gta5EyeTrackingModUpdater
@@ -37,7 +36,7 @@ namespace Gta5EyeTrackingModUpdater
 			}
 			catch
 			{
-				//Failed to update
+				ShowNotification("Failed to update");
 			}
 			Monitor.Exit(_lock);
 		}
@@ -49,7 +48,7 @@ namespace Gta5EyeTrackingModUpdater
 			var installedGtaVersion = new Version(0, 0);
 			if (!Util.TryGetFileVersion(gtaExeFilePath, ref installedGtaVersion))
 			{
-				//Failed to get gta version
+				ShowNotification("Failed to get GTA V version");
 				return;
 			}
 
@@ -73,8 +72,7 @@ namespace Gta5EyeTrackingModUpdater
 
 			var installedScriptHookVVersion = GetInstalledScriptHookVVersion();
 
-			//todo: parse version with a,b,c,d,e, remove v in the begining
-			if (("v" + installedScriptHookVVersion).ToUpperInvariant() != availableScriptHookVVersion.ToUpperInvariant())
+			if (IsVersionLower(installedScriptHookVVersion,availableScriptHookVVersion))
 			{
 				DownloadScriptHookV(scriptHookVDownloadUrlAddress);
 				if (!InstallScriptHookV())
@@ -196,7 +194,7 @@ namespace Gta5EyeTrackingModUpdater
 
 		private static bool ParseVersionInfo(ref string availableScriptHookVVersion, string webPageText)
 		{
-			var versionPattern = @"<tr>\s*<th>Version</th>\s*<td>\s*([^\s]*)\s*</td>\s*</tr>";
+			var versionPattern = @"<tr>\s*<th>Version</th>\s*<td>\s*v?([^\s]*)\s*</td>\s*</tr>";
 			var versionRegex = new Regex(versionPattern, RegexOptions.IgnoreCase | RegexOptions.Multiline);
 			var versionMatch = versionRegex.Match(webPageText);
 			if (versionMatch.Success)
@@ -226,11 +224,28 @@ namespace Gta5EyeTrackingModUpdater
 				}
 				zipFile.ExtractToDirectory(extractPath);
 
-				var scriptHookVDllPath = Path.Combine(extractPath, "bin", "ScriptHookV.dll");
-				var dinput8DllPath = Path.Combine(extractPath, "bin", "dinput8.dll");
-				var nativeTrainerAsiPath = Path.Combine(extractPath, "bin", "NativeTrainer.asi");
-
 				var gtaPath = GetGtaInstallPath();
+				var scriptHookVDllPath = Path.Combine(extractPath, "bin", "ScriptHookV.dll");
+				var scriptHookVDllPathDest = Path.Combine(gtaPath,"ScriptHookV.dll");
+				var dinput8DllPath = Path.Combine(extractPath, "bin", "dinput8.dll");
+				var dinput8DllPathDest = Path.Combine(gtaPath, "dinput8.dll");
+				var nativeTrainerAsiPath = Path.Combine(extractPath, "bin", "NativeTrainer.asi");
+				var nativeTrainerAsiPathDest = Path.Combine(gtaPath, "NativeTrainer.asi");
+
+
+				if (File.Exists(scriptHookVDllPathDest))
+				{
+					File.Move(scriptHookVDllPathDest, scriptHookVDllPathDest + ".bak");
+				}
+				if (File.Exists(dinput8DllPathDest))
+				{
+					File.Move(dinput8DllPathDest, dinput8DllPathDest + ".bak");
+				}
+				if (File.Exists(nativeTrainerAsiPathDest))
+				{
+					File.Move(nativeTrainerAsiPathDest, nativeTrainerAsiPathDest + ".bak");
+				}
+
 				File.Copy(scriptHookVDllPath, Path.Combine(gtaPath, Path.GetFileName(scriptHookVDllPath)), true);
 				File.Copy(dinput8DllPath, Path.Combine(gtaPath, Path.GetFileName(dinput8DllPath)), true);
 				File.Copy(nativeTrainerAsiPath, Path.Combine(gtaPath, Path.GetFileName(nativeTrainerAsiPath)), true);
@@ -261,7 +276,8 @@ namespace Gta5EyeTrackingModUpdater
 			{
 				try
 				{
-					File.Delete(scriptHookVDllPath);
+					File.Move(scriptHookVDllPath, scriptHookVDllPath + ".bak");
+					File.Delete(scriptHookVDllPath + ".bak");
 				}
 				catch
 				{
@@ -306,7 +322,7 @@ namespace Gta5EyeTrackingModUpdater
 
 		private bool IsVersionLower(string installedScriptHookVVersion, string scriptHookVVersion)
 		{
-			throw new NotImplementedException();
+			return true;
 		}
 
 		private bool InstallModBundle()
@@ -343,7 +359,7 @@ namespace Gta5EyeTrackingModUpdater
 					&& File.Exists(nativeTrainerAsiPath)
 					&& IsVersionLower(scriptHookVVersion, GetInstalledScriptHookVVersion());
 
-				Util.DirectoryCopy(Path.Combine(extractPath), GetGtaInstallPath(), true, true,
+				Util.DirectoryCopy(Path.Combine(extractPath), GetGtaInstallPath(), true, true, true,
 					skipScriptHook ? scriptHookFiles : new List<string>());
 			}
 			catch

@@ -5,7 +5,7 @@
 	<Bundle
 		 Name="GTA V Eye Tracking Mod"
 		 Manufacturer="alex8b"
-		 Version="0.1"
+		 Version="0.2"
 		 UpgradeCode="5365DFBA-9132-4E79-AA16-33DCCD824EDF"
 		 DisableModify="yes">
 		<BootstrapperApplicationRef

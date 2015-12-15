@@ -4,7 +4,7 @@
 	<Product Id="*"
 					 Name="GTA V Eye Tracking Mod"
 					 Language="1033"
-					 Version="0.1"
+					 Version="0.2"
 					 Manufacturer="alex8b"
 					 UpgradeCode="916B8E72-0A18-44F2-A723-010338C54B22">
 		<Package InstallerVersion="405" 
