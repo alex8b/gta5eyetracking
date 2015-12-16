@@ -11,8 +11,10 @@ namespace Gta5EyeTrackingModUpdater
 		private string _scriptHookVVersionText;
 		private string _gtaVersionText;
 		private string _modVersionText;
-		private bool _enabled;
+		private bool _autoupdate;
 		private bool _autostart;
+		private bool _canInstall;
+		private bool _canRemove;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void OnNotifyPropertyChanged([CallerMemberName] String propertyName = "")
@@ -74,13 +76,13 @@ namespace Gta5EyeTrackingModUpdater
 			}
 		}
 
-		public bool Enabled
+		public bool Autoupdate
 		{
-			get { return _enabled; }
+			get { return _autoupdate; }
 			set
 			{
-				_enabled = value;
-				OnNotifyPropertyChanged("Enabled");
+				_autoupdate = value;
+				OnNotifyPropertyChanged("Autoupdate");
 			}
 		}
 
@@ -94,6 +96,25 @@ namespace Gta5EyeTrackingModUpdater
 			}
 		}
 
+		public bool CanInstall
+		{
+			get { return _canInstall; }
+			set
+			{
+				_canInstall = value;
+				OnNotifyPropertyChanged("CanInstall");
+			}
+		}
+
+		public bool CanRemove
+		{
+			get { return _canRemove; }
+			set
+			{
+				_canRemove = value;
+				OnNotifyPropertyChanged("CanRemove");
+			}
+		}
 
 		public MainWindowModel()
 		{

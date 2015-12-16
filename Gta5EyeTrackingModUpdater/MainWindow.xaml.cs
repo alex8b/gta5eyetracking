@@ -43,7 +43,8 @@ namespace Gta5EyeTrackingModUpdater
 			_updater.ModInstalled += UpdaterOnModInstalled;
 			_updater.ScriptHookVInstalled += UpdaterOnScriptHookVInstalled;
 			_updater.ScriptHookVRemoved += UpdaterOnScriptHookVRemoved;
-
+			_updater.ModRemoved += UpdaterOnModRemoved;
+			_updater.UpdatesChecked += UpdaterOnUpdatesChecked;
 			_updaterNotifyIcon.QuitMenuItemClick += UpdaterNotifyIconOnQuitMenuItemClick;
 			_updaterNotifyIcon.CheckForUpdateMenuItemClick += UpdaterNotifyIconOnCheckForUpdateMenuItemClick;
 			_updaterNotifyIcon.OpenWindowMenuItemClick += UpdaterNotifyIconOnOpenWindowMenuItemClick;
@@ -69,15 +70,22 @@ namespace Gta5EyeTrackingModUpdater
 
 			Task.Run(() =>
 			{
-				_updater.CheckForUpdates();
+				_updater.CheckForUpdates(_settings.Autoupdate);
 			});
 
 			//todo: autostart reg key
-			//todo: not installed vs disabled vs not compatible
-			//todo: Status: Checking for update, up to date
-			//todo: log
 			//todo: sign
 			//todo: run remove on uninstall
+		}
+
+		private void UpdaterOnUpdatesChecked(object sender, EventArgs eventArgs)
+		{
+			UpdateText();
+		}
+
+		private void UpdaterOnModRemoved(object sender, EventArgs eventArgs)
+		{
+			UpdateText();
 		}
 
 		private void UpdaterOnScriptHookVRemoved(object sender, EventArgs eventArgs)
@@ -101,45 +109,87 @@ namespace Gta5EyeTrackingModUpdater
 		{
 			_model.GtaPathText = _settings.GtaPath;
 
-			var modVersion = _updater.GetModVersion();
-			if (modVersion == new Version(0, 0))
-			{
-				_model.ModVersionText = "Mod is not installed";
-			}
-			else
-			{
-				_model.ModVersionText = "Mod version: " + modVersion;
-			}
-
-			var scriptHookVVersion = _updater.GetInstalledScriptHookVVersion();
-			if (scriptHookVVersion == "")
-			{
-				_model.ScriptHookVVersionText = "Script Hook V is not installed";
-			}
-			else
-			{
-				_model.ScriptHookVVersionText = "Script Hook V version: " + scriptHookVVersion;
-			}
-
+			// Gta V
 			var gtaVersion = _updater.GetGtaVersion();
 			if ((_model.GtaPathText == "")
 				|| (gtaVersion == new Version(0, 0)))
 			{
-				_model.GtaVersionText = "GTA V is not found in the provided path";
+				_model.GtaVersionText = "GTA V: not found in the provided path";
 			}
 			else
 			{
-				_model.GtaVersionText = "GTA V version: " + gtaVersion;
+				_model.GtaVersionText = "GTA V: installed - " + gtaVersion;
 			}
 
-			_model.Enabled = _updater.IsScriptHookVInstalled();
+			// Script hook V
+			var scriptHookVtext = "Script Hook V: ";
+			var installedScriptHookVVersion = _updater.GetInstalledScriptHookVVersion();
+			if (installedScriptHookVVersion == "")
+			{
+				scriptHookVtext += "not installed";
+			}
+			else
+			{
+				scriptHookVtext += "installed - " + installedScriptHookVVersion;
+			}
+
+			var availableScriptHookVVersion = _updater.GetAvailableScriptHookVVersion();
+			var isGtaVersionSupported = false;
+			if (availableScriptHookVVersion != null)
+			{
+				scriptHookVtext += " / ";
+
+				isGtaVersionSupported = _updater.IsGtaSupportedByAvailableScriptHookVVersion();
+				if (!isGtaVersionSupported)
+				{
+					scriptHookVtext += "GTA V version is not supported";
+				}
+				else if (availableScriptHookVVersion == "")
+				{
+					scriptHookVtext += "no update available";
+				}
+				else
+				{
+					scriptHookVtext += "available - " + availableScriptHookVVersion;
+				}
+			}
+			
+			_model.ScriptHookVVersionText = scriptHookVtext;
+
+			// Mod
+			var modText = "Mod: ";
+			var installedModVersion = _updater.GetModVersion();
+			if (installedModVersion == new Version(0, 0))
+			{
+				modText += "not installed";
+			}
+			else
+			{
+				modText += "installed - " + installedModVersion;
+			}
+			var availableModVersion = _updater.GetAvailableModVersion();
+			if (availableModVersion != null)
+			{
+				modText += " / ";
+				modText += "available - " + availableModVersion;
+			}
+
+			_model.ModVersionText = modText;
+			_model.CanInstall = isGtaVersionSupported &&
+				(_updater.IsVersionLower(installedScriptHookVVersion, availableScriptHookVVersion)
+				|| (installedModVersion < availableModVersion));
+			_model.CanRemove = _updater.IsScriptHookVInstalled();
+
+			// Autoupdate
+
+			_model.Autoupdate = _settings.Autoupdate;
 		}
 
 		private void TimerOnTick(object sender, EventArgs eventArgs)
 		{
 			if (_updater != null)
 			{
-				_updater.CheckForUpdates();
+				_updater.CheckForUpdates(_settings.Autoupdate);
 			}
 		}
 
@@ -194,6 +244,8 @@ namespace Gta5EyeTrackingModUpdater
 			_updater.ScriptHookVInstalled -= UpdaterOnScriptHookVInstalled;
 			_updater.ModInstalled -= UpdaterOnModInstalled;
 			_updater.ScriptHookVRemoved -= UpdaterOnScriptHookVRemoved;
+			_updater.ModRemoved -= UpdaterOnModRemoved;
+			_updater.UpdatesChecked -= UpdaterOnUpdatesChecked;
 			_updater.Close();
 			_updaterNotifyIcon.Dispose();
 			_updaterNotifyIcon = null;
@@ -229,20 +281,16 @@ namespace Gta5EyeTrackingModUpdater
 			});
 		}
 
-		private void Enabled_OnChecked(object sender, RoutedEventArgs e)
+		private void Autoupdate_OnChecked(object sender, RoutedEventArgs e)
 		{
-			Task.Run(() =>
-			{
-				_updater.CheckForUpdates();
-			});
+			_settings.Autoupdate = true;
+			_model.Autoupdate = true;
 		}
 
-		private void Enabled_OnUnchecked(object sender, RoutedEventArgs e)
+		private void Autoupdate_OnUnchecked(object sender, RoutedEventArgs e)
 		{
-			Task.Run(() =>
-			{
-				_updater.RemoveScriptHookV();
-			});
+			_settings.Autoupdate = false;
+			_model.Autoupdate = false;
 		}
 
 		private void Autostart_OnChecked(object sender, RoutedEventArgs e)
@@ -255,6 +303,23 @@ namespace Gta5EyeTrackingModUpdater
 		{
 			_settings.Autostart = false;
 			_model.Autostart = false;
+		}
+
+		private void Install_OnClick(object sender, RoutedEventArgs e)
+		{
+			Task.Run(() =>
+			{
+				_updater.CheckForUpdates(true);
+			});
+		}
+
+		private void Remove_OnClick(object sender, RoutedEventArgs e)
+		{
+			Task.Run(() =>
+			{
+				_updater.RemoveScriptHookV();
+				_updater.RemoveMod();
+			});
 		}
 	}
 }

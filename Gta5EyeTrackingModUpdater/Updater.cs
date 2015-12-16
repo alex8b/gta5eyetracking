@@ -16,12 +16,18 @@ namespace Gta5EyeTrackingModUpdater
 		public event EventHandler<EventArgs> ScriptHookVInstalled = delegate { };
 		public event EventHandler<EventArgs> ScriptHookVRemoved = delegate { };
 		public event EventHandler<EventArgs> ModInstalled = delegate { };
+		public event EventHandler<EventArgs> ModRemoved = delegate { };
+		public event EventHandler<EventArgs> UpdatesChecked = delegate { };
 
 		private readonly UpdaterNotifyIcon _updaterNotifyIcon;
 		private readonly Settings _settings;
 		private readonly object _lock = new object();
 		private bool _enabled = true;
-		
+
+		private Version _lastSupportedGtaVersion;
+		private Version _lastAvailableModVersion;
+		private string _lastAvailableScriptHookVVersion;
+
 
 		public Updater(UpdaterNotifyIcon updaterNotifyIcon, Settings settings)
 		{
@@ -29,21 +35,23 @@ namespace Gta5EyeTrackingModUpdater
 			_settings = settings;
 		}
 
-		public void CheckForUpdates()
+		public void CheckForUpdates(bool forceInstall = false)
 		{
 			if (!_enabled) return;
 			if (!Monitor.TryEnter(_lock)) return;
+			forceInstall = forceInstall || _settings.Autoupdate;
 			try
 			{
 				Util.Log("Checking for updates");
 				SelfUpdate();
-				UpdateModBundle();
-				UpdateScriptHookV();
+				UpdateModBundle(forceInstall);
+				UpdateScriptHookV(forceInstall);
 			}
 			catch
 			{
 				Util.Log("Failed to update");
 			}
+			UpdatesChecked(this, new EventArgs());
 			Monitor.Exit(_lock);
 		}
 
@@ -55,7 +63,7 @@ namespace Gta5EyeTrackingModUpdater
 			return installedGtaVersion;
 		}
 
-		public void UpdateScriptHookV()
+		public void UpdateScriptHookV(bool forceInstall)
 		{
 			var installedGtaVersion = GetGtaVersion();
 			
@@ -74,8 +82,11 @@ namespace Gta5EyeTrackingModUpdater
 				//Failed to get script hook version
 				return;
 			}
+			_lastSupportedGtaVersion = supportedGtaVersion;
+			_lastAvailableScriptHookVVersion = availableScriptHookVVersion;
 
-			if (installedGtaVersion > supportedGtaVersion)
+			if (forceInstall 
+				&& (installedGtaVersion > supportedGtaVersion))
 			{
 				RemoveScriptHookV();
 				Util.Log("Script Hook V is temporarly disabled");
@@ -86,6 +97,8 @@ namespace Gta5EyeTrackingModUpdater
 			{
 				return;
 			}
+
+			if (!forceInstall) return;
 
 			DownloadScriptHookV(scriptHookVDownloadUrlAddress);
 			if (!InstallScriptHookV())
@@ -268,7 +281,7 @@ namespace Gta5EyeTrackingModUpdater
 			catch(Exception e)
 			{
 				return false;
-				//Failed to install
+				//Failed to forceInstall
 			}
 
 			ScriptHookVInstalled(this, new EventArgs());
@@ -323,7 +336,7 @@ namespace Gta5EyeTrackingModUpdater
 			return installedModVersion;
 		}
 
-		private void UpdateModBundle()
+		private void UpdateModBundle(bool forceInstall)
 		{
 			var installedModVersion = GetModVersion();
 
@@ -338,11 +351,14 @@ namespace Gta5EyeTrackingModUpdater
 				return;
 			}
 
+			_lastAvailableModVersion = availableModVersion;
 			if (installedModVersion >= availableModVersion)
 			{
 				//Mod is up to date
 				return;
 			}
+
+			if (!forceInstall) return;
 
 			DownloadModBundle(modBundleDownloadUrl);
 
@@ -396,7 +412,7 @@ namespace Gta5EyeTrackingModUpdater
 			return true;
 		}
 
-		private bool IsVersionLower(string installedScriptHookVVersion, string scriptHookVVersion)
+		public bool IsVersionLower(string installedScriptHookVVersion, string scriptHookVVersion)
 		{
 			Version v1major;
 			Version v1minor;
@@ -451,11 +467,35 @@ namespace Gta5EyeTrackingModUpdater
 			catch
 			{
 				return false;
-				//Failed to install
+				//Failed to forceInstall
 			}
 
 			ModInstalled(this, new EventArgs());
 			return true;
+		}
+
+		public void RemoveMod()
+		{
+			if (!Monitor.TryEnter(_lock)) return;
+
+			var gta5EyeTrackingDllPath = Path.Combine(_settings.GtaPath, "scripts", "gta5eyetracking.dll");
+			if (File.Exists(gta5EyeTrackingDllPath))
+			{
+				try
+				{
+					if (File.Exists(gta5EyeTrackingDllPath + ".bak"))
+					{
+						File.Delete(gta5EyeTrackingDllPath + ".bak");
+					}
+					File.Move(gta5EyeTrackingDllPath, gta5EyeTrackingDllPath + ".bak");
+					File.Delete(gta5EyeTrackingDllPath);
+				}
+				catch
+				{
+					Util.Log("Failed to remove GTA V Eye Tracking Mod");
+				}
+			}
+			ModRemoved(this, new EventArgs());
 		}
 
 		private void DownloadModBundle(string downloadUrlAddress)
@@ -572,7 +612,7 @@ namespace Gta5EyeTrackingModUpdater
 				File.Copy(bakPath, exePath, true);
 
 				var installerPath = Path.Combine(Util.GetDownloadsPath(), "gta5eyetrackingmodupdater_bundle.exe");
-				Process.Start(installerPath, "/quiet /install");
+				Process.Start(installerPath, "/quiet /forceInstall");
 			}
 			catch
 			{
@@ -592,5 +632,22 @@ namespace Gta5EyeTrackingModUpdater
 			Monitor.Enter(_lock);
 			Monitor.Exit(_lock);
 		}
+
+		public string GetAvailableScriptHookVVersion()
+		{
+			return _lastAvailableScriptHookVVersion;
+		}
+
+		public bool IsGtaSupportedByAvailableScriptHookVVersion()
+		{
+			return (GetGtaVersion() <= _lastSupportedGtaVersion);
+		}
+
+		public Version GetAvailableModVersion()
+		{
+			return _lastAvailableModVersion;
+		}
+
+
 	}
 }
