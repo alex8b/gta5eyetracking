@@ -15,6 +15,7 @@ namespace Gta5EyeTrackingModUpdater
 		private bool _autostart;
 		private bool _canInstall;
 		private bool _canRemove;
+		private bool _installing;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void OnNotifyPropertyChanged([CallerMemberName] String propertyName = "")
@@ -98,7 +99,7 @@ namespace Gta5EyeTrackingModUpdater
 
 		public bool CanInstall
 		{
-			get { return _canInstall; }
+			get { return _canInstall && !_installing; }
 			set
 			{
 				_canInstall = value;
@@ -108,11 +109,22 @@ namespace Gta5EyeTrackingModUpdater
 
 		public bool CanRemove
 		{
-			get { return _canRemove; }
+			get { return _canRemove && !_installing; }
 			set
 			{
 				_canRemove = value;
 				OnNotifyPropertyChanged("CanRemove");
+			}
+		}
+
+		public bool Installing
+		{
+			get { return _installing; }
+			set
+			{
+				_installing = value;
+				OnNotifyPropertyChanged("CanRemove");
+				OnNotifyPropertyChanged("CanInstall");
 			}
 		}
 

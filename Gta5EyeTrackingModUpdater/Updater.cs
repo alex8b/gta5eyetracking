@@ -232,14 +232,17 @@ namespace Gta5EyeTrackingModUpdater
 
 			try
 			{
-				var zipFile = ZipFile.Open(localFilePath, ZipArchiveMode.Read);
 				
 				var extractPath = Path.Combine(Util.GetDownloadsPath(), "scripthookv");
 				if (Directory.Exists(extractPath))
 				{
 					Directory.Delete(extractPath,true);
 				}
-				zipFile.ExtractToDirectory(extractPath);
+				using (var zipFile = ZipFile.Open(localFilePath, ZipArchiveMode.Read))
+				{
+					zipFile.ExtractToDirectory(extractPath);
+				}
+				File.Delete(localFilePath);
 
 				var scriptHookVDllPath = Path.Combine(extractPath, "bin", "ScriptHookV.dll");
 				var scriptHookVDllPathDest = Path.Combine(_settings.GtaPath, "ScriptHookV.dll");
@@ -301,32 +304,34 @@ namespace Gta5EyeTrackingModUpdater
 		{
 			if (!Monitor.TryEnter(_lock)) return;
 
-			var dinput8DllPath = Path.Combine(_settings.GtaPath, "dinput8.dll");
-			var scriptHookVDllPath = Path.Combine(_settings.GtaPath, "ScriptHookV.dll");
-			if (File.Exists(scriptHookVDllPath))
+			try
 			{
-				try
+				var dinput8DllPath = Path.Combine(_settings.GtaPath, "dinput8.dll");
+				var scriptHookVDllPath = Path.Combine(_settings.GtaPath, "ScriptHookV.dll");
+				if (File.Exists(scriptHookVDllPath))
 				{
-					if (File.Exists(scriptHookVDllPath + ".bak"))
-					{
-						File.Delete(scriptHookVDllPath + ".bak");
-					}
-					File.Move(scriptHookVDllPath, scriptHookVDllPath + ".bak");
-					File.Delete(scriptHookVDllPath);
 
-					if (File.Exists(dinput8DllPath + ".bak"))
-					{
-						File.Delete(dinput8DllPath + ".bak");
-					}
-					File.Move(dinput8DllPath, dinput8DllPath + ".bak");
-					File.Delete(dinput8DllPath);
+						if (File.Exists(scriptHookVDllPath + ".bak"))
+						{
+							File.Delete(scriptHookVDllPath + ".bak");
+						}
+						File.Move(scriptHookVDllPath, scriptHookVDllPath + ".bak");
+						File.Delete(scriptHookVDllPath);
+
+						if (File.Exists(dinput8DllPath + ".bak"))
+						{
+							File.Delete(dinput8DllPath + ".bak");
+						}
+						File.Move(dinput8DllPath, dinput8DllPath + ".bak");
+						File.Delete(dinput8DllPath);
 				}
-				catch
-				{
-					Util.Log("Failed to remove Script Hook V");
-				}
+				ScriptHookVRemoved(this, new EventArgs());
 			}
-			ScriptHookVRemoved(this, new EventArgs());
+			catch
+			{
+				Util.Log("Failed to remove Script Hook V");
+			}
+			Monitor.Exit(_lock);
 		}
 		public Version GetModVersion()
 		{
@@ -435,14 +440,18 @@ namespace Gta5EyeTrackingModUpdater
 
 			try
 			{
-				var zipFile = ZipFile.Open(localFilePath, ZipArchiveMode.Read);
-
 				var extractPath = Path.Combine(Util.GetDownloadsPath(), "gta5eyetracking_bundle");
 				if (Directory.Exists(extractPath))
 				{
 					Directory.Delete(extractPath, true);
 				}
-				zipFile.ExtractToDirectory(extractPath);
+
+				using (var zipFile = ZipFile.Open(localFilePath, ZipArchiveMode.Read))
+				{
+					zipFile.ExtractToDirectory(extractPath);
+				}
+				File.Delete(localFilePath);
+
 				var scriptHookFiles = new List<string>
 				{
 					"ScriptHookV.dll",
@@ -477,11 +486,10 @@ namespace Gta5EyeTrackingModUpdater
 		public void RemoveMod()
 		{
 			if (!Monitor.TryEnter(_lock)) return;
-
-			var gta5EyeTrackingDllPath = Path.Combine(_settings.GtaPath, "scripts", "gta5eyetracking.dll");
-			if (File.Exists(gta5EyeTrackingDllPath))
+			try
 			{
-				try
+				var gta5EyeTrackingDllPath = Path.Combine(_settings.GtaPath, "scripts", "gta5eyetracking.dll");
+				if (File.Exists(gta5EyeTrackingDllPath))
 				{
 					if (File.Exists(gta5EyeTrackingDllPath + ".bak"))
 					{
@@ -490,12 +498,13 @@ namespace Gta5EyeTrackingModUpdater
 					File.Move(gta5EyeTrackingDllPath, gta5EyeTrackingDllPath + ".bak");
 					File.Delete(gta5EyeTrackingDllPath);
 				}
-				catch
-				{
-					Util.Log("Failed to remove GTA V Eye Tracking Mod");
-				}
+				ModRemoved(this, new EventArgs());
 			}
-			ModRemoved(this, new EventArgs());
+			catch
+			{
+				Util.Log("Failed to remove GTA V Eye Tracking Mod");
+			}
+			Monitor.Exit(_lock);
 		}
 
 		private void DownloadModBundle(string downloadUrlAddress)
@@ -647,7 +656,5 @@ namespace Gta5EyeTrackingModUpdater
 		{
 			return _lastAvailableModVersion;
 		}
-
-
 	}
 }

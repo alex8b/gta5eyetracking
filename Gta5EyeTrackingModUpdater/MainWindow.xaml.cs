@@ -31,10 +31,23 @@ namespace Gta5EyeTrackingModUpdater
 
 			_settingsStorage = new SettingsStorage();
 			_settings = _settingsStorage.LoadSettings();
-
+			
 			if (_settings.GtaPath == null)
 			{
 				_settings.GtaPath = "";
+			}
+
+			if (!Util.IsValidGtaFolder(_settings.GtaPath))
+			{
+				var registryPath = Util.GetGtaInstallPathFromRegistry();
+				if (Util.IsValidGtaFolder(registryPath))
+				{
+					_settings.GtaPath = registryPath;
+				}
+				else
+				{
+					_settings.GtaPath = "";
+				}
 			}
 
 			//Init NotifyIcon
@@ -56,7 +69,8 @@ namespace Gta5EyeTrackingModUpdater
 			UpdateText();
 
 			var args = Environment.GetCommandLineArgs();
-			if (args.Contains("-hide") && _settings.GtaPath != "")
+			if (args.Contains("-hide") 
+				&& _settings.GtaPath != "")
 			{
 				Hide();
 			}
@@ -309,7 +323,9 @@ namespace Gta5EyeTrackingModUpdater
 		{
 			Task.Run(() =>
 			{
+				_model.Installing = true;
 				_updater.CheckForUpdates(true);
+				_model.Installing = false;
 			});
 		}
 
@@ -317,8 +333,10 @@ namespace Gta5EyeTrackingModUpdater
 		{
 			Task.Run(() =>
 			{
+				_model.Installing = true;
 				_updater.RemoveScriptHookV();
 				_updater.RemoveMod();
+				_model.Installing = false;
 			});
 		}
 	}

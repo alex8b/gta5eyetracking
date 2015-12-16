@@ -11,7 +11,7 @@ namespace Gta5EyeTrackingModUpdater
 
 		public Settings()
 		{
-			GtaPath = Util.GetGtaInstallPathFromRegistry();
+			GtaPath = "";
 			Autostart = true;
 		}
 

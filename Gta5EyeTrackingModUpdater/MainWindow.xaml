@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="{Binding WindowTitle}" Height="249.526" Width="426.734" ResizeMode="NoResize" Icon="Resources/ApplicationIcon.ico">
 	<Grid Margin="0,0,0,0">
-		<Button x:Name="browse" Content="Browse" HorizontalAlignment="Left" Margin="270,36,0,0" VerticalAlignment="Top" Width="125" Click="Browse_OnClick"/>
+		<Button x:Name="browse" Content="Browse" HorizontalAlignment="Left" Margin="270,40,0,0" VerticalAlignment="Top" Width="125" Click="Browse_OnClick"/>
 		<Button x:Name="checkForUpdates" Content="Check for updates" HorizontalAlignment="Left" Margin="10,140,0,0" VerticalAlignment="Top" Width="125" Click="CheckForUpdates_OnClick"/>
 		<Label x:Name="gtaPath" Content="{Binding GtaPathText, Mode=OneWay}" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.88,0.008" Width="230"/>
 		<Label x:Name="scriptHookVersion" Content="{Binding ScriptHookVVersionText, Mode=OneWay}" Margin="10,83,20,0" VerticalAlignment="Top" RenderTransformOrigin="0.88,0.008"/>
