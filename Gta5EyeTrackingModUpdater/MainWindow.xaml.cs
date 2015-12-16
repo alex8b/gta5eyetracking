@@ -99,11 +99,13 @@ namespace Gta5EyeTrackingModUpdater
 
 		private void UpdaterOnModRemoved(object sender, EventArgs eventArgs)
 		{
+			_updaterNotifyIcon.ShowNotification("Removed Eye Tracking Mod");
 			UpdateText();
 		}
 
 		private void UpdaterOnScriptHookVRemoved(object sender, EventArgs eventArgs)
 		{
+			_updaterNotifyIcon.ShowNotification("Removed Script Hook V");
 			UpdateText();
 		}
 
@@ -282,6 +284,10 @@ namespace Gta5EyeTrackingModUpdater
 			{
 				_settings.GtaPath = Path.GetDirectoryName(gtaExePath);
 				UpdateText();
+				Task.Run(() =>
+				{
+					_updater.CheckForUpdates();
+				});
 			}
 		}
 

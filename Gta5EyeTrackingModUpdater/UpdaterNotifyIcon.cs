@@ -29,7 +29,7 @@ namespace Gta5EyeTrackingModUpdater
 			_notifyIcon.BalloonTipClicked += BalloonTipClickedEventHandler;
 
 			_notifyIcon.ContextMenu.MenuItems.Add("Open main window", OpenWindowMenuItemClickEventHandler);
-			_notifyIcon.ContextMenu.MenuItems.Add("Check for update", CheckForUpdateMenuItemClickEventHandler);
+			_notifyIcon.ContextMenu.MenuItems.Add("Check for updates", CheckForUpdateMenuItemClickEventHandler);
 			_notifyIcon.ContextMenu.MenuItems.Add("Quit", QuitMenuItemClickEventHandler);
 		}
 
@@ -45,7 +45,6 @@ namespace Gta5EyeTrackingModUpdater
 
 		private void BalloonTipClickedEventHandler(object sender, EventArgs eventArgs)
 		{
-			//Process.Start(_applicationVersionMonitor.LatestNotifiedDownloadableVersion.DownloadUrl.ToString());
 		}
 
 		private void OpenWindowMenuItemClickEventHandler(object sender, EventArgs eventArgs)
@@ -55,7 +54,6 @@ namespace Gta5EyeTrackingModUpdater
 
 		private void CheckForUpdateMenuItemClickEventHandler(object sender, EventArgs eventArgs)
 		{
-			//_applicationVersionMonitor.CheckForNewVersion();
 			CheckForUpdateMenuItemClick(this, eventArgs);
 		}
 

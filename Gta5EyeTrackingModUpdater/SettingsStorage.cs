@@ -14,6 +14,8 @@ namespace Gta5EyeTrackingModUpdater
 			{
 				var folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Util.SettingsPath);
 				var filePath = Path.Combine(folderPath, SettingsFileName);
+				if (!File.Exists(SettingsFileName)) return result;
+
 				System.Xml.Serialization.XmlSerializer reader = new System.Xml.Serialization.XmlSerializer(typeof(Settings));
 				var file = new StreamReader(filePath);
 				var settings = (Settings)reader.Deserialize(file);

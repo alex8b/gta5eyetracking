@@ -23,6 +23,7 @@ namespace Gta5EyeTrackingModUpdater
 		}
 		public static bool IsValidGtaFolder(string gtaPath)
 		{
+			if (gtaPath == null) return false;
 			return File.Exists(Path.Combine(gtaPath, "GTA5.exe"));
 		}
 
