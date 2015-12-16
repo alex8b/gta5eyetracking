@@ -200,6 +200,7 @@ namespace Gta5EyeTrackingModUpdater
 			// Autoupdate
 
 			_model.Autoupdate = _settings.Autoupdate;
+			_model.Autostart = _settings.Autostart;
 		}
 
 		private void TimerOnTick(object sender, EventArgs eventArgs)
