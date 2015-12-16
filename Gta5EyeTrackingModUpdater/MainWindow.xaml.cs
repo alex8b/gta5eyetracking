@@ -89,7 +89,6 @@ namespace Gta5EyeTrackingModUpdater
 				_updater.CheckForUpdates(_settings.Autoupdate);
 			});
 
-			//todo: autostart reg key
 			//todo: sign
 			//todo: run remove on uninstall
 		}
