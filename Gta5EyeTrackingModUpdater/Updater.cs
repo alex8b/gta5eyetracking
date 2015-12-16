@@ -68,8 +68,7 @@ namespace Gta5EyeTrackingModUpdater
 			var supportedGtaVersion = new Version(0, 0);
 			var availableScriptHookVVersion = "";
 			var scriptHookVDownloadUrlAddress = "";
-			if (
-				!TryParseScriptHookVWebPage(out supportedGtaVersion, out availableScriptHookVVersion,
+			if (!TryParseScriptHookVWebPage(out supportedGtaVersion, out availableScriptHookVVersion,
 					out scriptHookVDownloadUrlAddress))
 			{
 				//Failed to get script hook version
@@ -83,22 +82,15 @@ namespace Gta5EyeTrackingModUpdater
 				return;
 			}
 
-			var installedScriptHookVVersion = GetInstalledScriptHookVVersion();
-
-			if (IsVersionLower(installedScriptHookVVersion,availableScriptHookVVersion))
+			if (IsScriptHookVInstalled() && (!IsVersionLower(GetInstalledScriptHookVVersion(), availableScriptHookVVersion)))
 			{
-				DownloadScriptHookV(scriptHookVDownloadUrlAddress);
-				if (!InstallScriptHookV())
-				{
-					Util.Log("Failed to update Script Hook V");
-				}
+				return;
 			}
-			else if (!IsScriptHookVInstalled())
+
+			DownloadScriptHookV(scriptHookVDownloadUrlAddress);
+			if (!InstallScriptHookV())
 			{
-				if (!InstallScriptHookV())
-				{
-					Util.Log("Failed to update Script Hook V");
-				}
+				Util.Log("Failed to update Script Hook V");
 			}
 		}
 
@@ -360,10 +352,64 @@ namespace Gta5EyeTrackingModUpdater
 			}
 		}
 
+		private bool ParseScriptHookVVerstion(string version, out Version major, out Version minor)
+		{
+			major = new Version();
+			minor = new Version();
+
+			var versionPattern = @"([\d\.]+)([abcde]?)";
+			var regex = new Regex(versionPattern, RegexOptions.IgnoreCase);
+			var match = regex.Match(version);
+
+			if (!match.Success) return false;
+
+			var majorString = match.Groups[1].Captures[0].Value;
+			if (!Version.TryParse(majorString, out major)) return false;
+
+			var minorString = match.Groups[2].Captures[0].Value;
+			minor = new Version(0, 0);
+			if (minorString.Equals("", StringComparison.OrdinalIgnoreCase))
+			{
+				minor = new Version(0, 0);
+			}
+			else if (minorString.Equals("a", StringComparison.OrdinalIgnoreCase))
+			{
+				minor = new Version(1, 0);
+			}
+			else if (minorString.Equals("b", StringComparison.OrdinalIgnoreCase))
+			{
+				minor = new Version(2, 0);
+			}
+			else if (minorString.Equals("c", StringComparison.OrdinalIgnoreCase))
+			{
+				minor = new Version(3, 0);
+			}
+			else if (minorString.Equals("d", StringComparison.OrdinalIgnoreCase))
+			{
+				minor = new Version(4, 0);
+			}
+			else if (minorString.Equals("e", StringComparison.OrdinalIgnoreCase))
+			{
+				minor = new Version(5, 0);
+			}
+
+			return true;
+		}
+
 		private bool IsVersionLower(string installedScriptHookVVersion, string scriptHookVVersion)
 		{
-			return true;
-			//todo: parse version + abcde
+			Version v1major;
+			Version v1minor;
+			if (!ParseScriptHookVVerstion(installedScriptHookVVersion, out v1major, out v1minor)) return false;
+
+			Version v2major;
+			Version v2minor;
+			if (!ParseScriptHookVVerstion(scriptHookVVersion, out v2major, out v2minor)) return false;
+
+			if (v1major < v2major) return true;
+			if ((v1major == v2major) && (v1minor < v2minor)) return true;
+
+			return false;
 		}
 
 		private bool InstallModBundle()

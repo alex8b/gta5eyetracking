@@ -72,12 +72,12 @@ namespace Gta5EyeTrackingModUpdater
 				_updater.CheckForUpdates();
 			});
 
-			//todo: autostart
-			//todo: remove some notifications
+			//todo: autostart reg key
 			//todo: not installed vs disabled vs not compatible
 			//todo: Status: Checking for update, up to date
 			//todo: log
 			//todo: sign
+			//todo: run remove on uninstall
 		}
 
 		private void UpdaterOnScriptHookVRemoved(object sender, EventArgs eventArgs)
