@@ -23,8 +23,6 @@ namespace Gta5EyeTrackingModUpdater
 
 		public MainWindow()
 		{
-			PreventMultipleProcess();
-
 			_model = new MainWindowModel();
 
 			this.Closing += OnClosing;
@@ -208,18 +206,6 @@ namespace Gta5EyeTrackingModUpdater
 			if (_updater != null)
 			{
 				_updater.CheckForUpdates(_settings.Autoupdate);
-			}
-		}
-
-		private void PreventMultipleProcess()
-		{
-			var processes =
-				Process.GetProcesses()
-					.Where(
-						pr => pr.ProcessName.Equals(Assembly.GetExecutingAssembly().GetName().Name, StringComparison.OrdinalIgnoreCase));
-			if (processes.Count() > 1)
-			{
-				Application.Current.Shutdown();
 			}
 		}
 
