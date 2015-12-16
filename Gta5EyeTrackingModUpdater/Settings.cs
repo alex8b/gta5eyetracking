@@ -13,6 +13,7 @@ namespace Gta5EyeTrackingModUpdater
 		{
 			GtaPath = "";
 			Autostart = true;
+			Autoupdate = true;
 		}
 
 	}

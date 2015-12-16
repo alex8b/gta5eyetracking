@@ -50,6 +50,8 @@ namespace Gta5EyeTrackingModUpdater
 				}
 			}
 
+			SetupAutostart();
+
 			//Init NotifyIcon
 			_updaterNotifyIcon = new UpdaterNotifyIcon();
 			_updater = new Updater(_updaterNotifyIcon, _settings);
@@ -317,12 +319,14 @@ namespace Gta5EyeTrackingModUpdater
 		{
 			_settings.Autostart = true;
 			_model.Autostart = true;
+			SetupAutostart();
 		}
 
 		private void Autostart_OnUnchecked(object sender, RoutedEventArgs e)
 		{
 			_settings.Autostart = false;
 			_model.Autostart = false;
+			SetupAutostart();
 		}
 
 		private void Install_OnClick(object sender, RoutedEventArgs e)
@@ -344,6 +348,20 @@ namespace Gta5EyeTrackingModUpdater
 				_updater.RemoveMod();
 				_model.Installing = false;
 			});
+		}
+
+		public void SetupAutostart()
+		{
+			var reg = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+			if (reg == null) return;
+			if (_settings.Autostart)
+			{
+				reg.SetValue("Gta5EyeTrackingModUpdater", @"""" + Assembly.GetExecutingAssembly().Location + @""" -hide");
+			}
+			else
+			{
+				reg.DeleteValue("Gta5EyeTrackingModUpdater");
+			}
 		}
 	}
 }

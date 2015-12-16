@@ -38,7 +38,9 @@ namespace Gta5EyeTrackingModUpdater
 		public void CheckForUpdates(bool forceInstall = false)
 		{
 			if (!_enabled) return;
+			if (_settings.GtaPath == "") return;
 			if (!Monitor.TryEnter(_lock)) return;
+
 			forceInstall = forceInstall || _settings.Autoupdate;
 			try
 			{
@@ -302,8 +304,8 @@ namespace Gta5EyeTrackingModUpdater
 
 		public void RemoveScriptHookV()
 		{
+			if (_settings.GtaPath == "") return;
 			if (!Monitor.TryEnter(_lock)) return;
-
 			try
 			{
 				var dinput8DllPath = Path.Combine(_settings.GtaPath, "dinput8.dll");
@@ -485,7 +487,9 @@ namespace Gta5EyeTrackingModUpdater
 
 		public void RemoveMod()
 		{
+			if (_settings.GtaPath == "") return;
 			if (!Monitor.TryEnter(_lock)) return;
+
 			try
 			{
 				var gta5EyeTrackingDllPath = Path.Combine(_settings.GtaPath, "scripts", "gta5eyetracking.dll");
