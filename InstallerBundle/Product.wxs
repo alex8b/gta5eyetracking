@@ -5,19 +5,19 @@
 	<Bundle
 		 Name="GTA V Eye Tracking Mod"
 		 Manufacturer="alex8b"
-		 Version="0.2"
-		 UpgradeCode="5365DFBA-9132-4E79-AA16-33DCCD824EDF"
+		 Version="!(bind.packageVersion.Gta5EyeTrackingModUpdater)"
+		 UpgradeCode="5ABF7B44-353C-4C52-BE9E-9EB6735A4445"
 		 DisableModify="yes">
 		<BootstrapperApplicationRef
       Id="WixStandardBootstrapperApplication.RtfLicense" >
 			<bal:WixStandardBootstrapperApplication
-        LicenseFile="Resources\License.rtf"
-        LogoFile="Resources\gta5eyetracking.png"/>
+        LicenseFile="..\Installer\Resources\License.rtf"
+        LogoFile="..\Installer\Resources\gta5eyetracking.png"/>
 		</BootstrapperApplicationRef>
 
 		<Chain>
 			<PackageGroupRef Id="NetFx452Web"/>
-			<MsiPackage SourceFile="..\bin\installer\Gta5EyeTrackingModUpdater.msi"/>
+			<MsiPackage Id="Gta5EyeTrackingModUpdater" SourceFile="..\bin\installer\Gta5EyeTrackingModUpdater.msi"/>
 		</Chain>
 	</Bundle>
 </Wix>

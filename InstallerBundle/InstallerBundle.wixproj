@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
     <ProductVersion>3.10</ProductVersion>
     <ProjectGuid>b60702f3-bed4-4efd-a2df-80a0be9a572a</ProjectGuid>
@@ -27,7 +27,6 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\Banner.bmp" />
     <Content Include="Resources\Dialog.bmp" />
     <Content Include="Resources\gta5eyetracking.ico" />
     <Content Include="Resources\gta5eyetracking.png" />

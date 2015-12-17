@@ -6,7 +6,7 @@ environment:
   VisualStudioVersion: 14.0
 assembly_info:
   patch: true
-  file: Gta5EyeTracking\Properties\AssemblyInfo.cs
+  file: AssemblyInfo.*
   assembly_version: '{version}'
   assembly_file_version: '{version}'
   assembly_informational_version: '{version}'

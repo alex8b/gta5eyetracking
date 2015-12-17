@@ -4,13 +4,12 @@
 	<Product Id="*"
 					 Name="GTA V Eye Tracking Mod"
 					 Language="1033"
-					 Version="0.2"
+					 Version="!(bind.FileVersion.Gta5EyeTrackingModUpdaterExe)"
 					 Manufacturer="alex8b"
-					 UpgradeCode="916B8E72-0A18-44F2-A723-010338C54B22">
+					 UpgradeCode="5ABF7B44-353C-4C52-BE9E-9EB6735A4445">
 		<Package InstallerVersion="405" 
 						 Compressed="yes" 
-						 InstallScope="perMachine"
-						 Platform="x64" />
+						 InstallScope="perMachine" />
 
 		<MajorUpgrade AllowSameVersionUpgrades="yes" DowngradeErrorMessage="A newer version of [ProductName] is already installed."/>
 		<MediaTemplate EmbedCab="yes"/>
@@ -62,7 +61,7 @@
 
 			<Directory Id="ProgramMenuFolder" Name="Programs">
 				<Directory Id="ProgramMenuGta5EyeTrackingModUpdaterFolder" Name="GTA V Eye Tracking Mod">
-					<Component Id="ProgramMenuItems" Guid="c3ab1bb0-4394-4c1c-955e-7cbd98777f4d">
+					<Component Id="ProgramMenuItems" Guid="c3ab1bb0-4394-4c1c-955e-7cbd98777f4d" Win64="yes">
 						<Shortcut Id="ExecutableProgramMenuShortcut"
                       Directory="ProgramMenuGta5EyeTrackingModUpdaterFolder"
                       Name="GTA V Eye Tracking Mod Updater"
@@ -104,7 +103,7 @@
 	<Fragment>
 		<DirectoryRef Id="INSTALLFOLDER">
 			<Component Id="Program" Guid="DE9D2DC5-6FE6-4406-BD6E-12A82717E831" Win64="yes" >
-				<File Id="Manual" KeyPath="yes" Source="..\bin\updater\Gta5EyeTrackingModUpdater.exe"/>
+				<File Id="Gta5EyeTrackingModUpdaterExe" KeyPath="yes" Source="..\bin\updater\Gta5EyeTrackingModUpdater.exe"/>
 			</Component>
 		</DirectoryRef>
 	</Fragment>
