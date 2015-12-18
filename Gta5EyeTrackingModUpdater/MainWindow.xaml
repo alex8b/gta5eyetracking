@@ -5,19 +5,65 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Gta5EyeTrackingModUpdater"
         mc:Ignorable="d"
-        Title="{Binding WindowTitle}" Height="249.526" Width="426.734" ResizeMode="NoResize" Icon="Resources/ApplicationIcon.ico">
+        Title="{Binding WindowTitle}" Height="372.081" Width="477.523" ResizeMode="NoResize" Icon="Resources/ApplicationIcon.ico">
 	<Grid Margin="0,0,0,0">
-		<Button x:Name="browse" Content="Browse" HorizontalAlignment="Left" Margin="270,40,0,0" VerticalAlignment="Top" Width="125" Click="Browse_OnClick"/>
-		<Button x:Name="checkForUpdates" Content="Check for updates" HorizontalAlignment="Left" Margin="10,140,0,0" VerticalAlignment="Top" Width="125" Click="CheckForUpdates_OnClick"/>
-		<Label x:Name="gtaPath" Content="{Binding GtaPathText, Mode=OneWay}" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.88,0.008" Width="230"/>
-		<Label x:Name="scriptHookVersion" Content="{Binding ScriptHookVVersionText, Mode=OneWay}" Margin="10,83,20,0" VerticalAlignment="Top" RenderTransformOrigin="0.88,0.008"/>
-		<Label x:Name="modVersion" Content="{Binding ModVersionText, Mode=OneWay}" Margin="10,109,20,0" VerticalAlignment="Top" RenderTransformOrigin="0.88,0.008"/>
-		<Label x:Name="gtaVersion" Content="{Binding GtaVersionText, Mode=OneWay}" Margin="10,60,20,0" VerticalAlignment="Top" RenderTransformOrigin="0.88,0.008"/>
-		<Label x:Name="gtaPathLabel" Content="GTA V path:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.88,0.008" Width="253"/>
-		<CheckBox x:Name="autoupdate" IsChecked="{Binding Autoupdate, Mode=OneWay}" Content="Enable auto-update" HorizontalAlignment="Left" Margin="10,165,0,0" VerticalAlignment="Top" Checked="Autoupdate_OnChecked" Unchecked="Autoupdate_OnUnchecked"/>
-		<CheckBox x:Name="autostart" IsChecked="{Binding Autostart, Mode=OneWay}" Content="Autostart on Windows startup" HorizontalAlignment="Left" Margin="10,185,0,0" VerticalAlignment="Top" Checked="Autostart_OnChecked" Unchecked="Autostart_OnUnchecked"/>
-		<Button x:Name="install" IsEnabled="{Binding CanInstall, Mode=OneWay}" Content="Install or update" HorizontalAlignment="Left" Margin="140,140,0,0" VerticalAlignment="Top" Width="125" Click="Install_OnClick"/>
-		<Button x:Name="remove" IsEnabled="{Binding CanRemove, Mode=OneWay}" Content="Remove" HorizontalAlignment="Left" Margin="270,140,0,0" VerticalAlignment="Top" Width="125" Click="Remove_OnClick"/>
+		<Grid Height="40" Margin="10,10,10,0" VerticalAlignment="Top">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="Auto" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<Label x:Name="gtaPathLabel" Content="GTA V path:" Grid.Column="0" Grid.Row="0" Margin="5"/>
+			<TextBox x:Name="gtaPath" Text="{Binding GtaPathText, Mode=OneWay}" Grid.Column="1" Grid.Row="0" IsEnabled="False" Margin="5" />
+			<Button x:Name="browse" Content="Browse" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="0" Width="100" Margin="5" />
+		</Grid>
+		
+		<Grid Height="220" Margin="10,55,10,10" VerticalAlignment="Top">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="Auto" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="35" />
+				<RowDefinition Height="35" />
+				<RowDefinition Height="35" />
+				<RowDefinition Height="35" />
+				<RowDefinition Height="35" />
+				<RowDefinition Height="35" />
+			</Grid.RowDefinitions>
+			<Label x:Name="installedLabel" Content="Installed version" Grid.Row="0" Grid.Column="1" Margin="5"/>
+			<Label x:Name="availableLabel" Content="Available version" Grid.Row="0" Grid.Column="2" Margin="5"/>
+
+			<Label x:Name="gtaLabel" Content="GTA V:" Grid.Row="1" Grid.Column="0" Margin="5"/>
+			<Label x:Name="scriptHookVLabel" Content="Script Hook V:" Grid.Row="2" Grid.Column="0" Margin="5" />
+			<Label x:Name="modLabel" Content="Eye Tracking Mod:" Grid.Row="3" Grid.Column="0" Margin="5" />
+			<Label x:Name="modUpdaterLabel" Content="Mod Updater:" Grid.Row="4" Grid.Column="0" Margin="5" />
+
+			<Label x:Name="gtaVersion" Content="{Binding GtaVersion, Mode=OneWay}" Grid.Row="1" Grid.Column="1" Margin="5" />
+			<Label x:Name="scriptHookVVersion" Content="{Binding ScriptHookVVersion, Mode=OneWay}"  Grid.Row="2" Grid.Column="1" Margin="5"/>
+			<Label x:Name="modVersion" Content="{Binding ModVersion, Mode=OneWay}" Grid.Row="3" Grid.Column="1" Margin="5" />
+			<Label x:Name="modUpdaterVersion" Content="{Binding ModUpdaterVersion, Mode=OneWay}" Grid.Row="3" Grid.Column="1" Margin="5" />
+			
+			<Label x:Name="scriptHookVAvailableVersion" Content="{Binding ScriptHookVAvailableVersion, Mode=OneWay}"  Grid.Row="2" Grid.Column="2" Margin="5"/>
+			<Label x:Name="modAvailableVersion" Content="{Binding ModAvailableVersion, Mode=OneWay}" Grid.Row="3" Grid.Column="2" Margin="5" />
+			<Label x:Name="modUpdaterAvailableVersion" Content="{Binding ModUpdaterAvailableVersion, Mode=OneWay}" Grid.Row="4" Grid.Column="2" Margin="5" />
+
+			<Button x:Name="scriptHookVUpdate" Content="Check for update" Grid.Row="2" Grid.Column="3" Margin="5" Width="100" Height="25" Click="CheckForUpdates_OnClick"/>
+			<Button x:Name="modUpdate" Content="Check for update" Grid.Row="3" Grid.Column="3" Margin="5" Width="100" Height="25" Click="CheckForUpdates_OnClick"/>
+			<Button x:Name="modUpdaterUpdate" Content="Check for update" Grid.Row="4" Grid.Column="3" Margin="5" Width="100" Height="25" Click="CheckForUpdates_OnClick"/>
+
+			<Button x:Name="checkAll" Content="Update all" Grid.Row="5" Grid.Column="3" Margin="5" Width="100" Height="25" Click="CheckForUpdates_OnClick"/>
+			<Button x:Name="remove" IsEnabled="{Binding CanRemove, Mode=OneWay}" Content="Remove the mod" Grid.Row="5" Grid.Column="1" Margin="5" Height="25" Click="Remove_OnClick"/>
+
+		</Grid>
+
+		<CheckBox x:Name="autoupdate" IsChecked="{Binding Autoupdate, Mode=OneWay}" Content="Enable auto-update" HorizontalAlignment="Left" Margin="10,275,0,0" VerticalAlignment="Top" Checked="Autoupdate_OnChecked" Unchecked="Autoupdate_OnUnchecked"/>
+		<CheckBox x:Name="autostart" IsChecked="{Binding Autostart, Mode=OneWay}" Content="Autostart on Windows startup" HorizontalAlignment="Left" Margin="10,295,0,0" VerticalAlignment="Top" Checked="Autostart_OnChecked" Unchecked="Autostart_OnUnchecked"/>
 
 	</Grid>
 </Window>

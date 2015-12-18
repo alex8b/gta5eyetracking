@@ -8,14 +8,16 @@ namespace Gta5EyeTrackingModUpdater
 	{
 		private string _gtaPathText;
 		private string _windowTitle;
-		private string _scriptHookVVersionText;
-		private string _gtaVersionText;
-		private string _modVersionText;
+		private string _scriptHookVVersion;
+		private string _gtaVersion;
+		private string _modVersion;
 		private bool _autoupdate;
 		private bool _autostart;
 		private bool _canInstall;
 		private bool _canRemove;
 		private bool _installing;
+		private string _scriptHookVAvailableVersion;
+		private string _modAvailableVersion;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void OnNotifyPropertyChanged([CallerMemberName] String propertyName = "")
@@ -47,33 +49,33 @@ namespace Gta5EyeTrackingModUpdater
 			}
 		}
 
-		public string ScriptHookVVersionText
+		public string ScriptHookVVersion
 		{
-			get { return _scriptHookVVersionText; }
+			get { return _scriptHookVVersion; }
 			set
 			{
-				_scriptHookVVersionText = value;
-				OnNotifyPropertyChanged("ScriptHookVVersionText");
+				_scriptHookVVersion = value;
+				OnNotifyPropertyChanged("ScriptHookVVersion");
 			}
 		}
 
-		public string GtaVersionText
+		public string GtaVersion
 		{
-			get { return _gtaVersionText; }
+			get { return _gtaVersion; }
 			set
 			{
-				_gtaVersionText = value;
-				OnNotifyPropertyChanged("GtaVersionText");
+				_gtaVersion = value;
+				OnNotifyPropertyChanged("GtaVersion");
 			}
 		}
 
-		public string ModVersionText
+		public string ModVersion
 		{
-			get { return _modVersionText; }
+			get { return _modVersion; }
 			set
 			{
-				_modVersionText = value;
-				OnNotifyPropertyChanged("ModVersionText");
+				_modVersion = value;
+				OnNotifyPropertyChanged("ModVersion");
 			}
 		}
 
@@ -125,6 +127,26 @@ namespace Gta5EyeTrackingModUpdater
 				_installing = value;
 				OnNotifyPropertyChanged("CanRemove");
 				OnNotifyPropertyChanged("CanInstall");
+			}
+		}
+
+		public string ScriptHookVAvailableVersion
+		{
+			get { return _scriptHookVAvailableVersion; }
+			set
+			{
+				_scriptHookVAvailableVersion = value;
+				OnNotifyPropertyChanged("ScriptHookVAvailableVersion");
+			}
+		}
+
+		public string ModAvailableVersion
+		{
+			get { return _modAvailableVersion; }
+			set
+			{
+				_modAvailableVersion = value;
+				OnNotifyPropertyChanged("ModAvailableVersion");
 			}
 		}
 

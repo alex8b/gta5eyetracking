@@ -129,67 +129,61 @@ namespace Gta5EyeTrackingModUpdater
 			if ((_model.GtaPathText == "")
 				|| (gtaVersion == new Version(0, 0)))
 			{
-				_model.GtaVersionText = "GTA V: not found in the provided path";
+				_model.GtaVersion = "not found";
 			}
 			else
 			{
-				_model.GtaVersionText = "GTA V: installed - " + gtaVersion;
+				_model.GtaVersion = gtaVersion.ToString();
 			}
 
 			// Script hook V
-			var scriptHookVtext = "Script Hook V: ";
 			var installedScriptHookVVersion = _updater.GetInstalledScriptHookVVersion();
 			if (installedScriptHookVVersion == "")
 			{
-				scriptHookVtext += "not installed";
+				_model.ScriptHookVVersion = "not installed";
 			}
 			else
 			{
-				scriptHookVtext += "installed - " + installedScriptHookVVersion;
+				_model.ScriptHookVVersion = installedScriptHookVVersion;
 			}
 
+			_model.ScriptHookVAvailableVersion = "";
 			var availableScriptHookVVersion = _updater.GetAvailableScriptHookVVersion();
 			var isGtaVersionSupported = false;
 			if (availableScriptHookVVersion != null)
 			{
-				scriptHookVtext += " / ";
-
 				isGtaVersionSupported = _updater.IsGtaSupportedByAvailableScriptHookVVersion();
 				if (!isGtaVersionSupported)
 				{
-					scriptHookVtext += "GTA V version is not supported";
+					_model.ScriptHookVAvailableVersion = "GTA V not supported";
 				}
 				else if (availableScriptHookVVersion == "")
 				{
-					scriptHookVtext += "no update available";
+					_model.ScriptHookVAvailableVersion = "not available";
 				}
 				else
 				{
-					scriptHookVtext += "available - " + availableScriptHookVVersion;
+					_model.ScriptHookVAvailableVersion = availableScriptHookVVersion;
 				}
 			}
-			
-			_model.ScriptHookVVersionText = scriptHookVtext;
 
 			// Mod
-			var modText = "Mod: ";
 			var installedModVersion = _updater.GetModVersion();
 			if (installedModVersion == new Version(0, 0))
 			{
-				modText += "not installed";
+				_model.ModVersion = "not installed";
 			}
 			else
 			{
-				modText += "installed - " + installedModVersion;
+				_model.ModVersion = installedModVersion.ToString();
 			}
+
 			var availableModVersion = _updater.GetAvailableModVersion();
 			if (availableModVersion != null)
 			{
-				modText += " / ";
-				modText += "available - " + availableModVersion;
+				_model.ModAvailableVersion = availableModVersion.ToString();
 			}
 
-			_model.ModVersionText = modText;
 			_model.CanInstall = isGtaVersionSupported &&
 				(_updater.IsVersionLower(installedScriptHookVVersion, availableScriptHookVVersion)
 				|| (installedModVersion < availableModVersion));
