@@ -27,6 +27,7 @@ namespace Gta5EyeTrackingModUpdater
 		private Version _lastSupportedGtaVersion;
 		private Version _lastAvailableModVersion;
 		private string _lastAvailableScriptHookVVersion;
+		private Version _lastAvailableModUpdaterVersion;
 
 
 		public Updater(UpdaterNotifyIcon updaterNotifyIcon, Settings settings)
@@ -590,6 +591,8 @@ namespace Gta5EyeTrackingModUpdater
 				return;
 			}
 
+			_lastAvailableModUpdaterVersion = availableUpdaterVersion;
+
 			if (installedUpdaterVersion >= availableUpdaterVersion)
 			{
 				//Updater is up to date
@@ -659,6 +662,11 @@ namespace Gta5EyeTrackingModUpdater
 		public Version GetAvailableModVersion()
 		{
 			return _lastAvailableModVersion;
+		}
+
+		public Version GetAvailableModUpdaterVersion()
+		{
+			return _lastAvailableModUpdaterVersion;
 		}
 	}
 }

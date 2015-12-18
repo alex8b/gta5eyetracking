@@ -184,10 +184,25 @@ namespace Gta5EyeTrackingModUpdater
 				_model.ModAvailableVersion = availableModVersion.ToString();
 			}
 
+
+			//Mod updater
+			var installedModUpdaterVersion = Assembly.GetExecutingAssembly().GetName().Version;
+
+			_model.ModUpdaterVersion = installedModUpdaterVersion;
+			var availableModUpdaterVersion = _updater.GetAvailableModUpdaterVersion();
+			if (availableModVersion != null)
+			{
+				_model.ModUpdaterAvailableVersion = availableModUpdaterVersion;
+			}
+
+			//Button states
+
 			_model.CanInstall = isGtaVersionSupported &&
 				(_updater.IsVersionLower(installedScriptHookVVersion, availableScriptHookVVersion)
 				|| (installedModVersion < availableModVersion));
 			_model.CanRemove = _updater.IsScriptHookVInstalled();
+
+
 
 			// Autoupdate
 

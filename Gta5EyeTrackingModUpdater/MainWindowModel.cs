@@ -18,6 +18,8 @@ namespace Gta5EyeTrackingModUpdater
 		private bool _installing;
 		private string _scriptHookVAvailableVersion;
 		private string _modAvailableVersion;
+		private Version _modUpdaterVersion;
+		private Version _modUpdaterAvailableVersion;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void OnNotifyPropertyChanged([CallerMemberName] String propertyName = "")
@@ -150,8 +152,25 @@ namespace Gta5EyeTrackingModUpdater
 			}
 		}
 
-		public MainWindowModel()
+		public Version ModUpdaterVersion
 		{
+			get { return _modUpdaterVersion; }
+			set
+			{
+				_modUpdaterVersion = value;
+				OnNotifyPropertyChanged("ModUpdaterVersion");
+			}
 		}
+
+		public Version ModUpdaterAvailableVersion
+		{
+			get { return _modUpdaterAvailableVersion; }
+			set
+			{
+				_modUpdaterAvailableVersion = value;
+				OnNotifyPropertyChanged("ModUpdaterAvailableVersion");
+			}
+		}
+
 	}
 }
