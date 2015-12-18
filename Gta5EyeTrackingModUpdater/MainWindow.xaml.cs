@@ -65,7 +65,8 @@ namespace Gta5EyeTrackingModUpdater
 
 			InitializeComponent();
 			this.DataContext = _model;
-			_model.WindowTitle = "GTA V Eye Tracking Mod Updater " + Assembly.GetExecutingAssembly().GetName().Version;
+			var version = Assembly.GetExecutingAssembly().GetName().Version;
+			_model.WindowTitle = "GTA V Eye Tracking Mod Updater " + version.Major + "." + version.Minor + "." + version.Build;
 			UpdateText();
 
 			var args = Environment.GetCommandLineArgs();
@@ -186,13 +187,14 @@ namespace Gta5EyeTrackingModUpdater
 
 
 			//Mod updater
-			var installedModUpdaterVersion = Assembly.GetExecutingAssembly().GetName().Version;
+			var version = Assembly.GetExecutingAssembly().GetName().Version;
+			var installedModUpdaterVersion = version.Major + "." + version.Minor + "." + version.Build;
 
 			_model.ModUpdaterVersion = installedModUpdaterVersion;
 			var availableModUpdaterVersion = _updater.GetAvailableModUpdaterVersion();
 			if (availableModVersion != null)
 			{
-				_model.ModUpdaterAvailableVersion = availableModUpdaterVersion;
+				_model.ModUpdaterAvailableVersion = availableModUpdaterVersion.ToString();
 			}
 
 			//Button states

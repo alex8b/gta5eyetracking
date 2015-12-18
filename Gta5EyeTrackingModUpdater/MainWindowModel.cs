@@ -18,8 +18,8 @@ namespace Gta5EyeTrackingModUpdater
 		private bool _installing;
 		private string _scriptHookVAvailableVersion;
 		private string _modAvailableVersion;
-		private Version _modUpdaterVersion;
-		private Version _modUpdaterAvailableVersion;
+		private string _modUpdaterVersion;
+		private string _modUpdaterAvailableVersion;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void OnNotifyPropertyChanged([CallerMemberName] String propertyName = "")
@@ -51,16 +51,6 @@ namespace Gta5EyeTrackingModUpdater
 			}
 		}
 
-		public string ScriptHookVVersion
-		{
-			get { return _scriptHookVVersion; }
-			set
-			{
-				_scriptHookVVersion = value;
-				OnNotifyPropertyChanged("ScriptHookVVersion");
-			}
-		}
-
 		public string GtaVersion
 		{
 			get { return _gtaVersion; }
@@ -68,16 +58,6 @@ namespace Gta5EyeTrackingModUpdater
 			{
 				_gtaVersion = value;
 				OnNotifyPropertyChanged("GtaVersion");
-			}
-		}
-
-		public string ModVersion
-		{
-			get { return _modVersion; }
-			set
-			{
-				_modVersion = value;
-				OnNotifyPropertyChanged("ModVersion");
 			}
 		}
 
@@ -132,6 +112,16 @@ namespace Gta5EyeTrackingModUpdater
 			}
 		}
 
+		public string ScriptHookVVersion
+		{
+			get { return _scriptHookVVersion; }
+			set
+			{
+				_scriptHookVVersion = value;
+				OnNotifyPropertyChanged("ScriptHookVVersion");
+			}
+		}
+
 		public string ScriptHookVAvailableVersion
 		{
 			get { return _scriptHookVAvailableVersion; }
@@ -139,6 +129,17 @@ namespace Gta5EyeTrackingModUpdater
 			{
 				_scriptHookVAvailableVersion = value;
 				OnNotifyPropertyChanged("ScriptHookVAvailableVersion");
+			}
+		}
+
+
+		public string ModVersion
+		{
+			get { return _modVersion; }
+			set
+			{
+				_modVersion = value;
+				OnNotifyPropertyChanged("ModVersion");
 			}
 		}
 
@@ -152,7 +153,7 @@ namespace Gta5EyeTrackingModUpdater
 			}
 		}
 
-		public Version ModUpdaterVersion
+		public string ModUpdaterVersion
 		{
 			get { return _modUpdaterVersion; }
 			set
@@ -162,7 +163,7 @@ namespace Gta5EyeTrackingModUpdater
 			}
 		}
 
-		public Version ModUpdaterAvailableVersion
+		public string ModUpdaterAvailableVersion
 		{
 			get { return _modUpdaterAvailableVersion; }
 			set
