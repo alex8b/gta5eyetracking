@@ -20,6 +20,9 @@ namespace Gta5EyeTrackingModUpdater
 		private string _modAvailableVersion;
 		private string _modUpdaterVersion;
 		private string _modUpdaterAvailableVersion;
+		private string _scriptHookVButtonText;
+		private string _modButtonText;
+		private string _modUpdaterButtonText;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void OnNotifyPropertyChanged([CallerMemberName] String propertyName = "")
@@ -132,7 +135,6 @@ namespace Gta5EyeTrackingModUpdater
 			}
 		}
 
-
 		public string ModVersion
 		{
 			get { return _modVersion; }
@@ -150,6 +152,35 @@ namespace Gta5EyeTrackingModUpdater
 			{
 				_modAvailableVersion = value;
 				OnNotifyPropertyChanged("ModAvailableVersion");
+			}
+		}
+		public string ScriptHookVButtonText
+		{
+			get { return _scriptHookVButtonText; }
+			set
+			{
+				_scriptHookVButtonText = value;
+				OnNotifyPropertyChanged("ScriptHookVButtonText");
+			}
+		}
+
+		public string ModButtonText
+		{
+			get { return _modButtonText; }
+			set
+			{
+				_modButtonText = value;
+				OnNotifyPropertyChanged("ModButtonText");
+			}
+		}
+
+		public string ModUpdaterButtonText
+		{
+			get { return _modUpdaterButtonText; }
+			set
+			{
+				_modUpdaterButtonText = value;
+				OnNotifyPropertyChanged("ModUpdaterButtonText");
 			}
 		}
 
