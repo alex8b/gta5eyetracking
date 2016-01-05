@@ -196,6 +196,11 @@ namespace Gta5EyeTracking.Features
 				_drawCrosshair = true;
 			}
 
+			if (_drawCrosshair)
+			{
+				UI.HideHudComponentThisFrame((HudComponent)14);
+			}
+
 			if (_drawCrosshair
 				&& !MissileLockedCrosshairVisible)
 			{
