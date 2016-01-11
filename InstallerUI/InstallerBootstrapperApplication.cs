@@ -14,7 +14,6 @@ namespace InstallerUI
 		public static Dispatcher BootstrapperDispatcher { get; private set; }
 		protected override void Run()
 		{
-			MessageBox.Show("aaaaaaaa");
 			this.Engine.Log(LogLevel.Verbose, "Launching custom InstallerBootstrapperApplication");
 			BootstrapperDispatcher = Dispatcher.CurrentDispatcher;
 

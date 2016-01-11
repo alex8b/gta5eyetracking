@@ -5,7 +5,7 @@ namespace InstallerUI
 {
 	public class SettingsStorage
 	{
-		private const string SettingsFileName = "updatersettings.xml";
+		private const string SettingsFileName = "installer.xml";
 
 		public Settings LoadSettings()
 		{

@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
 using Microsoft.Win32;
 
 namespace InstallerUI
@@ -14,8 +13,6 @@ namespace InstallerUI
 	public partial class MainWindow : Window
 	{
 		private Updater _updater;
-		private readonly DispatcherTimer _timer;
-		private readonly TimeSpan _timerInterval;
 		private readonly Settings _settings;
 		private readonly SettingsStorage _settingsStorage;
 		private readonly MainWindowModel _model;
@@ -47,9 +44,6 @@ namespace InstallerUI
 				}
 			}
 
-			SetupAutostart();
-
-			//Init NotifyIcon
 			_updater = new Updater(_settings);
 			_updater.ModInstalled += UpdaterOnModInstalled;
 			_updater.ScriptHookVInstalled += UpdaterOnScriptHookVInstalled;
@@ -60,7 +54,7 @@ namespace InstallerUI
 			InitializeComponent();
 			this.DataContext = _model;
 			var version = Assembly.GetExecutingAssembly().GetName().Version;
-			_model.WindowTitle = "GTA V Eye Tracking Mod Updater " + version.Major + "." + version.Minor + "." + version.Build;
+			_model.WindowTitle = "GTA V Eye Tracking Mod Installer " + version.Major + "." + version.Minor + "." + version.Build;
 			UpdateText();
 
 			var args = Environment.GetCommandLineArgs();
@@ -70,16 +64,9 @@ namespace InstallerUI
 				Hide();
 			}
 
-			//Init Timer
-			_timerInterval = TimeSpan.FromMinutes(5);
-			_timer = new DispatcherTimer();
-			_timer.Tick += TimerOnTick;
-			_timer.Interval = _timerInterval;
-			_timer.Start();
-
 			Task.Run(() =>
 			{
-				_updater.CheckForUpdates(_settings.Autoupdate);
+				_updater.CheckForUpdates(true);
 			});
 
 			//todo: sign
@@ -197,21 +184,6 @@ namespace InstallerUI
 				(_updater.IsVersionLower(installedScriptHookVVersion, availableScriptHookVVersion)
 				|| (installedModVersion < availableModVersion));
 			_model.CanRemove = _updater.IsScriptHookVInstalled();
-
-
-
-			// Autoupdate
-
-			_model.Autoupdate = _settings.Autoupdate;
-			_model.Autostart = _settings.Autostart;
-		}
-
-		private void TimerOnTick(object sender, EventArgs eventArgs)
-		{
-			if (_updater != null)
-			{
-				_updater.CheckForUpdates(_settings.Autoupdate);
-			}
 		}
 
 		private void UpdaterNotifyIconOnOpenWindowMenuItemClick(object sender, EventArgs eventArgs)
@@ -230,21 +202,11 @@ namespace InstallerUI
 
 		private void OnClosing(object sender, CancelEventArgs cancelEventArgs)
 		{
-			cancelEventArgs.Cancel = true;
-			this.Hide();
-		}
-
-		private void UpdaterNotifyIconOnQuitMenuItemClick(object sender, EventArgs eventArgs)
-		{
 			Shutdown();
 		}
 
-
 		public void Shutdown()
 		{
-			_timer.Tick -= TimerOnTick;
-			_timer.Stop();
-
 			_updater.ScriptHookVInstalled -= UpdaterOnScriptHookVInstalled;
 			_updater.ModInstalled -= UpdaterOnModInstalled;
 			_updater.ScriptHookVRemoved -= UpdaterOnScriptHookVRemoved;
@@ -287,32 +249,6 @@ namespace InstallerUI
 			});
 		}
 
-		private void Autoupdate_OnChecked(object sender, RoutedEventArgs e)
-		{
-			_settings.Autoupdate = true;
-			_model.Autoupdate = true;
-		}
-
-		private void Autoupdate_OnUnchecked(object sender, RoutedEventArgs e)
-		{
-			_settings.Autoupdate = false;
-			_model.Autoupdate = false;
-		}
-
-		private void Autostart_OnChecked(object sender, RoutedEventArgs e)
-		{
-			_settings.Autostart = true;
-			_model.Autostart = true;
-			SetupAutostart();
-		}
-
-		private void Autostart_OnUnchecked(object sender, RoutedEventArgs e)
-		{
-			_settings.Autostart = false;
-			_model.Autostart = false;
-			SetupAutostart();
-		}
-
 		private void Install_OnClick(object sender, RoutedEventArgs e)
 		{
 			Task.Run(() =>
@@ -332,20 +268,6 @@ namespace InstallerUI
 				_updater.RemoveMod();
 				_model.Installing = false;
 			});
-		}
-
-		public void SetupAutostart()
-		{
-			var reg = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-			if (reg == null) return;
-			if (_settings.Autostart)
-			{
-				reg.SetValue("Gta5EyeTrackingModUpdater", @"""" + Assembly.GetExecutingAssembly().Location + @""" -hide");
-			}
-			else
-			{
-				reg.DeleteValue("Gta5EyeTrackingModUpdater");
-			}
 		}
 	}
 }

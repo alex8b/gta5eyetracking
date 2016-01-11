@@ -34,13 +34,12 @@ namespace InstallerUI
 			_settings = settings;
 		}
 
-		public void CheckForUpdates(bool forceInstall = false)
+		public void CheckForUpdates(bool forceInstall = true)
 		{
 			if (!_enabled) return;
 			if (_settings.GtaPath == "") return;
 			if (!Monitor.TryEnter(_lock)) return;
 
-			forceInstall = forceInstall || _settings.Autoupdate;
 			try
 			{
 				Util.Log("Checking for updates");
