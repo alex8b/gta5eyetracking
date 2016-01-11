@@ -7,7 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 
-namespace Gta5EyeTrackingModUpdater
+namespace InstallerUI
 {
 	public static class Util
 	{

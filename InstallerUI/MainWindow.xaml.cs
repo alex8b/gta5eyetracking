@@ -9,11 +9,10 @@ using System.Windows;
 using System.Windows.Threading;
 using Microsoft.Win32;
 
-namespace Gta5EyeTrackingModUpdater
+namespace InstallerUI
 {
 	public partial class MainWindow : Window
 	{
-		private UpdaterNotifyIcon _updaterNotifyIcon;
 		private Updater _updater;
 		private readonly DispatcherTimer _timer;
 		private readonly TimeSpan _timerInterval;
@@ -21,9 +20,9 @@ namespace Gta5EyeTrackingModUpdater
 		private readonly SettingsStorage _settingsStorage;
 		private readonly MainWindowModel _model;
 
-		public MainWindow()
+		public MainWindow(MainWindowModel model)
 		{
-			_model = new MainWindowModel();
+			_model = model;
 
 			this.Closing += OnClosing;
 
@@ -51,17 +50,12 @@ namespace Gta5EyeTrackingModUpdater
 			SetupAutostart();
 
 			//Init NotifyIcon
-			_updaterNotifyIcon = new UpdaterNotifyIcon();
-			_updater = new Updater(_updaterNotifyIcon, _settings);
+			_updater = new Updater(_settings);
 			_updater.ModInstalled += UpdaterOnModInstalled;
 			_updater.ScriptHookVInstalled += UpdaterOnScriptHookVInstalled;
 			_updater.ScriptHookVRemoved += UpdaterOnScriptHookVRemoved;
 			_updater.ModRemoved += UpdaterOnModRemoved;
 			_updater.UpdatesChecked += UpdaterOnUpdatesChecked;
-			_updaterNotifyIcon.QuitMenuItemClick += UpdaterNotifyIconOnQuitMenuItemClick;
-			_updaterNotifyIcon.CheckForUpdateMenuItemClick += UpdaterNotifyIconOnCheckForUpdateMenuItemClick;
-			_updaterNotifyIcon.OpenWindowMenuItemClick += UpdaterNotifyIconOnOpenWindowMenuItemClick;
-			_updaterNotifyIcon.DoubleClick += UpdaterNotifyIconOnOpenWindowMenuItemClick;
 
 			InitializeComponent();
 			this.DataContext = _model;
@@ -99,25 +93,25 @@ namespace Gta5EyeTrackingModUpdater
 
 		private void UpdaterOnModRemoved(object sender, EventArgs eventArgs)
 		{
-			_updaterNotifyIcon.ShowNotification("Removed Eye Tracking Mod");
+			//_updaterNotifyIcon.ShowNotification("Removed Eye Tracking Mod");
 			UpdateText();
 		}
 
 		private void UpdaterOnScriptHookVRemoved(object sender, EventArgs eventArgs)
 		{
-			_updaterNotifyIcon.ShowNotification("Removed Script Hook V");
+			//_updaterNotifyIcon.ShowNotification("Removed Script Hook V");
 			UpdateText();
 		}
 
 		private void UpdaterOnScriptHookVInstalled(object sender, EventArgs eventArgs)
 		{
-			_updaterNotifyIcon.ShowNotification("Installed Script Hook V");
+			//_updaterNotifyIcon.ShowNotification("Installed Script Hook V");
 			UpdateText();
 		}
 
 		private void UpdaterOnModInstalled(object sender, EventArgs eventArgs)
 		{
-			_updaterNotifyIcon.ShowNotification("Installed Eye Tracking Mod");
+			//_updaterNotifyIcon.ShowNotification("Installed Eye Tracking Mod");
 			UpdateText();
 		}
 
@@ -227,7 +221,7 @@ namespace Gta5EyeTrackingModUpdater
 
 		private void UpdaterNotifyIconOnCheckForUpdateMenuItemClick(object sender, EventArgs e)
 		{
-			_updaterNotifyIcon.ShowNotification("Checking for updates");
+			//_updaterNotifyIcon.ShowNotification("Checking for updates");
 			Task.Run(() =>
 			{
 				_updater.CheckForUpdates();
@@ -251,19 +245,12 @@ namespace Gta5EyeTrackingModUpdater
 			_timer.Tick -= TimerOnTick;
 			_timer.Stop();
 
-			_updaterNotifyIcon.QuitMenuItemClick -= UpdaterNotifyIconOnQuitMenuItemClick;
-			_updaterNotifyIcon.CheckForUpdateMenuItemClick -= UpdaterNotifyIconOnCheckForUpdateMenuItemClick;
-			_updaterNotifyIcon.OpenWindowMenuItemClick -= UpdaterNotifyIconOnOpenWindowMenuItemClick;
-			_updaterNotifyIcon.DoubleClick -= UpdaterNotifyIconOnOpenWindowMenuItemClick;
-
 			_updater.ScriptHookVInstalled -= UpdaterOnScriptHookVInstalled;
 			_updater.ModInstalled -= UpdaterOnModInstalled;
 			_updater.ScriptHookVRemoved -= UpdaterOnScriptHookVRemoved;
 			_updater.ModRemoved -= UpdaterOnModRemoved;
 			_updater.UpdatesChecked -= UpdaterOnUpdatesChecked;
 			_updater.Close();
-			_updaterNotifyIcon.Dispose();
-			_updaterNotifyIcon = null;
 
 			_updater = null;
 
@@ -292,7 +279,7 @@ namespace Gta5EyeTrackingModUpdater
 
 		private void CheckForUpdates_OnClick(object sender, RoutedEventArgs e)
 		{
-			_updaterNotifyIcon.ShowNotification("Checking for updates");
+			//_updaterNotifyIcon.ShowNotification("Checking for updates");
 
 			Task.Run(() =>
 			{

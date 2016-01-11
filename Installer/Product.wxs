@@ -4,7 +4,7 @@
 	<Product Id="*"
 					 Name="GTA V Eye Tracking Mod"
 					 Language="1033"
-					 Version="!(bind.FileVersion.Gta5EyeTrackingModUpdaterExe)"
+					 Version="$(var.BuildVersion)"
 					 Manufacturer="alex8b"
 					 UpgradeCode="5ABF7B44-353C-4C52-BE9E-9EB6735A4445">
 		<Package InstallerVersion="405" 
@@ -14,9 +14,9 @@
 		<MajorUpgrade AllowSameVersionUpgrades="yes" DowngradeErrorMessage="A newer version of [ProductName] is already installed."/>
 		<MediaTemplate EmbedCab="yes"/>
 
-		<Icon Id="Gta5EyeTrackingModUpdaterIcon" SourceFile="Resources\gta5eyetracking.ico"/>
+		<Icon Id="InstallerUIIcon" SourceFile="Resources\gta5eyetracking.ico"/>
 
-		<Property Id="ARPPRODUCTICON" Value="Gta5EyeTrackingModUpdaterIcon"/>
+		<Property Id="ARPPRODUCTICON" Value="InstallerUIIcon"/>
 		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER"/>
 
 		<!-- Defining a value here defaults their UI checkboxes to true, not defining a value defaults to false... -->
@@ -103,7 +103,7 @@
 	<!--<Fragment>
 		<DirectoryRef Id="INSTALLFOLDER">
 			<Component Id="Program" Guid="DE9D2DC5-6FE6-4406-BD6E-12A82717E831" Win64="yes" >
-				<File Id="Gta5EyeTrackingModUpdaterExe" KeyPath="yes" Source="..\bin\updater\Gta5EyeTrackingModUpdater.exe"/>
+				<File Id="Gta5EyeTrackingModUpdaterExe" KeyPath="yes" Source="..\bin\updater\InstallerUI.dll"/>
 			</Component>
 		</DirectoryRef>
 	</Fragment>-->

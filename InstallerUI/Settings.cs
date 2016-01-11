@@ -1,4 +1,4 @@
-namespace Gta5EyeTrackingModUpdater
+namespace InstallerUI
 {
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml

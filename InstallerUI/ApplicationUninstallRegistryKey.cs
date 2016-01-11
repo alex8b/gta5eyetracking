@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Linq;
 using Microsoft.Win32;
 
-namespace Gta5EyeTrackingModUpdater
+namespace InstallerUI
 {
 	public class ApplicationUninstallRegistryKey
 	{

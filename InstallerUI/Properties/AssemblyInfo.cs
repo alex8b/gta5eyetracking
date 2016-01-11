@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
-using System.Resources;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
+using InstallerUI;
+using Microsoft.Tools.WindowsInstallerXml.Bootstrapper;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
@@ -53,3 +53,6 @@ using System.Windows;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("0.6.97")]
 [assembly: AssemblyFileVersion("0.6.97")]
+
+//WiX -- denotes which class is the Managed Bootstrapper
+[assembly: BootstrapperApplication(typeof(InstallerBootstrapperApplication))]

@@ -5,7 +5,7 @@
 	<Bundle
 		 Name="GTA V Eye Tracking Mod"
 		 Manufacturer="alex8b"
-		 Version="!(bind.packageVersion.Gta5EyeTrackingModUpdater)"
+		 Version="!(bind.packageVersion.Gta5EyeTrackingModInstaller)"
 		 UpgradeCode="5ABF7B44-353C-4C52-BE9E-9EB6735A4445"
 		 DisableModify="yes">
 		<BootstrapperApplicationRef Id="ManagedBootstrapperApplicationHost" >
@@ -14,15 +14,15 @@
 
 		<Chain>
 			<PackageGroupRef Id="NetFx452Web"/>
-			<MsiPackage Id="Gta5EyeTrackingModUpdater" SourceFile="..\bin\installer\Gta5EyeTrackingModUpdater.msi"/>
+			<MsiPackage Id="Gta5EyeTrackingModInstaller" SourceFile="..\bin\installer\Gta5EyeTrackingModInstaller.msi"/>
 		</Chain>
 	</Bundle>
 
 	<Fragment>
     <PayloadGroup Id ="InstallerPayload">
       <Payload SourceFile="BootstrapperCore.config" />     
-      <Payload SourceFile="..\bin\updater\Microsoft.Deployment.WindowsInstaller.dll" />
-			<Payload SourceFile="..\bin\updater\InstallerUI.dll" />
+      <Payload SourceFile="..\bin\installer\Microsoft.Deployment.WindowsInstaller.dll" />
+			<Payload SourceFile="..\bin\installer\InstallerUI.dll" />
 		</PayloadGroup>
 	</Fragment>
 </Wix>

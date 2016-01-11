@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Threading;
 using System.Xml;
 
-namespace Gta5EyeTrackingModUpdater
+namespace InstallerUI
 {
 	public class Updater
 	{
@@ -19,7 +19,6 @@ namespace Gta5EyeTrackingModUpdater
 		public event EventHandler<EventArgs> ModRemoved = delegate { };
 		public event EventHandler<EventArgs> UpdatesChecked = delegate { };
 
-		private readonly UpdaterNotifyIcon _updaterNotifyIcon;
 		private readonly Settings _settings;
 		private readonly object _lock = new object();
 		private bool _enabled = true;
@@ -30,9 +29,8 @@ namespace Gta5EyeTrackingModUpdater
 		private Version _lastAvailableModUpdaterVersion;
 
 
-		public Updater(UpdaterNotifyIcon updaterNotifyIcon, Settings settings)
+		public Updater(Settings settings)
 		{
-			_updaterNotifyIcon = updaterNotifyIcon;
 			_settings = settings;
 		}
 
@@ -639,7 +637,6 @@ namespace Gta5EyeTrackingModUpdater
 
 		private void ShowNotification(string text)
 		{
-			_updaterNotifyIcon.ShowNotification(text);
 		}
 
 		public void Close()

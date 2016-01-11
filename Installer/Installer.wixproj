@@ -6,7 +6,7 @@
     <ProductVersion>3.10</ProductVersion>
     <ProjectGuid>b12a324f-d2ea-4b11-8175-50c4d2ae368a</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>Gta5EyeTrackingModUpdater</OutputName>
+    <OutputName>Gta5EyeTrackingModInstaller</OutputName>
     <OutputType>Package</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
@@ -46,9 +46,16 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
+  <Target Name="BeforeBuild">
+    <GetAssemblyIdentity AssemblyFiles="$(SolutionDir)bin\installer\InstallerUI.dll">
+      <Output TaskParameter="Assemblies" ItemName="AssemblyVersion" />
+    </GetAssemblyIdentity>
+    <PropertyGroup>
+      <DefineConstants>BuildVersion=%(AssemblyVersion.Version)</DefineConstants>
+    </PropertyGroup>
+  </Target>
   <PropertyGroup>
-    <PostBuildEvent>rd /s /q "$(SolutionDir)bin\installer"
-xcopy "$(ProjectDir)bin\x64\Release\Gta5EyeTrackingModUpdater.msi" "$(SolutionDir)bin\installer\"</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\x64\Release\Gta5EyeTrackingModInstaller.msi" "$(SolutionDir)bin\installer\" /Y</PostBuildEvent>
   </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.

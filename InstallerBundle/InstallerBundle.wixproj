@@ -6,7 +6,7 @@
     <ProductVersion>3.10</ProductVersion>
     <ProjectGuid>b60702f3-bed4-4efd-a2df-80a0be9a572a</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>Gta5EyeTrackingModUpdater_bundle</OutputName>
+    <OutputName>Gta5EyeTrackingModInstaller_bundle</OutputName>
     <OutputType>Bundle</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
@@ -48,7 +48,7 @@
     <PreBuildEvent />
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)bin\x64\Release\Gta5EyeTrackingModUpdater_bundle.exe" "$(SolutionDir)bin\installer\"</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\x64\Release\Gta5EyeTrackingModInstaller_bundle.exe" "$(SolutionDir)bin\installer\" /Y</PostBuildEvent>
   </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.
