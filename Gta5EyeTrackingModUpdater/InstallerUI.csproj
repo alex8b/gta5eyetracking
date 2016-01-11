@@ -5,10 +5,10 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{47BE85E9-3420-4B93-BF48-0E69C1A00386}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Gta5EyeTrackingModUpdater</RootNamespace>
-    <AssemblyName>Gta5EyeTrackingModUpdater</AssemblyName>
+    <RootNamespace>InstallerUI</RootNamespace>
+    <AssemblyName>InstallerUI</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -53,6 +53,9 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -131,8 +134,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>rd /s /q "$(SolutionDir)bin\updater"
-xcopy "$(ProjectDir)bin\x64\Release\Gta5EyeTrackingModUpdater.exe" "$(SolutionDir)bin\updater\"
+    <PostBuildEvent>rd /s /q "$(SolutionDir)bin\installerui"
+xcopy "$(ProjectDir)bin\x64\Release\InstallerUI.dll" "$(SolutionDir)bin\installerui\"
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

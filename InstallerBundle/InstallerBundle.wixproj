@@ -27,6 +27,7 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="BootstrapperCore.config" />
     <Content Include="Resources\Dialog.bmp" />
     <Content Include="Resources\gta5eyetracking.ico" />
     <Content Include="Resources\gta5eyetracking.png" />

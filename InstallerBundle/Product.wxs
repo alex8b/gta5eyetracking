@@ -8,16 +8,21 @@
 		 Version="!(bind.packageVersion.Gta5EyeTrackingModUpdater)"
 		 UpgradeCode="5ABF7B44-353C-4C52-BE9E-9EB6735A4445"
 		 DisableModify="yes">
-		<BootstrapperApplicationRef
-      Id="WixStandardBootstrapperApplication.RtfLicense" >
-			<bal:WixStandardBootstrapperApplication
-        LicenseFile="..\Installer\Resources\License.rtf"
-        LogoFile="..\Installer\Resources\gta5eyetracking.png"/>
-		</BootstrapperApplicationRef>
+		<BootstrapperApplicationRef Id="ManagedBootstrapperApplicationHost" >
+			<PayloadGroupRef Id="InstallerPayload" />
+    </BootstrapperApplicationRef>
 
 		<Chain>
 			<PackageGroupRef Id="NetFx452Web"/>
 			<MsiPackage Id="Gta5EyeTrackingModUpdater" SourceFile="..\bin\installer\Gta5EyeTrackingModUpdater.msi"/>
 		</Chain>
 	</Bundle>
+
+	<Fragment>
+    <PayloadGroup Id ="InstallerPayload">
+      <Payload SourceFile="BootstrapperCore.config" />     
+      <Payload SourceFile="..\bin\updater\Microsoft.Deployment.WindowsInstaller.dll" />
+			<Payload SourceFile="..\bin\updater\InstallerUI.dll" />
+		</PayloadGroup>
+	</Fragment>
 </Wix>
