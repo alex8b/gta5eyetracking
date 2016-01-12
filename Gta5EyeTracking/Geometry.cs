@@ -66,9 +66,9 @@ namespace Gta5EyeTracking
 
         public static Vector3 ConecastPedsAndVehicles(Vector2 screenCoords, out  Entity hitEntity)
         {
-            var numPoints = 1;
+            var numPoints = 5;
             var angleStep = Math.PI * 0.2;
-            var distStep = 0.15 / 25;
+            var distStep = 0.15 / 5;
             var resultCoord = new Vector3();
             hitEntity = null;
             for (var i = 0; i < numPoints; i++)
@@ -103,15 +103,17 @@ namespace Gta5EyeTracking
 		public static Ped SearchPed(Vector2 screenCoords)
 		{
 			const double searchRange = 0.1;
-			var peds = World.GetNearbyPeds(Game.Player.Character.Position, 200);
+			const float raycastToDist = 200.0f;
+			var peds = World.GetNearbyPeds(Game.Player.Character.Position, raycastToDist);
 			var mindist = Double.MaxValue;
 			Ped foundPed = null;
+			var thresholdDist = 0.05;
 			//Util.Log("Peds - " + peds.Length);
 			//Util.Log("P - " + DateTime.UtcNow.Ticks);
 			foreach (var ped in peds)
 			{
 				if (ped.Handle == Game.Player.Character.Handle) continue;
-				if (ped.IsOccluded) continue;
+				//if (ped.IsOccluded) continue; slow?
 
 				{
 					var headOffest = ped.GetBoneCoord(Bone.SKEL_ROOT);
@@ -123,6 +125,10 @@ namespace Gta5EyeTracking
 						{
 							mindist = dist;
 							foundPed = ped;
+						}
+						if (dist < thresholdDist)
+						{
+							break;
 						}
 					}
 				}
@@ -138,6 +144,10 @@ namespace Gta5EyeTracking
 					if (!(dist < mindist)) continue;
 					mindist = dist;
 					foundPed = ped;
+					if (dist < thresholdDist)
+					{
+						break;
+					}
 				}
 
 			}
@@ -148,15 +158,17 @@ namespace Gta5EyeTracking
 		public static Vehicle SearchVehicle(Vector2 screenCoords)
 		{
 			const double searchRange = 0.1;
-			var vehs = World.GetNearbyVehicles(Game.Player.Character.Position, 200);
+			const float raycastToDist = 200.0f;
+			var vehs = World.GetNearbyVehicles(Game.Player.Character.Position, raycastToDist);
 			var mindist = Double.MaxValue;
+			var thresholdDist = 0.05;
 			Vehicle foundVeh = null;
 			//Util.Log("Vehs - " + vehs.Length);
 			//Util.Log("V - " + DateTime.UtcNow.Ticks);
 			foreach (var vehicle in vehs)
 			{
 				if ((Game.Player.Character.IsInVehicle()) && (vehicle.Handle == Game.Player.Character.CurrentVehicle.Handle)) continue; //you own veh
-				if (vehicle.IsOccluded) continue;
+				//if (vehicle.IsOccluded) continue; slow?
 				var vehOffset = vehicle.Position;
 				Vector2 vehScreenCoords;
 			    
@@ -166,6 +178,10 @@ namespace Gta5EyeTracking
 			    if (!(dist < mindist)) continue;
 			    mindist = dist;
 			    foundVeh = vehicle;
+				if (dist < thresholdDist)
+				{
+					break;
+				}
 			}
 			//Util.Log("W - " + DateTime.UtcNow.Ticks);
 

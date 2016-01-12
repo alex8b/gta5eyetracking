@@ -57,7 +57,7 @@ namespace Gta5EyeTracking
 			}
 			else
 			{
-				ped = null;//Geometry.SearchPed(unfilteredGazePointPlusJoystickDelta); //Too slow :(
+				ped = Geometry.SearchPed(unfilteredGazePointPlusJoystickDelta); //Too slow :(
 			}
 
 			if ((ped != null)
@@ -81,7 +81,7 @@ namespace Gta5EyeTracking
 				}
 				else
 				{
-					vehicle = null;//Geometry.SearchVehicle(unfilteredGazePointPlusJoystickDelta); // Too slow :(
+					vehicle = Geometry.SearchVehicle(unfilteredGazePointPlusJoystickDelta); // Too slow :(
 				}
 
 				if (vehicle != null
