@@ -68,7 +68,7 @@ namespace Gta5EyeTracking
         {
             var numPoints = 5;
             var angleStep = Math.PI * 0.2;
-            var distStep = 0.15 / 5;
+            var distStep = 0.05 / 5;
             var resultCoord = new Vector3();
             hitEntity = null;
             for (var i = 0; i < numPoints; i++)
@@ -103,7 +103,7 @@ namespace Gta5EyeTracking
 		public static Ped SearchPed(Vector2 screenCoords)
 		{
 			const double searchRange = 0.1;
-			const double thresholdRange = 0.05;
+			const double thresholdRange = 0.025;
 			const float raycastToDist = 200.0f;
 			var peds = World.GetNearbyPeds(Game.Player.Character.Position, raycastToDist);
 			var mindist = Double.MaxValue;
@@ -160,7 +160,7 @@ namespace Gta5EyeTracking
 		public static Vehicle SearchVehicle(Vector2 screenCoords)
 		{
 			const double searchRange = 0.1;
-			const double thresholdRange = 0.05;
+			const double thresholdRange = 0.025;
 			const float raycastToDist = 200.0f;
 			var vehs = World.GetNearbyVehicles(Game.Player.Character.Position, raycastToDist);
 			var mindist = Double.MaxValue;
