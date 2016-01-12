@@ -103,11 +103,11 @@ namespace Gta5EyeTracking
 		public static Ped SearchPed(Vector2 screenCoords)
 		{
 			const double searchRange = 0.1;
+			const double thresholdRange = 0.05;
 			const float raycastToDist = 200.0f;
 			var peds = World.GetNearbyPeds(Game.Player.Character.Position, raycastToDist);
 			var mindist = Double.MaxValue;
 			Ped foundPed = null;
-			var thresholdDist = 0.05;
 			//Util.Log("Peds - " + peds.Length);
 			//Util.Log("P - " + DateTime.UtcNow.Ticks);
 			foreach (var ped in peds)
@@ -121,12 +121,13 @@ namespace Gta5EyeTracking
 					if (WorldToScreenRel(headOffest, out pedScreenCoords))
 					{
 						var dist = (screenCoords - pedScreenCoords).Length();
-						if (dist < mindist)
+						if ((dist < mindist) && (dist < searchRange))
 						{
+							if (ped.IsOccluded) continue;
 							mindist = dist;
 							foundPed = ped;
 						}
-						if (dist < thresholdDist)
+						if (dist < thresholdRange)
 						{
 							break;
 						}
@@ -140,11 +141,12 @@ namespace Gta5EyeTracking
 					if (!WorldToScreenRel(headOffest, out pedScreenCoords)) continue;
 					
 					var dist = (screenCoords - pedScreenCoords).Length();
-					
-					if (!(dist < mindist)) continue;
+
+					if (!(dist < mindist) || !(dist < searchRange)) continue;
+					if (ped.IsOccluded) continue;
 					mindist = dist;
 					foundPed = ped;
-					if (dist < thresholdDist)
+					if (dist < thresholdRange)
 					{
 						break;
 					}
@@ -152,40 +154,40 @@ namespace Gta5EyeTracking
 
 			}
 			//Util.Log("Q - " + DateTime.UtcNow.Ticks);
-			return mindist < searchRange ? foundPed : null;
+			return foundPed;
 		}
 
 		public static Vehicle SearchVehicle(Vector2 screenCoords)
 		{
 			const double searchRange = 0.1;
+			const double thresholdRange = 0.05;
 			const float raycastToDist = 200.0f;
 			var vehs = World.GetNearbyVehicles(Game.Player.Character.Position, raycastToDist);
 			var mindist = Double.MaxValue;
-			var thresholdDist = 0.05;
 			Vehicle foundVeh = null;
 			//Util.Log("Vehs - " + vehs.Length);
 			//Util.Log("V - " + DateTime.UtcNow.Ticks);
 			foreach (var vehicle in vehs)
 			{
 				if ((Game.Player.Character.IsInVehicle()) && (vehicle.Handle == Game.Player.Character.CurrentVehicle.Handle)) continue; //you own veh
-				//if (vehicle.IsOccluded) continue; slow?
 				var vehOffset = vehicle.Position;
 				Vector2 vehScreenCoords;
 			    
                 if (!WorldToScreenRel(vehOffset, out vehScreenCoords)) continue;
 			    
                 var dist = (screenCoords - vehScreenCoords).Length();
-			    if (!(dist < mindist)) continue;
-			    mindist = dist;
+			    if (!(dist < mindist) || !(dist < searchRange)) continue;
+				if (vehicle.IsOccluded) continue;
+				mindist = dist;
 			    foundVeh = vehicle;
-				if (dist < thresholdDist)
+				if (dist < thresholdRange)
 				{
 					break;
 				}
 			}
 			//Util.Log("W - " + DateTime.UtcNow.Ticks);
 
-			return mindist < searchRange ? foundVeh : null;
+			return foundVeh;
 		}
 
 		public static bool WorldToScreenRel_Native(Vector3 worldCoords, out Vector2 screenCoords)
