@@ -21,7 +21,7 @@ namespace Gta5EyeTracking
 		private readonly RadialMenu _radialMenu;
 		private readonly SettingsMenu _settingsMenu;
 		private readonly MenuPool _menuPool;
-		private readonly Stopwatch _tickStopwatch;
+		private DateTime _lastTickTime;
 		private readonly DebugOutput _debugOutput;
 
 
@@ -40,7 +40,6 @@ namespace Gta5EyeTracking
 			RadialMenu radialMenu, 
 			SettingsMenu settingsMenu, 
 			MenuPool menuPool, 
-			Stopwatch tickStopwatch,
 			DebugOutput debugOutput)
 		{
 			_settings = settings;
@@ -50,7 +49,6 @@ namespace Gta5EyeTracking
 			_radialMenu = radialMenu;
 			_settingsMenu = settingsMenu;
 			_menuPool = menuPool;
-			_tickStopwatch = tickStopwatch;
 			_debugOutput = debugOutput;
 			_controllerEmulation.OnModifyState += OnModifyControllerState;
 		}
@@ -64,8 +62,9 @@ namespace Gta5EyeTracking
 			}
 		}
 
-		public void Process(Vector2 gazePoint, double aspectRatio, Vector3 shootCoord, Vector3 shootCoordSnap, Vector3 shootMissileCoord, Ped ped, Entity missileTarget)
+		public void Process(DateTime tickStopwatch, Vector2 gazePoint, double aspectRatio, Vector3 shootCoord, Vector3 shootCoordSnap, Vector3 shootMissileCoord, Ped ped, Entity missileTarget)
 		{
+			_lastTickTime = tickStopwatch;
 			_isPaused = Game.IsPaused;
 			_isInVehicle = Game.Player.Character.IsInVehicle();
 			_isInAircraft = Game.Player.Character.IsInPlane || Game.Player.Character.IsInHeli;
@@ -218,7 +217,7 @@ namespace Gta5EyeTracking
 			if (_shutDownRequestFlag) return;
 			if (_isPaused) return;
 			var timePausedThershold = TimeSpan.FromSeconds(0.5);
-			if (_tickStopwatch.Elapsed > timePausedThershold) return;
+			if (DateTime.UtcNow - _lastTickTime > timePausedThershold) return;
 
 			var state = modifyStateEventArgs.State;
 

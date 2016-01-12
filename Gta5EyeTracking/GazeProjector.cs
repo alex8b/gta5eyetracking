@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using GTA;
 using GTA.Math;
 
@@ -9,17 +8,15 @@ namespace Gta5EyeTracking
 	{
 		private readonly Settings _settings;
 
-		private readonly Stopwatch _missileLockedStopwatch;
+		private DateTime _lastMissileLockedTime;
 		private readonly TimeSpan _missileLockedMinTime;
 		private Entity _missileTarget;
 		private Vector2 _filteredGazePoint;
-
 		public GazeProjector(Settings settings)
 		{
 			_settings = settings;
 
-			_missileLockedStopwatch = new Stopwatch();
-			_missileLockedStopwatch.Restart();
+			_lastMissileLockedTime = DateTime.UtcNow;
 			_missileLockedMinTime = TimeSpan.FromSeconds(0.75);
 		}
 
@@ -47,10 +44,11 @@ namespace Gta5EyeTracking
 			var hitUnfiltered = Geometry.ConecastPedsAndVehicles(unfilteredGazePointPlusJoystickDelta, out unfilteredEntity);
 			shootMissileCoord = hitUnfiltered;
 			shootCoordSnap = hitUnfiltered;
-
+			//Util.Log("B - " + DateTime.UtcNow.Ticks);
 
 			var hitFiltered = Geometry.RaycastEverything(filteredGazePointPlusJoystickDelta, out filteredEntity, true);
 			shootCoord = hitFiltered;
+			//Util.Log("C - " + DateTime.UtcNow.Ticks);
 
 			if (unfilteredEntity != null
 				&& Util.IsEntityAPed(unfilteredEntity))
@@ -59,7 +57,7 @@ namespace Gta5EyeTracking
 			}
 			else
 			{
-				ped = Geometry.SearchPed(unfilteredGazePointPlusJoystickDelta);
+				ped = Geometry.SearchPed(unfilteredGazePointPlusJoystickDelta); //Too slow :(
 			}
 
 			if ((ped != null)
@@ -74,6 +72,7 @@ namespace Gta5EyeTracking
 			}
 			else
 			{
+				//Util.Log("D - " + DateTime.UtcNow.Ticks);
 				Vehicle vehicle;
 				if (unfilteredEntity != null
 					&& Util.IsEntityAVehicle(unfilteredEntity))
@@ -82,7 +81,7 @@ namespace Gta5EyeTracking
 				}
 				else
 				{
-					vehicle = Geometry.SearchVehicle(unfilteredGazePointPlusJoystickDelta);
+					vehicle = Geometry.SearchVehicle(unfilteredGazePointPlusJoystickDelta); // Too slow :(
 				}
 
 				if (vehicle != null
@@ -94,8 +93,10 @@ namespace Gta5EyeTracking
 					target = vehicle;
 				}
 			}
+			//Util.Log("E - " + DateTime.UtcNow.Ticks);
 
 			ProcessMissileLock(target);
+			//Util.Log("F - " + DateTime.UtcNow.Ticks);
 
 			missileTarget = _missileTarget;
 		}
@@ -105,10 +106,10 @@ namespace Gta5EyeTracking
 			if (target != null && target.IsAlive)
 			{
 				_missileTarget = target;
-				_missileLockedStopwatch.Restart();
+				_lastMissileLockedTime = DateTime.UtcNow;
 			}
 
-			if (_missileLockedStopwatch.Elapsed > _missileLockedMinTime)
+			if ((DateTime.UtcNow -_lastMissileLockedTime) > _missileLockedMinTime)
 			{
 				_missileTarget = null;
 			}

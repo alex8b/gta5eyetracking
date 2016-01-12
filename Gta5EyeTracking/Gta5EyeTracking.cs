@@ -21,7 +21,7 @@ namespace Gta5EyeTracking
 	public class Gta5EyeTracking: Script
 	{
 		//General
-		private readonly Stopwatch _tickStopwatch;
+		private DateTime _lastTickTime;
 		private readonly GazeProjector _gazeProjector;
 		private ControlsProcessor _controlsProcessor;
 
@@ -36,7 +36,7 @@ namespace Gta5EyeTracking
 		//Gaze
 		private EyeXHost _host;
 		private GazePointDataStream _lightlyFilteredGazePointDataProvider;
-		private readonly Stopwatch _gazeStopwatch;
+		private DateTime _lastGazeTime;
 		private Vector2 _lastNormalizedCenterDelta;
 		private double _aspectRatio;
 
@@ -93,8 +93,7 @@ namespace Gta5EyeTracking
 			_host.Start();
 			_lightlyFilteredGazePointDataProvider = _host.CreateGazePointDataStream(GazePointDataMode.LightlyFiltered);
 			_lightlyFilteredGazePointDataProvider.Next += NewGazePoint;
-			_gazeStopwatch = new Stopwatch();
-			_gazeStopwatch.Restart();
+			_lastGazeTime = DateTime.UtcNow;
 
 			//Menu
 			_menuPool = new MenuPool();
@@ -125,9 +124,8 @@ namespace Gta5EyeTracking
 			_isWindowForeground = _foregroundWindowWatcher.IsWindowForeground();
 
 			//General
-			_tickStopwatch = new Stopwatch();
 			_gazeProjector = new GazeProjector(_settings);
-			_controlsProcessor = new ControlsProcessor(_settings,_controllerEmulation,_aiming,_freelook,_radialMenu,_settingsMenu, _menuPool, _tickStopwatch, _debugOutput);
+			_controlsProcessor = new ControlsProcessor(_settings,_controllerEmulation,_aiming,_freelook,_radialMenu,_settingsMenu, _menuPool, _debugOutput);
 
 			KeyDown += OnKeyDown;
 			Tick += OnTick;
@@ -247,12 +245,12 @@ namespace Gta5EyeTracking
 
 			_lastNormalizedCenterDelta = new Vector2(normalizedCenterDeltaX, normalizedCenterDeltaY);
 			_debugGazeVisualization.Move(_lastNormalizedCenterDelta);
-            _gazeStopwatch.Restart();
+			_lastGazeTime = DateTime.UtcNow;
 		}
 
 		public void OnTick(object sender, EventArgs e)
 		{
-		    if (_shutDownRequestFlag) return;
+			if (_shutDownRequestFlag) return;
 
 			_controllerEmulation.Enabled = !Game.IsPaused;
 			_mouseEmulation.Enabled = !Game.IsPaused && !_menuPool.IsAnyMenuOpen() &&_isWindowForeground;
@@ -280,11 +278,15 @@ namespace Gta5EyeTracking
 			Ped ped;
 			Entity missileTarget;
 
+			//Util.Log("0 - " + DateTime.UtcNow.Ticks);
+
 			var controllerState = _controllerEmulation.ControllerState;
 			const float joystickRadius = 0.1f;
 
 			var joystickDelta = new Vector2(controllerState.Gamepad.RightThumbX, -controllerState.Gamepad.RightThumbY) *
 								(1.0f / 32768.0f) * joystickRadius;
+
+			//Util.Log("1 - " + DateTime.UtcNow.Ticks);
 
 			_gazeProjector.FindGazeProjection(
 				_lastNormalizedCenterDelta,
@@ -295,28 +297,45 @@ namespace Gta5EyeTracking
 				out ped, 
 				out missileTarget);
 
-			_controlsProcessor.Process(_lastNormalizedCenterDelta, _aspectRatio, shootCoord, shootCoordSnap, shootMissileCoord, ped, missileTarget);
-            
+			//Util.Log("2 - " + DateTime.UtcNow.Ticks);
+
+			_controlsProcessor.Process(_lastTickTime, _lastNormalizedCenterDelta, _aspectRatio, shootCoord, shootCoordSnap, shootMissileCoord, ped, missileTarget);
+
+			//Util.Log("3 - " + DateTime.UtcNow.Ticks);
+
+
 			//_aiming.TurnHead(ped, shootCoord);
 			_menuPool.ProcessMenus();
 
+			//Util.Log("4 - " + DateTime.UtcNow.Ticks);
+
 			_aiming.Process();
+
+			//Util.Log("5 - " + DateTime.UtcNow.Ticks);
 
 			if (_debugOutput.Visible)
 			{
 				_debugGazeVisualization.Render();
 			}
-			
+
 			_debugOutput.Process();
 
-			_pedestrianInteraction.Process(ped, _tickStopwatch.Elapsed);
+			//Util.Log("6 - " + DateTime.UtcNow.Ticks);
 
-            _deadzoneEditor.Process();
+			_pedestrianInteraction.Process(ped, DateTime.UtcNow - _lastTickTime);
+
+			//Util.Log("7 - " + DateTime.UtcNow.Ticks);
+
+
+			_deadzoneEditor.Process();
 
 			_mouseEmulation.ProcessInput();
-			_tickStopwatch.Restart();
 
-		    if (_shutDownRequestFlag)
+			//Util.Log("8 - " + DateTime.UtcNow.Ticks);
+
+			_lastTickTime = DateTime.UtcNow;
+
+			if (_shutDownRequestFlag)
 		    {
                 _shutDownRequestedEvent.Set();		        
 		    }
@@ -380,10 +399,10 @@ namespace Gta5EyeTracking
 		private void CheckUserPresense()
 		{
 			var maxAwayTime = TimeSpan.FromSeconds(2);
-			if (_gazeStopwatch.Elapsed > maxAwayTime)
+			if (DateTime.UtcNow - _lastGazeTime > maxAwayTime)
 			{
-				//_lastNormalizedCenterDelta = new Vector2();
-				//if (!Game.IsPaused) Game.Pause(true); //TODO: doesn't work
+		//		_lastNormalizedCenterDelta = new Vector2();
+		//		if (!Game.IsPaused) Game.Pause(true); //TODO: doesn't work
 			}
 		}
 	}
