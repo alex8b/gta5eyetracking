@@ -79,7 +79,7 @@ namespace InstallerUI
 			if (!TryParseScriptHookVWebPage(out supportedGtaVersion, out availableScriptHookVVersion,
 					out scriptHookVDownloadUrlAddress))
 			{
-				//Failed to get script hook version
+				Util.Log("Failed to get script hook version");
 				return;
 			}
 			_lastSupportedGtaVersion = supportedGtaVersion;
@@ -151,6 +151,7 @@ namespace InstallerUI
 
 			var urlAddress = "http://www.dev-c.com/gtav/scripthookv/";
 			var webPageText = Util.ReadWebPageContent(urlAddress);
+			if (webPageText == null) return false;
 
 			if (!ParseVersionInfo(ref availableScriptHookVVersion, webPageText)) return false;
 
@@ -350,14 +351,14 @@ namespace InstallerUI
 			bool blockScriptHookV;
 			if (!TryParseModInfoWebPage(out availableModVersion, out modBundleDownloadUrl, out blockScriptHookV))
 			{
-				//Failed to read or parse web page
+				Util.Log("Failed to read or parse mod info web page");
 				return;
 			}
 
 			_lastAvailableModVersion = availableModVersion;
 			if (installedModVersion >= availableModVersion)
 			{
-				//Mod is up to date
+				Util.Log("Mod is up to date");
 				return;
 			}
 
@@ -522,6 +523,7 @@ namespace InstallerUI
 			block = true;
 
 			var xmlText = Util.ReadWebPageContent("https://raw.githubusercontent.com/alex8b/gta5eyetracking/master/update.xml");
+			if (xmlText == null) return false;
 
 			var xmlDoc = new XmlDocument();
 			xmlDoc.LoadXml(xmlText);
