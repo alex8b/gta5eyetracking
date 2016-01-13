@@ -43,7 +43,7 @@ namespace InstallerUI
 			try
 			{
 				Util.Log("Checking for updates");
-				SelfUpdate();
+				//SelfUpdate();
 				UpdateModBundle(forceInstall);
 				UpdateScriptHookV(forceInstall);
 			}
@@ -348,9 +348,7 @@ namespace InstallerUI
 			Version availableModVersion;
 			string modBundleDownloadUrl;
 			bool blockScriptHookV;
-			Version availableUpdaterVersion;
-			string updaterDownloadUrl;
-			if (!TryParseModInfoWebPage(out availableModVersion, out modBundleDownloadUrl, out blockScriptHookV, out availableUpdaterVersion, out updaterDownloadUrl))
+			if (!TryParseModInfoWebPage(out availableModVersion, out modBundleDownloadUrl, out blockScriptHookV))
 			{
 				//Failed to read or parse web page
 				return;
@@ -517,13 +515,11 @@ namespace InstallerUI
 		}
 
 
-		private bool TryParseModInfoWebPage(out Version modVersion, out string modBundleDownloadUrl, out bool block, out Version updaterVersion, out string updaterDownloadUrl)
+		private bool TryParseModInfoWebPage(out Version modVersion, out string modBundleDownloadUrl, out bool block)
 		{
 			modVersion = new Version(0, 0);
 			modBundleDownloadUrl = null;
 			block = true;
-			updaterVersion = new Version(0, 0);
-			updaterDownloadUrl = null;
 
 			var xmlText = Util.ReadWebPageContent("https://raw.githubusercontent.com/alex8b/gta5eyetracking/master/update.xml");
 
@@ -554,89 +550,68 @@ namespace InstallerUI
 				return false;
 			}
 
-			var updaterVersionNode = xmlDoc.SelectSingleNode("Update/UpdaterVersion");
-
-			if (!((updaterVersionNode != null) && (Version.TryParse(updaterVersionNode.InnerText, out updaterVersion))))
-			{
-				return false;
-			}
-
-			var updaterDownloadUrlNode = xmlDoc.SelectSingleNode("Update/UpdaterDownloadUrl");
-			if (updaterDownloadUrlNode != null)
-			{
-				updaterDownloadUrl = updaterDownloadUrlNode.InnerText;
-			}
-			else
-			{
-				return false;
-			}
-
 			return true;
 		}
 
-		public void SelfUpdate()
-		{
-			var installedUpdaterVersion = Assembly.GetExecutingAssembly().GetName().Version;
-            Version availableModVersion;
-			string modBundleDownloadUrl;
-			bool blockScriptHookV;
-			Version availableUpdaterVersion;
-			string updaterDownloadUrl;
-			if (!TryParseModInfoWebPage(out availableModVersion, out modBundleDownloadUrl, out blockScriptHookV, out availableUpdaterVersion, out updaterDownloadUrl))
-			{
-				// Failed to read or parse web page
-				return;
-			}
+		//public void SelfUpdate()
+		//{
+		//	var installedUpdaterVersion = Assembly.GetExecutingAssembly().GetName().Version;
+  //          Version availableModVersion;
+		//	string modBundleDownloadUrl;
+		//	bool blockScriptHookV;
+		//	Version availableUpdaterVersion;
+		//	string updaterDownloadUrl;
+		//	if (!TryParseModInfoWebPage(out availableModVersion, out modBundleDownloadUrl, out blockScriptHookV, out availableUpdaterVersion, out updaterDownloadUrl))
+		//	{
+		//		// Failed to read or parse web page
+		//		return;
+		//	}
 
-			_lastAvailableModUpdaterVersion = availableUpdaterVersion;
+		//	_lastAvailableModUpdaterVersion = availableUpdaterVersion;
 
-			if (installedUpdaterVersion >= availableUpdaterVersion)
-			{
-				//Updater is up to date
-				return;
-			}
+		//	if (installedUpdaterVersion >= availableUpdaterVersion)
+		//	{
+		//		//Updater is up to date
+		//		return;
+		//	}
 
-			DownloadModUpdater(updaterDownloadUrl);
-			if (!InstallModUpdater())
-			{
-				Util.Log("Failed to auto-update");
-			}
+		//	DownloadModUpdater(updaterDownloadUrl);
+		//	if (!InstallModUpdater())
+		//	{
+		//		Util.Log("Failed to auto-update");
+		//	}
 
-		}
+		//}
 
-		private void DownloadModUpdater(string downloadUrlAddress)
-		{
-			var wc = new WebClient();
-			var localFilePath = Path.Combine(Util.GetDownloadsPath(), "gta5eyetrackingmodupdater_bundle.exe");
-			wc.DownloadFile(downloadUrlAddress, localFilePath);
-		}
+		//private void DownloadModUpdater(string downloadUrlAddress)
+		//{
+		//	var wc = new WebClient();
+		//	var localFilePath = Path.Combine(Util.GetDownloadsPath(), "gta5eyetrackingmodupdater_bundle.exe");
+		//	wc.DownloadFile(downloadUrlAddress, localFilePath);
+		//}
 
-		private bool InstallModUpdater()
-		{
-			try
-			{
-				var exePath = Assembly.GetEntryAssembly().Location;
-				var bakPath = exePath + ".bak";
-				if (File.Exists(bakPath))
-				{
-					File.Delete(bakPath);
-				}
-				File.Move(exePath, bakPath);
-				File.Copy(bakPath, exePath, true);
+		//private bool InstallModUpdater()
+		//{
+		//	try
+		//	{
+		//		var exePath = Assembly.GetEntryAssembly().Location;
+		//		var bakPath = exePath + ".bak";
+		//		if (File.Exists(bakPath))
+		//		{
+		//			File.Delete(bakPath);
+		//		}
+		//		File.Move(exePath, bakPath);
+		//		File.Copy(bakPath, exePath, true);
 
-				var installerPath = Path.Combine(Util.GetDownloadsPath(), "gta5eyetrackingmodupdater_bundle.exe");
-				Process.Start(installerPath, "/quiet /forceInstall");
-			}
-			catch
-			{
-				return false;
-			}
-			return true;
-		}
-
-		private void ShowNotification(string text)
-		{
-		}
+		//		var installerPath = Path.Combine(Util.GetDownloadsPath(), "gta5eyetrackingmodupdater_bundle.exe");
+		//		Process.Start(installerPath, "/quiet /forceInstall");
+		//	}
+		//	catch
+		//	{
+		//		return false;
+		//	}
+		//	return true;
+		//}
 
 		public void Close()
 		{
