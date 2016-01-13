@@ -1,0 +1,12 @@
+The mod is for SINGLE PLAYER (OFFLINE) USE ONLY.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+Here’s a statement from Rockstar Support regarding mods:
+
+“I’m having soo much fun with GTAV on the PC but I just have one question about it, how come you are not allowing mods for it?” - @ClarkMatthew63
+
+“Will I get banned from GTA Online for using a FoV Mod or Oculus Rift mod?” - @Mattophobia
+
+We have always appreciated the creative efforts of the PC modding community and we still fondly remember the awesome zombie invasion mod and original GTA map mod for GTAIV PC among many other classics. To be clear, the modding policy in our license has not changed and is the same as for GTAIV.  Recent updates to GTAV PC had an unintended effect of making unplayable certain single player modifications. This was not intentional, no one has been banned for using single player modifications, and you should not worry about being banned or being relegated to the cheater pool just for using single player PC mods. Our primary focus is on protecting GTA Online against modifications that could give players an unfair advantage, disrupt gameplay, or cause griefing. It also bears mentioning that because game mods are by definition unauthorized, they may be broken by technical updates, cause instability, or affect your game in other unforeseen ways.
+http://www.rockstargames.com/newswire/article/52429/asked-answered-the-rockstar-editor-gta-online-updates
