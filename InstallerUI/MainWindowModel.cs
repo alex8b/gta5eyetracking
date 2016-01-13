@@ -143,6 +143,7 @@ namespace InstallerUI
 		private bool _canRemove;
 		private string _scriptHookVAvailableVersion;
 		private string _modAvailableVersion;
+		private bool _accept;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void OnNotifyPropertyChanged([CallerMemberName] String propertyName = "")
@@ -186,7 +187,7 @@ namespace InstallerUI
 
 		public bool CanInstall
 		{
-			get { return _canInstall && !_isThinking; }
+			get { return _accept && _canInstall && !_isThinking; }
 			set
 			{
 				_canInstall = value;
@@ -242,7 +243,17 @@ namespace InstallerUI
 				_modAvailableVersion = value;
 				OnNotifyPropertyChanged("ModAvailableVersion");
 			}
-		}		
+		}
 
+		public bool Accept
+		{
+			get { return _accept; }
+			set
+			{
+				_accept = value;
+				OnNotifyPropertyChanged("Accept");
+				OnNotifyPropertyChanged("CanInstall");
+			}
+		}
 	}
 }

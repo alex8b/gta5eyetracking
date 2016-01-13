@@ -1,7 +1,5 @@
 <Update>
-	<ModVersion>0.6.67</ModVersion>
-	<ModBundleDownloadUrl>https://github.com/alex8b/gta5eyetracking/releases/download/0.6.67/Gta5EyeTracking_bundle_0.6.67.zip</ModBundleDownloadUrl>
+	<ModVersion>0.6.104</ModVersion>
+	<ModBundleDownloadUrl>https://github.com/alex8b/gta5eyetracking/releases/download/0.6.67/Gta5EyeTracking_bundle_0.6.104.zip</ModBundleDownloadUrl>
 	<Block>false</Block>
-	<UpdaterVersion>0.6.97</UpdaterVersion>
-	<UpdaterDownloadUrl>https://www.dropbox.com/s/a959gs9f30iqs93/Gta5EyeTrackingModUpdater_bundle_0.6.97.exe?dl=1</UpdaterDownloadUrl>
 </Update>

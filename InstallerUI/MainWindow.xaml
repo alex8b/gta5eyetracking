@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:InstallerUI"
         mc:Ignorable="d"
-        Title="{Binding WindowTitle}" Height="309.277" Width="477.523" ResizeMode="CanMinimize" Icon="Resources/ApplicationIcon.ico">
+        Title="{Binding WindowTitle}" Height="328.212" Width="493.302" ResizeMode="CanMinimize" Icon="Resources/ApplicationIcon.ico">
     <Grid Margin="0,0,0,0">
         <Grid Height="40" Margin="10,10,10,0" VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
@@ -14,14 +14,15 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
+                <RowDefinition Height="1.082" />
+                <RowDefinition Height="35.918"/>
             </Grid.RowDefinitions>
-            <Label x:Name="gtaPathLabel" Content="GTA V path:" Grid.Column="0" Grid.Row="0" Margin="5"/>
-            <TextBox x:Name="gtaPath" Text="{Binding GtaPathText, Mode=OneWay}" Grid.Column="1" Grid.Row="0" IsEnabled="False" Padding="4" Margin="5" />
-            <Button x:Name="browse" Content="Browse" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="0" Width="100" Margin="5" Click="Browse_OnClick"/>
+            <Label x:Name="GtaPathLabel" Content="GTA V path:" Grid.Column="0" Grid.Row="1" Margin="5,3.918,5,5"/>
+            <TextBox x:Name="GtaPath" Text="{Binding GtaPathText, Mode=OneWay}" Grid.Column="1" Grid.Row="1" IsEnabled="False" Padding="4" Margin="5,3.918,5,5" />
+            <Button x:Name="Browse" Content="Browse" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="1" Width="100" Margin="5,3.918,0,5" Click="Browse_OnClick"/>
         </Grid>
 
-        <Grid Height="147" Margin="10,55,10,0" VerticalAlignment="Top">
+        <Grid Margin="10,55,10,0" Height="147" VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
@@ -35,28 +36,33 @@
                 <RowDefinition Height="35" />
                 <RowDefinition Height="35" />
             </Grid.RowDefinitions>
-            <Label x:Name="installedLabel" Content="Installed version" Grid.Row="0" Grid.Column="1" Margin="5"/>
-            <Label x:Name="availableLabel" Content="Available version" Grid.Row="0" Grid.Column="2" Margin="5"/>
+            <Label x:Name="InstalledLabel" Content="Installed version" Grid.Row="0" Grid.Column="1" Margin="5"/>
+            <Label x:Name="AvailableLabel" Content="Available version" Grid.Row="0" Grid.Column="2" Margin="5"/>
 
-            <Label x:Name="gtaLabel" Content="GTA V:" Grid.Row="1" Grid.Column="0" Margin="5"/>
-            <Label x:Name="scriptHookVLabel" Content="Script Hook V:" Grid.Row="2" Grid.Column="0" Margin="5" />
-            <Label x:Name="modLabel" Content="Eye Tracking Mod:" Grid.Row="3" Grid.Column="0" Margin="5" />
+            <Label x:Name="GtaLabel" Content="GTA V:" Grid.Row="1" Grid.Column="0" Margin="5"/>
+            <Label x:Name="ScriptHookVLabel" Content="Script Hook V:" Grid.Row="2" Grid.Column="0" Margin="5" />
+            <Label x:Name="ModLabel" Content="Eye Tracking Mod:" Grid.Row="3" Grid.Column="0" Margin="5" />
 
-            <Label x:Name="gtaVersion" Content="{Binding GtaVersion, Mode=OneWay}" Grid.Row="1" Grid.Column="1" Margin="5" />
-            <Label x:Name="scriptHookVVersion" Content="{Binding ScriptHookVVersion, Mode=OneWay}"  Grid.Row="2" Grid.Column="1" Margin="5"/>
-            <Label x:Name="modVersion" Content="{Binding ModVersion, Mode=OneWay}" Grid.Row="3" Grid.Column="1" Margin="5" />
+            <Label x:Name="GtaVersion" Content="{Binding GtaVersion, Mode=OneWay}" Grid.Row="1" Grid.Column="1" Margin="5" />
+            <Label x:Name="ScriptHookVVersion" Content="{Binding ScriptHookVVersion, Mode=OneWay}"  Grid.Row="2" Grid.Column="1" Margin="5"/>
+            <Label x:Name="ModVersion" Content="{Binding ModVersion, Mode=OneWay}" Grid.Row="3" Grid.Column="1" Margin="5" />
 
-            <Label x:Name="scriptHookVAvailableVersion" Content="{Binding ScriptHookVAvailableVersion, Mode=OneWay}"  Grid.Row="2" Grid.Column="2" Margin="5"/>
-            <Label x:Name="modAvailableVersion" Content="{Binding ModAvailableVersion, Mode=OneWay}" Grid.Row="3" Grid.Column="2" Margin="5" />
+            <Label x:Name="ScriptHookVAvailableVersion" Content="{Binding ScriptHookVAvailableVersion, Mode=OneWay}"  Grid.Row="2" Grid.Column="2" Margin="5"/>
+            <Label x:Name="ModAvailableVersion" Content="{Binding ModAvailableVersion, Mode=OneWay}" Grid.Row="3" Grid.Column="2" Margin="5" />
         </Grid>
 
-        <ProgressBar x:Name="progress" IsIndeterminate="{Binding IsThinking, Mode=OneWay}" HorizontalAlignment="Left" Height="23" Margin="10,207,0,0" VerticalAlignment="Top" Width="452"/>
+        <ProgressBar x:Name="Progress" IsIndeterminate="{Binding IsThinking, Mode=OneWay}" Margin="10,0,10,50" Height="23" VerticalAlignment="Bottom"/>
 
 
-        <Rectangle Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="45" Margin="0,235,0,0" Stroke="Black" VerticalAlignment="Top" Width="472" StrokeThickness="0" />
-	    <Button x:Name="install" IsEnabled="{Binding CanInstall, Mode=OneWay}" Content="Install" Margin="241,245,131,0" Width="100" Height="25" Click="Install_OnClick" VerticalAlignment="Top"/>
-        <Button x:Name="remove" IsEnabled="{Binding CanRemove, Mode=OneWay}" Content="Remove"  Margin="136,245,236,0" Height="25" Click="Remove_OnClick" VerticalAlignment="Top"/>
-        <Button x:Name="cancel" Content="Exit"  Margin="362,245,10,0" Height="25" VerticalAlignment="Top" Click="Cancel_OnClick"/>
+        <Rectangle Fill="#FFF4F4F5" Stroke="Black" StrokeThickness="0" Height="45" VerticalAlignment="Bottom" />
+        <Button x:Name="Install" IsEnabled="{Binding CanInstall, Mode=OneWay}" Content="Install" Margin="0,0,131,10" Width="100" Click="Install_OnClick" Height="25" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
+        <Button x:Name="Remove" IsEnabled="{Binding CanRemove, Mode=OneWay}" Content="Remove"  Margin="0,0,236,10" Click="Remove_OnClick" Height="25" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="100"/>
+        <Button x:Name="Cancel" Content="Exit"  Margin="0,0,10,10" Click="Cancel_OnClick" Height="25" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="100"/>
+        <CheckBox x:Name="Accept" IsChecked="{Binding Accept, Mode=OneWay}" Content="I have read and accept the terms and conditions of the" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,202,0,0" Checked="Accept_OnChecked" Unchecked="Accept_OnUnchecked"/>
+        <TextBlock Margin="323,201,0,0"  TextDecorations="Underline" Foreground="#FF0000FB" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Width="154">
+				<Hyperlink Click="LicenseLink_OnClick">end-user license agreement</Hyperlink>
+        </TextBlock>
+
     </Grid>
 </Window>
 

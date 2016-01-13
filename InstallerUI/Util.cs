@@ -101,7 +101,7 @@ namespace InstallerUI
 			}
 
 
-			var logpath = Path.Combine(folderPath, "updaterlog.txt");
+			var logpath = Path.Combine(folderPath, "installerlog.txt");
 
 			try
 			{

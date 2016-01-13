@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -148,6 +149,7 @@ namespace InstallerUI
 			else
 			{
 				_model.ModVersion = installedModVersion.ToString();
+				_model.Accept = true;
 			}
 
 			var availableModVersion = _updater.GetAvailableModVersion();
@@ -238,6 +240,21 @@ namespace InstallerUI
 		private void Cancel_OnClick(object sender, RoutedEventArgs e)
 		{
 			Close();
+		}
+
+		private void LicenseLink_OnClick(object sender, RoutedEventArgs e)
+		{
+			Process.Start("https://raw.githubusercontent.com/alex8b/gta5eyetracking/master/licenses/eula.txt");
+		}
+
+		private void Accept_OnChecked(object sender, RoutedEventArgs e)
+		{
+			_model.Accept = true;
+		}
+
+		private void Accept_OnUnchecked(object sender, RoutedEventArgs e)
+		{
+			_model.Accept = false;
 		}
 	}
 }

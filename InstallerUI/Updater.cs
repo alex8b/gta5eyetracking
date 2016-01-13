@@ -525,7 +525,7 @@ namespace InstallerUI
 			updaterVersion = new Version(0, 0);
 			updaterDownloadUrl = null;
 
-			var xmlText = Util.ReadWebPageContent("https://raw.githubusercontent.com/alex8b/gta5eyetracking/updater/update.xml");
+			var xmlText = Util.ReadWebPageContent("https://raw.githubusercontent.com/alex8b/gta5eyetracking/master/update.xml");
 
 			var xmlDoc = new XmlDocument();
 			xmlDoc.LoadXml(xmlText);
