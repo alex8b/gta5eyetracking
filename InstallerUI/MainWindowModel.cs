@@ -15,34 +15,36 @@ namespace InstallerUI
 			this.Bootstrapper.DetectPackageComplete += this.OnDetectPackageComplete;
 			this.Bootstrapper.PlanComplete += this.OnPlanComplete;
 		}
-		private bool installEnabled;
+		private bool _installEnabled;
 		public bool InstallEnabled
 		{
-			get { return installEnabled; }
+			get { return _installEnabled; }
 			set
 			{
-				installEnabled = value;
+				_installEnabled = value;
 				OnNotifyPropertyChanged("InstallEnabled");
 			}
 		}
-		private bool uninstallEnabled;
+		private bool _uninstallEnabled;
 		public bool UninstallEnabled
 		{
-			get { return uninstallEnabled; }
+			get { return _uninstallEnabled; }
 			set
 			{
-				uninstallEnabled = value;
+				_uninstallEnabled = value;
 				OnNotifyPropertyChanged("UninstallEnabled");
 			}
 		}
-		private bool isThinking;
+		private bool _isThinking;
 		public bool IsThinking
 		{
-			get { return isThinking; }
+			get { return _isThinking; }
 			set
 			{
-				isThinking = value;
+				_isThinking = value;
 				OnNotifyPropertyChanged("IsThinking");
+				OnNotifyPropertyChanged("CanRemove");
+				OnNotifyPropertyChanged("CanInstall");
 			}
 		}
 		public BootstrapperApplication Bootstrapper { get; private set; }
@@ -137,18 +139,10 @@ namespace InstallerUI
 		private string _scriptHookVVersion;
 		private string _gtaVersion;
 		private string _modVersion;
-		private bool _autoupdate;
-		private bool _autostart;
 		private bool _canInstall;
 		private bool _canRemove;
-		private bool _installing;
 		private string _scriptHookVAvailableVersion;
 		private string _modAvailableVersion;
-		private string _modUpdaterVersion;
-		private string _modUpdaterAvailableVersion;
-		private string _scriptHookVButtonText;
-		private string _modButtonText;
-		private string _modUpdaterButtonText;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void OnNotifyPropertyChanged([CallerMemberName] String propertyName = "")
@@ -190,29 +184,9 @@ namespace InstallerUI
 			}
 		}
 
-		public bool Autoupdate
-		{
-			get { return _autoupdate; }
-			set
-			{
-				_autoupdate = value;
-				OnNotifyPropertyChanged("Autoupdate");
-			}
-		}
-
-		public bool Autostart
-		{
-			get { return _autostart; }
-			set
-			{
-				_autostart = value;
-				OnNotifyPropertyChanged("Autostart");
-			}
-		}
-
 		public bool CanInstall
 		{
-			get { return _canInstall && !_installing; }
+			get { return _canInstall && !_isThinking; }
 			set
 			{
 				_canInstall = value;
@@ -222,22 +196,11 @@ namespace InstallerUI
 
 		public bool CanRemove
 		{
-			get { return _canRemove && !_installing; }
+			get { return _canRemove && !_isThinking; }
 			set
 			{
 				_canRemove = value;
 				OnNotifyPropertyChanged("CanRemove");
-			}
-		}
-
-		public bool Installing
-		{
-			get { return _installing; }
-			set
-			{
-				_installing = value;
-				OnNotifyPropertyChanged("CanRemove");
-				OnNotifyPropertyChanged("CanInstall");
 			}
 		}
 
@@ -279,56 +242,7 @@ namespace InstallerUI
 				_modAvailableVersion = value;
 				OnNotifyPropertyChanged("ModAvailableVersion");
 			}
-		}
-		public string ScriptHookVButtonText
-		{
-			get { return _scriptHookVButtonText; }
-			set
-			{
-				_scriptHookVButtonText = value;
-				OnNotifyPropertyChanged("ScriptHookVButtonText");
-			}
-		}
-
-		public string ModButtonText
-		{
-			get { return _modButtonText; }
-			set
-			{
-				_modButtonText = value;
-				OnNotifyPropertyChanged("ModButtonText");
-			}
-		}
-
-		public string ModUpdaterButtonText
-		{
-			get { return _modUpdaterButtonText; }
-			set
-			{
-				_modUpdaterButtonText = value;
-				OnNotifyPropertyChanged("ModUpdaterButtonText");
-			}
-		}
-
-		public string ModUpdaterVersion
-		{
-			get { return _modUpdaterVersion; }
-			set
-			{
-				_modUpdaterVersion = value;
-				OnNotifyPropertyChanged("ModUpdaterVersion");
-			}
-		}
-
-		public string ModUpdaterAvailableVersion
-		{
-			get { return _modUpdaterAvailableVersion; }
-			set
-			{
-				_modUpdaterAvailableVersion = value;
-				OnNotifyPropertyChanged("ModUpdaterAvailableVersion");
-			}
-		}
+		}		
 
 	}
 }

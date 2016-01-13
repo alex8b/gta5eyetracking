@@ -1,8 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
@@ -57,20 +55,12 @@ namespace InstallerUI
 			_model.WindowTitle = "GTA V Eye Tracking Mod Installer " + version.Major + "." + version.Minor + "." + version.Build;
 			UpdateText();
 
-			var args = Environment.GetCommandLineArgs();
-			if (args.Contains("-hide") 
-				&& _settings.GtaPath != "")
-			{
-				Hide();
-			}
-
 			Task.Run(() =>
 			{
-				_updater.CheckForUpdates(true);
+				_model.IsThinking = true;
+				_updater.CheckForUpdates(false);
+				_model.IsThinking = false;
 			});
-
-			//todo: sign
-			//todo: run remove on uninstall
 		}
 
 		private void UpdaterOnUpdatesChecked(object sender, EventArgs eventArgs)
@@ -166,18 +156,6 @@ namespace InstallerUI
 				_model.ModAvailableVersion = availableModVersion.ToString();
 			}
 
-
-			//Mod updater
-			var version = Assembly.GetExecutingAssembly().GetName().Version;
-			var installedModUpdaterVersion = version.Major + "." + version.Minor + "." + version.Build;
-
-			_model.ModUpdaterVersion = installedModUpdaterVersion;
-			var availableModUpdaterVersion = _updater.GetAvailableModUpdaterVersion();
-			if (availableModVersion != null)
-			{
-				_model.ModUpdaterAvailableVersion = availableModUpdaterVersion.ToString();
-			}
-
 			//Button states
 
 			_model.CanInstall = isGtaVersionSupported &&
@@ -186,24 +164,22 @@ namespace InstallerUI
 			_model.CanRemove = _updater.IsScriptHookVInstalled();
 		}
 
-		private void UpdaterNotifyIconOnOpenWindowMenuItemClick(object sender, EventArgs eventArgs)
-		{
-			this.Show();
-		}
-
-		private void UpdaterNotifyIconOnCheckForUpdateMenuItemClick(object sender, EventArgs e)
-		{
-			//_updaterNotifyIcon.ShowNotification("Checking for updates");
-			Task.Run(() =>
-			{
-				_updater.CheckForUpdates();
-			});
-		}
 
 		private void OnClosing(object sender, CancelEventArgs cancelEventArgs)
 		{
-			Shutdown();
+			if (!_model.IsThinking &&
+			    (MessageBox.Show("Are you sure you want to quit GTA V Eye Tracking Mod installation?", this.Title,
+				    MessageBoxButton.YesNo) == MessageBoxResult.Yes))
+			{
+				Shutdown();
+				cancelEventArgs.Cancel = false;
+			}
+			else
+			{
+				cancelEventArgs.Cancel = true;
+			}
 		}
+
 
 		public void Shutdown()
 		{
@@ -217,7 +193,6 @@ namespace InstallerUI
 			_updater = null;
 
 			_settingsStorage.SaveSettings(_settings);
-			Application.Current.Shutdown();
 		}
 
 		private void Browse_OnClick(object sender, RoutedEventArgs e)
@@ -239,23 +214,13 @@ namespace InstallerUI
 			}
 		}
 
-		private void CheckForUpdates_OnClick(object sender, RoutedEventArgs e)
-		{
-			//_updaterNotifyIcon.ShowNotification("Checking for updates");
-
-			Task.Run(() =>
-			{
-				_updater.CheckForUpdates();
-			});
-		}
-
 		private void Install_OnClick(object sender, RoutedEventArgs e)
 		{
 			Task.Run(() =>
 			{
-				_model.Installing = true;
+				_model.IsThinking = true;
 				_updater.CheckForUpdates(true);
-				_model.Installing = false;
+				_model.IsThinking = false;
 			});
 		}
 
@@ -263,11 +228,16 @@ namespace InstallerUI
 		{
 			Task.Run(() =>
 			{
-				_model.Installing = true;
+				_model.IsThinking = true;
 				_updater.RemoveScriptHookV();
 				_updater.RemoveMod();
-				_model.Installing = false;
+				_model.IsThinking = false;
 			});
+		}
+
+		private void Cancel_OnClick(object sender, RoutedEventArgs e)
+		{
+			Close();
 		}
 	}
 }
