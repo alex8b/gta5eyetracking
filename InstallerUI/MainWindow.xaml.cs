@@ -212,51 +212,28 @@ namespace InstallerUI
 				UpdateText();
 				Task.Run(() =>
 				{
-					_updater.CheckForUpdates();
+					_updater.CheckForUpdates(false);
 				});
 			}
 		}
 
 		private void Install_OnClick(object sender, RoutedEventArgs e)
 		{
+			_model.IsThinking = true;
 			Task.Run(() =>
-			{
-				_model.IsThinking = true;
-				_model.Bootstrapper.PlanPackageBegin += SetPackagePlannedState;
-				_model.Bootstrapper.PlanMsiFeature += SetFeaturePlannedState;
-				_model.Bootstrapper.PlanComplete += BootstrapperOnPlanComplete;
+			{		
 				_model.Bootstrapper.Engine.Plan(LaunchAction.Install);
-				_model.Bootstrapper.Engine.Apply(IntPtr.Zero);
 				_updater.CheckForUpdates(true);
 				_model.IsThinking = false;
 			});
 		}
 
-		private void BootstrapperOnPlanComplete(object sender, PlanCompleteEventArgs e)
-		{
-			_model.Bootstrapper.PlanComplete -= BootstrapperOnPlanComplete;
-			Util.Log("OnPlanComplete: " + e.Status);
-		}
-
-		private void SetFeaturePlannedState(object sender, PlanMsiFeatureEventArgs e)
-		{
-			Util.Log("SetFeaturePlannedState: " + e.FeatureId);
-			e.State = FeatureState.Unknown;
-		}
-
-		private void SetPackagePlannedState(object sender, PlanPackageBeginEventArgs e)
-		{
-			Util.Log("SetPackagePlannedState: " + e.PackageId);
-			e.State = RequestState.Present;
-		}
-
 		private void Remove_OnClick(object sender, RoutedEventArgs e)
 		{
+			_model.IsThinking = true;
 			Task.Run(() =>
 			{
-				_model.IsThinking = true;
 				_model.Bootstrapper.Engine.Plan(LaunchAction.Uninstall);
-				_model.Bootstrapper.Engine.Apply(IntPtr.Zero);
 				_updater.RemoveScriptHookV();
 				_updater.RemoveMod();
 				_model.IsThinking = false;

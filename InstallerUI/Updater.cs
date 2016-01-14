@@ -42,7 +42,7 @@ namespace InstallerUI
 
 			try
 			{
-				Util.Log("Checking for updates");
+				Util.Log("Checking for updates " + forceInstall);
 				//SelfUpdate();
 				UpdateModBundle(forceInstall);
 				UpdateScriptHookV(forceInstall);

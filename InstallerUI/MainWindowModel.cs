@@ -11,30 +11,11 @@ namespace InstallerUI
 		{
 			this.IsThinking = false;
 			this.Bootstrapper = bootstrapper;
-			this.Bootstrapper.ApplyComplete += this.OnApplyComplete;
-			this.Bootstrapper.DetectPackageComplete += this.OnDetectPackageComplete;
-			this.Bootstrapper.PlanComplete += this.OnPlanComplete;
+			this.Bootstrapper.PlanPackageBegin += SetPackagePlannedState;
+			this.Bootstrapper.PlanMsiFeature += SetFeaturePlannedState;
+			this.Bootstrapper.PlanComplete += PlanComplete;
 		}
-		private bool _installEnabled;
-		public bool InstallEnabled
-		{
-			get { return _installEnabled; }
-			set
-			{
-				_installEnabled = value;
-				OnNotifyPropertyChanged("InstallEnabled");
-			}
-		}
-		private bool _uninstallEnabled;
-		public bool UninstallEnabled
-		{
-			get { return _uninstallEnabled; }
-			set
-			{
-				_uninstallEnabled = value;
-				OnNotifyPropertyChanged("UninstallEnabled");
-			}
-		}
+		
 		private bool _isThinking;
 		public bool IsThinking
 		{
@@ -49,52 +30,24 @@ namespace InstallerUI
 		}
 		public BootstrapperApplication Bootstrapper { get; private set; }
 
-		private void InstallExecute()
+		private void SetFeaturePlannedState(object sender, PlanMsiFeatureEventArgs e)
 		{
-			IsThinking = true;
-			Bootstrapper.Engine.Plan(LaunchAction.Install);
+			Util.Log("SetFeaturePlannedState: " + e.FeatureId);
+			e.State = FeatureState.Unknown;
 		}
-		private void UninstallExecute()
+
+		private void SetPackagePlannedState(object sender, PlanPackageBeginEventArgs e)
 		{
-			IsThinking = true;
-			Bootstrapper.Engine.Plan(LaunchAction.Uninstall);
+			Util.Log("SetPackagePlannedState: " + e.PackageId);
+			e.State = RequestState.Present;
 		}
-		private void ExitExecute()
-		{
-			InstallerBootstrapperApplication.BootstrapperDispatcher.InvokeShutdown();
-		}
-		/// <summary>
-		/// Method that gets invoked when the Bootstrapper ApplyComplete event is fired.
-		/// This is called after a bundle installation has completed. Make sure we updated the view.
-		/// </summary>
-		private void OnApplyComplete(object sender, ApplyCompleteEventArgs e)
-		{
-			IsThinking = false;
-			InstallEnabled = false;
-			UninstallEnabled = false;
-		}
-		/// <summary>
-		/// Method that gets invoked when the Bootstrapper DetectPackageComplete event is fired.
-		/// Checks the PackageId and sets the installation scenario. The PackageId is the ID
-		/// specified in one of the package elements (msipackage, exepackage, msppackage,
-		/// msupackage) in the WiX bundle.
-		/// </summary>
-		private void OnDetectPackageComplete(object sender, DetectPackageCompleteEventArgs e)
-		{
-			if (e.PackageId == "DummyInstallationPackageId")
-			{
-				if (e.State == PackageState.Absent)
-					InstallEnabled = true;
-				else if (e.State == PackageState.Present)
-					UninstallEnabled = true;
-			}
-		}
+
 		/// <summary>
 		/// Method that gets invoked when the Bootstrapper PlanComplete event is fired.
 		/// If the planning was successful, it instructs the Bootstrapper Engine to
 		/// install the packages.
 		/// </summary>
-		private void OnPlanComplete(object sender, PlanCompleteEventArgs e)
+		private void PlanComplete(object sender, PlanCompleteEventArgs e)
 		{
 			if (e.Status >= 0)
 				Bootstrapper.Engine.Apply(System.IntPtr.Zero);
