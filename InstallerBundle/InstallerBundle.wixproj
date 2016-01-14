@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>3.10</ProductVersion>
     <ProjectGuid>b60702f3-bed4-4efd-a2df-80a0be9a572a</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
@@ -11,12 +11,12 @@
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DefineConstants>Debug</DefineConstants>
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
@@ -53,13 +53,6 @@
     </WixExtension>
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
-  <PropertyGroup>
-    <PreBuildEvent />
-  </PropertyGroup>
-  <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)bin\x64\Release\Gta5EyeTrackingModInstaller_bundle.exe" "$(SolutionDir)bin\installer\" /Y</PostBuildEvent>
-  </PropertyGroup>
-  
   <Target Name="BeforeBuild">
     <GetAssemblyIdentity AssemblyFiles="$(SolutionDir)bin\installer\InstallerUI.dll">
       <Output TaskParameter="Assemblies" ItemName="AssemblyVersion" />
@@ -68,7 +61,12 @@
       <DefineConstants>BuildVersion=%(AssemblyVersion.Version)</DefineConstants>
     </PropertyGroup>
   </Target>
-
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\x86\Release\Gta5EyeTrackingModInstaller_bundle.exe" "$(SolutionDir)bin\installer\" /Y</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent />
+  </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.
 	Other similar extension points exist, see Wix.targets.
