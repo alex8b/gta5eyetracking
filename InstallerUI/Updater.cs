@@ -26,15 +26,13 @@ namespace InstallerUI
 		private Version _lastSupportedGtaVersion;
 		private Version _lastAvailableModVersion;
 		private string _lastAvailableScriptHookVVersion;
-		private Version _lastAvailableModUpdaterVersion;
-
 
 		public Updater(Settings settings)
 		{
 			_settings = settings;
 		}
 
-		public void CheckForUpdates(bool forceInstall = true)
+		public void CheckForUpdates(bool forceInstall)
 		{
 			if (!_enabled) return;
 			if (_settings.GtaPath == "") return;
@@ -635,11 +633,6 @@ namespace InstallerUI
 		public Version GetAvailableModVersion()
 		{
 			return _lastAvailableModVersion;
-		}
-
-		public Version GetAvailableModUpdaterVersion()
-		{
-			return _lastAvailableModUpdaterVersion;
 		}
 	}
 }

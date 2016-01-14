@@ -11,7 +11,7 @@ namespace InstallerUI
 {
 	public static class Util
 	{
-		public const string SettingsPath = "Gta5EyeTracking";
+        public const string SettingsPath = "Gta5EyeTracking";
 		public static string GetGtaInstallPathFromRegistry()
 		{
 			var regKey = new ApplicationUninstallRegistryKey("Grand Theft Auto V");
@@ -102,7 +102,7 @@ namespace InstallerUI
 			}
 
 
-			var logpath = Path.Combine(folderPath, "installerlog.txt");
+			var logpath = Path.Combine(folderPath, "installer.log." + Process.GetCurrentProcess().Id + ".txt");
 
 			try
 			{
