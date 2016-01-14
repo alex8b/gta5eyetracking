@@ -38,8 +38,16 @@ namespace InstallerUI
 
 		private void SetPackagePlannedState(object sender, PlanPackageBeginEventArgs e)
 		{
-			Util.Log("SetPackagePlannedState: " + e.PackageId);
-			e.State = RequestState.Present;
+			e.Result = Result.Continue;
+			if (Bootstrapper.Command.Action == LaunchAction.Uninstall)
+			{
+				e.State = RequestState.None;
+			}
+			else
+			{
+				e.State = RequestState.Present;
+			}
+			Util.Log("SetPackagePlannedState: " + e.PackageId + " " + e.State);
 		}
 
 		/// <summary>

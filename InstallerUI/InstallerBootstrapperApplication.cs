@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using Microsoft.Deployment.WindowsInstaller;
 using Microsoft.Tools.WindowsInstallerXml.Bootstrapper;
 
 namespace InstallerUI
@@ -22,8 +23,14 @@ namespace InstallerUI
 
 			var view = new MainWindow(viewModel);
 			view.DataContext = viewModel;
-			view.Closed += (sender, e) => BootstrapperDispatcher.InvokeShutdown();
+			view.Closed += (sender, e) =>
+			{
+				BootstrapperDispatcher.InvokeShutdown();
+				Util.Log("exit1");
+				Engine.Quit((int)ActionResult.Success);
+			};
 
+			Util.Log("Installer running: " + this.Command.Action.ToString() + " " + this.Command.Display.ToString());
 			if (this.Command.Action == LaunchAction.Uninstall && this.Command.Display == Display.Embedded)
 			{
 				viewModel.Bootstrapper.Engine.Plan(LaunchAction.Uninstall);
@@ -36,6 +43,7 @@ namespace InstallerUI
 			}
 
 			Dispatcher.Run();
+			Util.Log("exit2");
 			this.Engine.Quit(0);
 		}
 	}

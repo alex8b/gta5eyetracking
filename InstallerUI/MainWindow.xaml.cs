@@ -22,7 +22,7 @@ namespace InstallerUI
 			_model = model;
 
 			this.Closing += OnClosing;
-
+			this.Closed += OnClosed;
 			_settingsStorage = new SettingsStorage();
 			_settings = _settingsStorage.LoadSettings();
 			
@@ -63,6 +63,11 @@ namespace InstallerUI
 				_updater.CheckForUpdates(false);
 				_model.IsThinking = false;
 			});
+		}
+
+		private void OnClosed(object sender, EventArgs eventArgs)
+		{
+			Shutdown();
 		}
 
 		private void UpdaterOnUpdatesChecked(object sender, EventArgs eventArgs)
@@ -172,7 +177,6 @@ namespace InstallerUI
 		{
 			if (this.Visibility == Visibility.Hidden)
 			{
-				Shutdown();
 				cancelEventArgs.Cancel = false;
 				return;
 			}
@@ -181,7 +185,6 @@ namespace InstallerUI
 			    (!_model.CanInstall || MessageBox.Show("Are you sure you want to quit GTA V Eye Tracking Mod installation?", this.Title,
 				    MessageBoxButton.YesNo) == MessageBoxResult.Yes))
 			{
-				Shutdown();
 				cancelEventArgs.Cancel = false;
 			}
 			else

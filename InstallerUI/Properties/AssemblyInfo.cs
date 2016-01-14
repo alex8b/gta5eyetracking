@@ -51,8 +51,8 @@ using Microsoft.Tools.WindowsInstallerXml.Bootstrapper;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.6.114")]
-[assembly: AssemblyFileVersion("0.6.114")]
+[assembly: AssemblyVersion("0.6.123")]
+[assembly: AssemblyFileVersion("0.6.123")]
 
 //WiX -- denotes which class is the Managed Bootstrapper
 [assembly: BootstrapperApplication(typeof(InstallerBootstrapperApplication))]
