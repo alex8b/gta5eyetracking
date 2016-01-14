@@ -38,15 +38,21 @@ namespace InstallerUI
 				return;
 			}
 
-			if (!_model.IsThinking &&
-			    (!_model.CanInstall || MessageBox.Show("Are you sure you want to quit GTA V Eye Tracking Mod installation?", this.Title,
-				    MessageBoxButton.YesNo) == MessageBoxResult.Yes))
+			if (_model.IsThinking)
 			{
-				cancelEventArgs.Cancel = false;
-			}
+				if (MessageBox.Show("Are you sure you want to quit GTA V Eye Tracking Mod installation?", this.Title,
+				   MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+				{
+					cancelEventArgs.Cancel = false;
+				}
+				else
+				{
+					cancelEventArgs.Cancel = true;
+				}
+			} 
 			else
 			{
-				cancelEventArgs.Cancel = true;
+				cancelEventArgs.Cancel = false;
 			}
 		}
 

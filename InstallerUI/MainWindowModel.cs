@@ -1,8 +1,10 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Media;
 using System.Windows.Media.TextFormatting;
 using Microsoft.Tools.WindowsInstallerXml.Bootstrapper;
+using Color = System.Drawing.Color;
 
 namespace InstallerUI
 {
@@ -22,6 +24,14 @@ namespace InstallerUI
 		private string _scriptHookVAvailableVersion;
 		private string _modAvailableVersion;
 		private bool _accept;
+		private Brush _gtaVersionColor;
+		private Brush _scriptHookVVersionColor;
+		private Brush _scriptHookVAvailableVersionColor;
+		private Brush _modVersionColor;
+		private Brush _modAvailableVersionColor;
+		private readonly Brush _redColor = Brushes.Red;
+        private readonly Brush _greenColor = Brushes.GreenYellow;
+		private readonly Brush _whiteColor = Brushes.White;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 		public BootstrapperApplication Bootstrapper { get; private set; }
@@ -135,16 +145,6 @@ namespace InstallerUI
 			}
 		}
 
-		public string GtaVersion
-		{
-			get { return _gtaVersion; }
-			set
-			{
-				_gtaVersion = value;
-				OnNotifyPropertyChanged("GtaVersion");
-			}
-		}
-
 		public bool CanInstall
 		{
 			get { return _accept && _canInstall && !_isThinking; }
@@ -162,6 +162,15 @@ namespace InstallerUI
 			{
 				_canRemove = value;
 				OnNotifyPropertyChanged("CanRemove");
+			}
+		}
+		public string GtaVersion
+		{
+			get { return _gtaVersion; }
+			set
+			{
+				_gtaVersion = value;
+				OnNotifyPropertyChanged("GtaVersion");
 			}
 		}
 
@@ -204,6 +213,57 @@ namespace InstallerUI
 				OnNotifyPropertyChanged("ModAvailableVersion");
 			}
 		}
+
+		public Brush GtaVersionColor
+		{
+			get { return _gtaVersionColor; }
+			set
+			{
+				_gtaVersionColor = value;
+				OnNotifyPropertyChanged("GtaVersionColor");
+			}
+		}
+
+		public Brush ScriptHookVVersionColor
+		{
+			get { return _scriptHookVVersionColor; }
+			set
+			{
+				_scriptHookVVersionColor = value;
+				OnNotifyPropertyChanged("ScriptHookVVersionColor");
+			}
+		}
+
+		public Brush ScriptHookVAvailableVersionColor
+		{
+			get { return _scriptHookVAvailableVersionColor; }
+			set
+			{
+				_scriptHookVAvailableVersionColor = value;
+				OnNotifyPropertyChanged("ScriptHookVAvailableVersionColor");
+			}
+		}
+
+		public Brush ModVersionColor
+		{
+			get { return _modVersionColor; }
+			set
+			{
+				_modVersionColor = value;
+				OnNotifyPropertyChanged("ModVersionColor");
+			}
+		}
+
+		public Brush ModAvailableVersionColor
+		{
+			get { return _modAvailableVersionColor; }
+			set
+			{
+				_modAvailableVersionColor = value;
+				OnNotifyPropertyChanged("ModAvailableVersionColor");
+			}
+		}
+
 
 		public bool Accept
 		{
@@ -287,23 +347,35 @@ namespace InstallerUI
 				|| (gtaVersion == new Version(0, 0)))
 			{
 				this.GtaVersion = "not found";
+				this.GtaVersionColor = _redColor;
 			}
 			else
 			{
 				this.GtaVersion = gtaVersion.ToString();
+				this.GtaVersionColor = _whiteColor;
 			}
 			// Script hook V
 			var installedScriptHookVVersion = _updater.GetInstalledScriptHookVVersion();
+			var availableScriptHookVVersion = _updater.GetAvailableScriptHookVVersion();
 			if (installedScriptHookVVersion == "")
 			{
 				this.ScriptHookVVersion = "not installed";
+				this.ScriptHookVVersionColor = _redColor;
 			}
 			else
 			{
 				this.ScriptHookVVersion = installedScriptHookVVersion;
+				if (availableScriptHookVVersion != null && _updater.IsVersionLower(installedScriptHookVVersion, availableScriptHookVVersion))
+				{
+					this.ScriptHookVVersionColor = _redColor;
+				}
+				else
+				{
+					this.ScriptHookVVersionColor = _whiteColor;
+				}
 			}
 			this.ScriptHookVAvailableVersion = "";
-			var availableScriptHookVVersion = _updater.GetAvailableScriptHookVVersion();
+
 			var isGtaVersionSupported = false;
 			if (availableScriptHookVVersion != null)
 			{
@@ -311,32 +383,62 @@ namespace InstallerUI
 				if (!isGtaVersionSupported)
 				{
 					this.ScriptHookVAvailableVersion = "GTA V not supported";
+					this.ScriptHookVAvailableVersionColor = _redColor;
 				}
 				else if (availableScriptHookVVersion == "")
 				{
 					this.ScriptHookVAvailableVersion = "not available";
+					this.ScriptHookVAvailableVersionColor = _redColor;
 				}
 				else
 				{
 					this.ScriptHookVAvailableVersion = availableScriptHookVVersion;
+					if (availableScriptHookVVersion == installedScriptHookVVersion)
+					{
+						this.ScriptHookVAvailableVersionColor = _whiteColor;
+					}
+					else
+					{
+						this.ScriptHookVAvailableVersionColor = _greenColor;
+					}
 				}
 			}
 			// Mod
 			var installedModVersion = _updater.GetModVersion();
+			var availableModVersion = _updater.GetAvailableModVersion();
+
 			if (installedModVersion == new Version(0, 0))
 			{
 				this.ModVersion = "not installed";
+				this.ModVersionColor = _redColor;
 			}
 			else
 			{
 				this.ModVersion = installedModVersion.ToString();
+				if (availableModVersion != null && installedModVersion < availableModVersion)
+				{
+					this.ModVersionColor = _redColor;
+				}
+				else
+				{
+					this.ModVersionColor = _whiteColor;
+				}
+
 				this.Accept = true;
 			}
 
-			var availableModVersion = _updater.GetAvailableModVersion();
+
 			if (availableModVersion != null)
 			{
 				this.ModAvailableVersion = availableModVersion.ToString();
+				if (availableModVersion == installedModVersion)
+				{
+					this.ModAvailableVersionColor = _whiteColor;
+				}
+				else
+				{
+					this.ModAvailableVersionColor = _greenColor;
+				}
 			}
 
 			//Button states
