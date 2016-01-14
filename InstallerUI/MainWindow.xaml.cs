@@ -170,8 +170,15 @@ namespace InstallerUI
 
 		private void OnClosing(object sender, CancelEventArgs cancelEventArgs)
 		{
+			if (this.Visibility == Visibility.Hidden)
+			{
+				Shutdown();
+				cancelEventArgs.Cancel = false;
+				return;
+			}
+
 			if (!_model.IsThinking &&
-			    (MessageBox.Show("Are you sure you want to quit GTA V Eye Tracking Mod installation?", this.Title,
+			    (!_model.CanInstall || MessageBox.Show("Are you sure you want to quit GTA V Eye Tracking Mod installation?", this.Title,
 				    MessageBoxButton.YesNo) == MessageBoxResult.Yes))
 			{
 				Shutdown();
@@ -219,25 +226,30 @@ namespace InstallerUI
 
 		private void Install_OnClick(object sender, RoutedEventArgs e)
 		{
-			_model.IsThinking = true;
 			Task.Run(() =>
-			{		
+			{
+				_model.IsThinking = true;
 				_model.Bootstrapper.Engine.Plan(LaunchAction.Install);
 				_updater.CheckForUpdates(true);
 				_model.IsThinking = false;
 			});
 		}
 
-		private void Remove_OnClick(object sender, RoutedEventArgs e)
+		public void Remove_OnClick(object sender, RoutedEventArgs e)
 		{
-			_model.IsThinking = true;
 			Task.Run(() =>
 			{
-				_model.Bootstrapper.Engine.Plan(LaunchAction.Uninstall);
-				_updater.RemoveScriptHookV();
-				_updater.RemoveMod();
+				_model.IsThinking = true;
+				Uninstall();
 				_model.IsThinking = false;
 			});
+		}
+
+		public void Uninstall()
+		{
+			_model.Bootstrapper.Engine.Plan(LaunchAction.Uninstall);
+			_updater.RemoveScriptHookV();
+			_updater.RemoveMod();
 		}
 
 		private void Cancel_OnClick(object sender, RoutedEventArgs e)
@@ -259,5 +271,7 @@ namespace InstallerUI
 		{
 			_model.Accept = false;
 		}
+
+
 	}
 }

@@ -23,7 +23,18 @@ namespace InstallerUI
 			var view = new MainWindow(viewModel);
 			view.DataContext = viewModel;
 			view.Closed += (sender, e) => BootstrapperDispatcher.InvokeShutdown();
-			view.Show();
+
+			if (this.Command.Action == LaunchAction.Uninstall && this.Command.Display == Display.Embedded)
+			{
+				viewModel.Bootstrapper.Engine.Plan(LaunchAction.Uninstall);
+				view.Uninstall();
+				view.Close();
+			}
+			else
+			{
+				view.Show();
+			}
+
 			Dispatcher.Run();
 			this.Engine.Quit(0);
 		}
