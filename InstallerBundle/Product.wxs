@@ -1,11 +1,12 @@
 <Wix
   xmlns="http://schemas.microsoft.com/wix/2006/wi"
   xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
-	xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
+	xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension"
+	xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 	<Bundle
 		 Name="GTA V Eye Tracking Mod"
 		 Manufacturer="alex8b"
-		 Version="!(bind.packageVersion.Gta5EyeTrackingModInstaller)"
+		 Version="$(var.BuildVersion)"
 		 UpgradeCode="5ABF7B44-353C-4C52-BE9E-9EB6735A4445"
 		 DisableModify="yes">
 		<BootstrapperApplicationRef Id="ManagedBootstrapperApplicationHost" >
@@ -13,16 +14,51 @@
     </BootstrapperApplicationRef>
 
 		<Chain>
+			<PackageGroupRef Id="redist_vc120"/>
+			<PackageGroupRef Id="redist_vc140"/>
 			<PackageGroupRef Id="NetFx452Web"/>
-			<MsiPackage Id="Gta5EyeTrackingModInstaller" SourceFile="..\bin\installer\Gta5EyeTrackingModInstaller.msi"/>
 		</Chain>
 	</Bundle>
 
+	<!--visual studio runtime 12 x64-->
+	<Fragment>
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\12.0\VC\Runtimes\x64"
+												 Value="Installed" Variable="MFC120_Version_x64"/>
+		
+		<PackageGroup Id="redist_vc120">
+			<ExePackage Id="vc120" Cache="yes" PerMachine="yes" Permanent="yes" Vital="yes" Compressed="yes"
+                  SourceFile="redist\vc120\vcredist_x64.exe"
+                  Name="redist\vc120\vcredist_x64.exe"
+                  InstallCommand="/quiet /norestart"
+                  InstallCondition="NOT MFC120_Version_x64"
+                  Protocol="burn"
+                  />
+		</PackageGroup>
+	</Fragment>
+
+	<!--visual studio runtime 14 x64-->
+	<Fragment>
+		<util:RegistrySearch Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64"
+												 Value="Installed" Variable="MFC140_Version_x64"/>
+
+		<PackageGroup Id="redist_vc140">
+			<ExePackage Id="vc140" Cache="yes" PerMachine="yes" Permanent="yes" Vital="yes" Compressed="yes"
+                  SourceFile="redist\vc140\vc_redist.x64.exe"
+                  Name="redist\vc140\vc_redist.x64.exe"
+                  InstallCommand="/quiet /norestart"
+                  InstallCondition="NOT MFC140_Version_x64"
+                  Protocol="burn"
+                  />
+		</PackageGroup>
+	</Fragment>
+	
 	<Fragment>
     <PayloadGroup Id ="InstallerPayload">
       <Payload SourceFile="BootstrapperCore.config" />     
       <Payload SourceFile="..\bin\installer\Microsoft.Deployment.WindowsInstaller.dll" />
-			<Payload SourceFile="..\bin\installer\InstallerUI.dll" />
+			<Payload Id="InstallerUIdll" SourceFile="..\bin\installer\InstallerUI.dll" />
 		</PayloadGroup>
 	</Fragment>
+	
+	
 </Wix>
