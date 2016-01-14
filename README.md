@@ -19,7 +19,7 @@ This mod allows you to control the camera and aim in GTA V with your eyes!
 If any skilled mod developers want to help me working on this mod then Tobii will give them few eye trackers FOR FREE.
 
 You need to have one of these eye trackers to use it:
-- Tobii EyeX DevKit
+- Tobii EyeX
 http://www.tobii.com/xperience/products/buy/
 $139 / €119
  
