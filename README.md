@@ -21,11 +21,13 @@ If any skilled mod developers want to help me working on this mod then Tobii wil
 You need to have one of these eye trackers to use it:
 - Tobii EyeX DevKit
 http://www.tobii.com/xperience/products/buy/
-$139 / €99
+$139 / €119
  
 - SteelSeries Sentry Gaming Eye Tracker
 http://steelseries.com/gaming-controllers/sentry-gaming-eye-tracker
-$199
+$199 / €249
+
+- MSI GT72 Dominator Tobii (laptop)
 
 More info:
 http://gtaforums.com/topic/814604-vrelnet-gta-v-eye-tracking-mod/
