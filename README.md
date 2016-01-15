@@ -1,4 +1,5 @@
 # GTA V Eye Tracking Mod
+[![GTA V Eye Tracking Mod Review](https://i.ytimg.com/vi_webp/RqayFa_nSXs/mqdefault.webp)](https://www.youtube.com/watch?v=6UQdwbOINm4)
 
 ## Dependencies
 
@@ -20,7 +21,7 @@ This mod allows you to control the camera and aim in GTA V with your eyes!
  
 If any skilled mod developers want to help me working on this mod then Tobii will give them few eye trackers **FOR FREE**.
 
-*You need to have one of these eye trackers to use it:*
+**You need to have one of these eye trackers to use it:**
 - Tobii EyeX
 http://www.tobii.com/xperience/products/buy/
 $139 / €119
@@ -55,27 +56,27 @@ Extract the files to Grand Theft Auto V\scripts\
 
 ## Controls
 ### Cheats
-F4 - Cheat menu (Immortality/Give all weapons/Disable cops/Spawn vehicles) 
-NUMPAD5, NUMPAD4, NUMPAD6, NUMPAD2, NUMPAD8 - Navigate the cheat menu 
+- F4 - Cheat menu (Immortality/Give all weapons/Disable cops/Spawn vehicles) 
+- NUMPAD5, NUMPAD4, NUMPAD6, NUMPAD2, NUMPAD8 - Navigate the cheat menu 
 
 ### XBOX 360 Controller
-(LEFT THUMB + START) - Eye tracking settings menu (Freelook sensitivity, min/max pitch angles) 
-DPAD - Navigate the eye tracking menu 
+- (LEFT THUMB + START) - Eye tracking settings menu (Freelook sensitivity, min/max pitch angles) 
+- DPAD - Navigate the eye tracking menu 
 
-LB (on foot) - Weapon selection menu 
-RT (on foot) - Shoot at gaze 
-RIGHT JOYSTICK (while holding LEFT THUMB) - Fine adjust the crosshair while shooting 
+- LB (on foot) - Weapon selection menu 
+- RT (on foot) - Shoot at gaze 
+- RIGHT JOYSTICK (while holding LEFT THUMB) - Fine adjust the crosshair while shooting 
 
-A - Incinerate at gaze 
-B - Shoot a missile at gaze 
-RB - Tase at gaze 
+- A - Incinerate at gaze 
+- B - Shoot a missile at gaze 
+- RB - Tase at gaze 
 
-LB (in vehicle) - Shoot at gaze 
-X (in vehicle) - Weapon selection 
+- LB (in vehicle) - Shoot at gaze 
+- X (in vehicle) - Weapon selection 
 
 ### Keyboard and mouse
-F8 - Eye tracking settings menu (Freelook sensitivity, min/max pitch angles) 
-ARROWS - Navigate the eye tracking menu 
+- F8 - Eye tracking settings menu (Freelook sensitivity, min/max pitch angles) 
+- ARROWS - Navigate the eye tracking menu 
 
 ## More info
 http://gtaforums.com/topic/814604-vrelnet-gta-v-eye-tracking-mod/
