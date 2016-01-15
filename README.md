@@ -1,6 +1,6 @@
 # GTA V Eye Tracking Mod
 
-## Dependencies:
+## Dependencies
 
 1.	EasyHook – https://github.com/EasyHook/EasyHook/
 
@@ -54,11 +54,11 @@ Extract the files to Grand Theft Auto V\scripts\
 7. **Disable joystick deadzone in the gamepad settings in GTA**
 
 ## Controls
-### Cheats: 
+### Cheats
 F4 - Cheat menu (Immortality/Give all weapons/Disable cops/Spawn vehicles) 
 NUMPAD5, NUMPAD4, NUMPAD6, NUMPAD2, NUMPAD8 - Navigate the cheat menu 
 
-### XBOX 360 Controller: 
+### XBOX 360 Controller
 (LEFT THUMB + START) - Eye tracking settings menu (Freelook sensitivity, min/max pitch angles) 
 DPAD - Navigate the eye tracking menu 
 
@@ -73,9 +73,9 @@ RB - Tase at gaze
 LB (in vehicle) - Shoot at gaze 
 X (in vehicle) - Weapon selection 
 
-### Keyboard and mouse: 
+### Keyboard and mouse
 F8 - Eye tracking settings menu (Freelook sensitivity, min/max pitch angles) 
 ARROWS - Navigate the eye tracking menu 
 
-## More info:
+## More info
 http://gtaforums.com/topic/814604-vrelnet-gta-v-eye-tracking-mod/
