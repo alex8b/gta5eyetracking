@@ -32,6 +32,7 @@ namespace InstallerUI
 		private readonly Brush _redColor = Brushes.Red;
         private readonly Brush _greenColor = Brushes.GreenYellow;
 		private readonly Brush _whiteColor = Brushes.White;
+		public LaunchAction LastInstallCommand { get; set; }
 
 		public event PropertyChangedEventHandler PropertyChanged;
 		public BootstrapperApplication Bootstrapper { get; private set; }
@@ -91,7 +92,7 @@ namespace InstallerUI
 		private void SetPackagePlannedState(object sender, PlanPackageBeginEventArgs e)
 		{
 			e.Result = Result.Continue;
-			if (Bootstrapper.Command.Action == LaunchAction.Uninstall)
+			if (LastInstallCommand == LaunchAction.Uninstall)
 			{
 				e.State = RequestState.None;
 			}
@@ -101,6 +102,7 @@ namespace InstallerUI
 			}
 			Util.Log("SetPackagePlannedState: " + e.PackageId + " " + e.State);
 		}
+
 
 		/// <summary>
 		/// Method that gets invoked when the Bootstrapper PlanComplete event is fired.
@@ -279,7 +281,8 @@ namespace InstallerUI
 		public void Uninstall()
 		{
 			this.IsThinking = true;
-			Bootstrapper.Engine.Plan(LaunchAction.Uninstall);
+			LastInstallCommand = LaunchAction.Uninstall;
+            Bootstrapper.Engine.Plan(LaunchAction.Uninstall);
 			_updater.RemoveScriptHookV();
 			_updater.RemoveMod();
 			this.IsThinking = false;
@@ -295,6 +298,7 @@ namespace InstallerUI
 		public void Install()
 		{
 			this.IsThinking = true;
+			LastInstallCommand = LaunchAction.Install;
 			Bootstrapper.Engine.Plan(LaunchAction.Install);
 			_updater.CheckForUpdates(true);
 			this.IsThinking = false;

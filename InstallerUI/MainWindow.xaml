@@ -50,12 +50,12 @@
             <Label x:Name="ScriptHookVLabel" Content="Script Hook V:" Grid.Row="2" Grid.Column="0" Margin="3" />
             <Label x:Name="ModLabel" Content="Eye Tracking Mod:" Grid.Row="3" Grid.Column="0" Margin="3" />
 
-            <Label x:Name="GtaVersion" Content="{Binding GtaVersion, Mode=OneWay}" Foreground="{Binding GtaVersionColor, Mode=OneWay}" Grid.Row="1" Grid.Column="1" Margin="5"  />
-            <Label x:Name="ScriptHookVVersion" Content="{Binding ScriptHookVVersion, Mode=OneWay}" Foreground="{Binding ScriptHookVVersionColor, Mode=OneWay}"  Grid.Row="2" Grid.Column="1" Margin="5"/>
-            <Label x:Name="ModVersion" Content="{Binding ModVersion, Mode=OneWay}" Foreground="{Binding ModVersionColor, Mode=OneWay}" Grid.Row="3" Grid.Column="1" Margin="5" />
+            <Label x:Name="GtaVersion" Content="{Binding GtaVersion, Mode=OneWay}" Foreground="{Binding GtaVersionColor, Mode=OneWay}" Grid.Row="1" Grid.Column="1" Margin="3"  />
+            <Label x:Name="ScriptHookVVersion" Content="{Binding ScriptHookVVersion, Mode=OneWay}" Foreground="{Binding ScriptHookVVersionColor, Mode=OneWay}"  Grid.Row="2" Grid.Column="1" Margin="3"/>
+            <Label x:Name="ModVersion" Content="{Binding ModVersion, Mode=OneWay}" Foreground="{Binding ModVersionColor, Mode=OneWay}" Grid.Row="3" Grid.Column="1" Margin="3" />
 
-            <Label x:Name="ScriptHookVAvailableVersion" Content="{Binding ScriptHookVAvailableVersion, Mode=OneWay}" Foreground="{Binding ScriptHookVAvailableVersionColor, Mode=OneWay}" Grid.Row="2" Grid.Column="2" Margin="5"/>
-            <Label x:Name="ModAvailableVersion" Content="{Binding ModAvailableVersion, Mode=OneWay}" Foreground="{Binding ModAvailableVersionColor, Mode=OneWay}" Grid.Row="3" Grid.Column="2" Margin="5" />
+            <Label x:Name="ScriptHookVAvailableVersion" Content="{Binding ScriptHookVAvailableVersion, Mode=OneWay}" Foreground="{Binding ScriptHookVAvailableVersionColor, Mode=OneWay}" Grid.Row="2" Grid.Column="2" Margin="3"/>
+            <Label x:Name="ModAvailableVersion" Content="{Binding ModAvailableVersion, Mode=OneWay}" Foreground="{Binding ModAvailableVersionColor, Mode=OneWay}" Grid.Row="3" Grid.Column="2" Margin="3" />
         </Grid>
 
         <ProgressBar x:Name="Progress" IsIndeterminate="{Binding IsThinking, Mode=OneWay}" Margin="10,0,10,50" Height="23" VerticalAlignment="Bottom"/>
