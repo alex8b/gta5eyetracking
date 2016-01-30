@@ -28,7 +28,7 @@ $139 / €119
  
 - SteelSeries Sentry Gaming Eye Tracker
 http://steelseries.com/gaming-controllers/sentry-gaming-eye-tracker
-$199 / €249
+$149 / €199
 
 - MSI GT72 Dominator Tobii (laptop)
 
