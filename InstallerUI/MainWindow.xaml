@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:InstallerUI"
         mc:Ignorable="d"
-        Title="{Binding WindowTitle}" Height="328.212" Width="493.302" ResizeMode="CanMinimize" Icon="Resources/ApplicationIcon.ico" Background="#2D2D30" WindowStartupLocation="CenterScreen">
+        Title="{Binding WindowTitle}" Height="355.132" Width="493.302" ResizeMode="CanMinimize" Icon="Resources/ApplicationIcon.ico" Background="#2D2D30" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <Style TargetType="{x:Type Label}">
             <Setter Property="Foreground" Value="#CACACA" />
@@ -57,8 +57,24 @@
             <Label x:Name="ScriptHookVAvailableVersion" Content="{Binding ScriptHookVAvailableVersion, Mode=OneWay}" Foreground="{Binding ScriptHookVAvailableVersionColor, Mode=OneWay}" Grid.Row="2" Grid.Column="2" Margin="3"/>
             <Label x:Name="ModAvailableVersion" Content="{Binding ModAvailableVersion, Mode=OneWay}" Foreground="{Binding ModAvailableVersionColor, Mode=OneWay}" Grid.Row="3" Grid.Column="2" Margin="3" />
         </Grid>
+		
+		<TextBlock Margin="323,201,0,0"  TextDecorations="Underline" Foreground="#FF0000FB" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Width="154">
+				<Hyperlink Click="LicenseLink_OnClick">end-user license agreement</Hyperlink>
+		</TextBlock>
+		
+		<Grid Height="33" Margin="3,220,10,0" VerticalAlignment="Top">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="33"/>
+			</Grid.RowDefinitions>
+			<Label x:Name="StatusLabel" Content="Status:" Grid.Column="0" Grid.Row="1" Margin="3,3,3,3"/>
+			<Label x:Name="StatusText" Content="{Binding StatusText, Mode=OneWay}" Grid.Column="1" Grid.Row="1" Margin="3,3,3,3"/>
+		</Grid>
 
-        <ProgressBar x:Name="Progress" IsIndeterminate="{Binding IsThinking, Mode=OneWay}" Margin="10,0,10,50" Height="23" VerticalAlignment="Bottom"/>
+		<ProgressBar x:Name="Progress" IsIndeterminate="{Binding IsThinking, Mode=OneWay}" Margin="10,0,10,50" Height="23" VerticalAlignment="Bottom"/>
 
 
         <Rectangle Fill="#202023" Stroke="Black" StrokeThickness="0" Height="45" VerticalAlignment="Bottom" />
@@ -66,10 +82,6 @@
         <Button x:Name="Remove" IsEnabled="{Binding CanRemove, Mode=OneWay}" Content="Remove"  Margin="0,0,236,10" Click="Remove_OnClick" Height="25" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="100"/>
         <Button x:Name="Cancel" Content="Exit"  Margin="0,0,10,10" Click="Cancel_OnClick" Height="25" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="100"/>
         <CheckBox x:Name="Accept" IsChecked="{Binding Accept, Mode=OneWay}" Content="I have read and accept the terms and conditions of the" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,202,0,0" Checked="Accept_OnChecked" Unchecked="Accept_OnUnchecked"/>
-        <TextBlock Margin="323,201,0,0"  TextDecorations="Underline" Foreground="#FF0000FB" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Width="154">
-				<Hyperlink Click="LicenseLink_OnClick">end-user license agreement</Hyperlink>
-        </TextBlock>
-
-    </Grid>
+	</Grid>
 </Window>
 

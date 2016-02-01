@@ -10,6 +10,8 @@ namespace InstallerUI
 {
 	public class MainWindowModel : INotifyPropertyChanged
 	{
+		public const int MaxCheckCount = 3;
+
 		private Updater _updater;
 		private readonly Settings _settings;
 		private readonly SettingsStorage _settingsStorage;
@@ -32,6 +34,7 @@ namespace InstallerUI
 		private readonly Brush _redColor = Brushes.Red;
         private readonly Brush _greenColor = Brushes.GreenYellow;
 		private readonly Brush _whiteColor = Brushes.White;
+		private string _statusText;
 		public LaunchAction LastInstallCommand { get; set; }
 
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -65,7 +68,7 @@ namespace InstallerUI
 					_settings.GtaPath = "";
 				}
 			}
-
+			StatusText = "Ready.";
 			_updater = new Updater(_settings);
 			_updater.ModInstalled += UpdaterOnModInstalled;
 			_updater.ScriptHookVInstalled += UpdaterOnScriptHookVInstalled;
@@ -126,7 +129,15 @@ namespace InstallerUI
 				OnNotifyPropertyChanged("CanInstall");
 			}
 		}
-
+		public string StatusText
+		{
+			get { return _statusText; }
+			set
+			{
+				_statusText = value;
+				OnNotifyPropertyChanged("StatusText");
+			}
+		}
 		public string GtaPathText
 		{
 			get { return _gtaPathText; }
@@ -280,6 +291,7 @@ namespace InstallerUI
 
 		public void Uninstall()
 		{
+			StatusText = "Uninstalling...";
 			this.IsThinking = true;
 			LastInstallCommand = LaunchAction.Uninstall;
             Bootstrapper.Engine.Plan(LaunchAction.Uninstall);
@@ -290,13 +302,29 @@ namespace InstallerUI
 
 		public void CheckForUpdates()
 		{
+			StatusText = "Checking for updates...";
 			this.IsThinking = true;
-			_updater.CheckForUpdates(false);
+			var result = false;
+			int i = 0;
+			while (!result && (i < MaxCheckCount))
+			{
+				result = _updater.CheckForUpdates(false);
+				i++;
+			}
+			if (!result)
+			{
+				StatusText = "Failed to read version info from the server. Please try again later.";
+			}
+			else
+			{
+				StatusText = "Ready.";
+			}
 			this.IsThinking = false;
 		}
 
 		public void Install()
 		{
+			StatusText = "Installing...";
 			this.IsThinking = true;
 			LastInstallCommand = LaunchAction.Install;
 			Bootstrapper.Engine.Plan(LaunchAction.Install);
@@ -325,21 +353,25 @@ namespace InstallerUI
 		private void UpdaterOnModRemoved(object sender, EventArgs eventArgs)
 		{
 			UpdateText();
+			StatusText = "GTA V Eye Tracking Mod removed.";
 		}
 
 		private void UpdaterOnScriptHookVRemoved(object sender, EventArgs eventArgs)
 		{
 			UpdateText();
+			StatusText = "Script Hook V removed.";
 		}
 
 		private void UpdaterOnScriptHookVInstalled(object sender, EventArgs eventArgs)
 		{
 			UpdateText();
+			StatusText = "Script Hook V installed.";
 		}
 
 		private void UpdaterOnModInstalled(object sender, EventArgs eventArgs)
 		{
 			UpdateText();
+			StatusText = "GTA V Eye Tracking Mod installed.";
 		}
 
 		public void UpdateText()

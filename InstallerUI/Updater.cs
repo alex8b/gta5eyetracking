@@ -32,25 +32,28 @@ namespace InstallerUI
 			_settings = settings;
 		}
 
-		public void CheckForUpdates(bool forceInstall)
+		public bool CheckForUpdates(bool forceInstall)
 		{
-			if (!_enabled) return;
-			if (_settings.GtaPath == "") return;
-			if (!Monitor.TryEnter(_lock)) return;
+			if (!_enabled) return false;
+			if (_settings.GtaPath == "") return false;
+			if (!Monitor.TryEnter(_lock)) return false;
 
+			bool hr = true;
 			try
 			{
 				Util.Log("Checking for updates " + forceInstall);
 				//SelfUpdate();
-				UpdateModBundle(forceInstall);
-				UpdateScriptHookV(forceInstall);
+				hr &= UpdateModBundle(forceInstall);
+				hr &= UpdateScriptHookV(forceInstall);
 			}
 			catch
 			{
+				hr = false;
 				Util.Log("Failed to update");
 			}
 			UpdatesChecked(this, new EventArgs());
 			Monitor.Exit(_lock);
+			return hr;
 		}
 
 		public Version GetGtaVersion()
@@ -61,14 +64,14 @@ namespace InstallerUI
 			return installedGtaVersion;
 		}
 
-		public void UpdateScriptHookV(bool forceInstall)
+		public bool UpdateScriptHookV(bool forceInstall)
 		{
 			var installedGtaVersion = GetGtaVersion();
 			
 			if (installedGtaVersion == new Version(0,0))
 			{
 				Util.Log("Failed to get GTA V version");
-				return;
+				return false;
 			}
 
 			var supportedGtaVersion = new Version(0, 0);
@@ -78,7 +81,7 @@ namespace InstallerUI
 					out scriptHookVDownloadUrlAddress))
 			{
 				Util.Log("Failed to get script hook version");
-				return;
+				return false;
 			}
 			_lastSupportedGtaVersion = supportedGtaVersion;
 			_lastAvailableScriptHookVVersion = availableScriptHookVVersion;
@@ -88,21 +91,23 @@ namespace InstallerUI
 			{
 				RemoveScriptHookV();
 				Util.Log("Script Hook V is temporarly disabled");
-				return;
+				return true;
 			}
 
 			if (IsScriptHookVInstalled() && (!IsVersionLower(GetInstalledScriptHookVVersion(), availableScriptHookVVersion)))
 			{
-				return;
+				return true;
 			}
 
-			if (!forceInstall) return;
+			if (!forceInstall) return true;
 
 			DownloadScriptHookV(scriptHookVDownloadUrlAddress);
 			if (!InstallScriptHookV())
 			{
 				Util.Log("Failed to update Script Hook V");
+				return false;
 			}
+			return true;
 		}
 
 		public string GetInstalledScriptHookVVersion()
@@ -340,7 +345,7 @@ namespace InstallerUI
 			return installedModVersion;
 		}
 
-		private void UpdateModBundle(bool forceInstall)
+		private bool UpdateModBundle(bool forceInstall)
 		{
 			var installedModVersion = GetModVersion();
 
@@ -350,24 +355,26 @@ namespace InstallerUI
 			if (!TryParseModInfoWebPage(out availableModVersion, out modBundleDownloadUrl, out blockScriptHookV))
 			{
 				Util.Log("Failed to read or parse mod info web page");
-				return;
+				return false;
 			}
 
 			_lastAvailableModVersion = availableModVersion;
 			if (installedModVersion >= availableModVersion)
 			{
 				Util.Log("Mod is up to date");
-				return;
+				return true;
 			}
 
-			if (!forceInstall) return;
+			if (!forceInstall) return true;
 
 			DownloadModBundle(modBundleDownloadUrl);
 
 			if (!InstallModBundle())
 			{
 				Util.Log("Failed to update Gta V Eye Tracking Mod");
+				return false;
 			}
+			return true;
 		}
 
 		private bool ParseScriptHookVVerstion(string version, out Version major, out Version minor)

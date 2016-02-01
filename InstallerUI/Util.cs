@@ -55,7 +55,7 @@ namespace InstallerUI
 		public static string ReadWebPageContent(string urlAddress)
 		{
 			var request = (HttpWebRequest)WebRequest.Create(urlAddress);
-			request.Timeout = 2000;
+			request.Timeout = 5000;
 			var response = (HttpWebResponse)request.GetResponse();
 
 			if (response.StatusCode != HttpStatusCode.OK) return null;

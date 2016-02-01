@@ -5,7 +5,6 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
-using Microsoft.Tools.WindowsInstallerXml.Bootstrapper;
 using Microsoft.Win32;
 
 namespace InstallerUI
@@ -13,7 +12,6 @@ namespace InstallerUI
 	public partial class MainWindow : Window
 	{
 		private readonly MainWindowModel _model;
-
 		public MainWindow(MainWindowModel model)
 		{
 			_model = model;
@@ -24,6 +22,7 @@ namespace InstallerUI
 			var version = Assembly.GetExecutingAssembly().GetName().Version;
 			_model.WindowTitle = "GTA V Eye Tracking Mod Installer " + version.Major + "." + version.Minor + "." + version.Build;
 			_model.UpdateText();
+
 			Task.Run(() =>
 			{
 				_model.CheckForUpdates();
