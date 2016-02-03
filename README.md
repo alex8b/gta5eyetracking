@@ -30,7 +30,8 @@ $139 / €119
 http://steelseries.com/gaming-controllers/sentry-gaming-eye-tracker
 $149 / €199
 
-- MSI GT72 Dominator Tobii (laptop)
+- MSI GT72S G TOBII Gaming Laptop
+https://us.msi.com/product/notebook/GT72S-G-Tobii-6th-Gen-GTX-980M.html
 
 **You need to have an XBOX 360 Controller (or any other XInput compatible).**
 
