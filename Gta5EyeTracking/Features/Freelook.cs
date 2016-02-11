@@ -137,6 +137,10 @@ namespace Gta5EyeTracking.Features
 					{
 						deltaY = (freelookDeltaVector.Y - Math.Sign(freelookDeltaVector.Y) * deadzoneHeight) * (float)(_settings.ThirdPersonSensitivity);
 					}
+					else
+					{
+						deltaY = ((freelookDeltaVector.Y - Math.Sign(freelookDeltaVector.Y) * deadzoneHeight) * (float)(_settings.ThirdPersonSensitivity)) * 0.1;
+					}
 				}
 			}
 
