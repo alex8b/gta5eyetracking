@@ -22,7 +22,7 @@ install:
 - mkdir lib\ScriptHookVDotNet\
 - cd lib/ScriptHookVDotNet/
 - 'echo Downloading ScriptHookVDotNet ...'
-- appveyor DownloadFile https://github.com/crosire/scripthookvdotnet/releases/download/v2.3/ScriptHookVDotNet.zip -FileName ScriptHookVDotNet.zip
+- appveyor DownloadFile https://github.com/crosire/scripthookvdotnet/releases/download/v2.5.1/ScriptHookVDotNet.zip -FileName ScriptHookVDotNet.zip
 - echo Download completed. Extracting ...
 - 7z x ScriptHookVDotNet.zip
 - echo Extraction completed. Compiling ...
@@ -30,7 +30,7 @@ install:
 - mkdir lib\NativeUI\
 - cd lib/NativeUI/
 - 'echo Downloading NativeUI ...'
-- appveyor DownloadFile https://github.com/Guad/NativeUI/releases/download/1.5/NativeUI.zip -FileName NativeUI.zip
+- appveyor DownloadFile https://github.com/Guad/NativeUI/releases/download/1.6.1/NativeUI.zip -FileName NativeUI.zip
 - echo Download completed. Extracting ...
 - 7z x NativeUI.zip
 - echo Extraction completed. Compiling ...

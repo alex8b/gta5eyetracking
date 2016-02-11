@@ -37,6 +37,7 @@ namespace InstallerUI
 					Util.Log("BootstrapperDispatcher.InvokeShutdown");
 					BootstrapperDispatcher.InvokeShutdown();
 					Util.Log("Engine.Quit");
+					viewModel.Dispose();
 					Engine.Quit((int)ActionResult.Success);
 				};
 				Util.Log("view.Show");

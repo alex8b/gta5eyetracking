@@ -80,7 +80,7 @@ namespace Gta5EyeTracking
 			ThirdPersonFreelookEnabled = true;
 			ThirdPersonSensitivity = 0.3;
 
-			ThirdPersonYOffset = 0.3; 
+			ThirdPersonYOffset = 0.2; 
 			ThirdPersonDeadZoneWidth = 0.1;
 			ThirdPersonDeadZoneHeight = 0.1;
 			ThirdPersonMinPitchDeg = -20;

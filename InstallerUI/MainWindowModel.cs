@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
 using System.Windows.Media.TextFormatting;
@@ -302,6 +303,8 @@ namespace InstallerUI
 
 		public void CheckForUpdates()
 		{
+			if (_settings.GtaPath == ""
+				|| !Directory.Exists(_settings.GtaPath)) return;
 			StatusText = "Checking for updates...";
 			this.IsThinking = true;
 			var result = false;
