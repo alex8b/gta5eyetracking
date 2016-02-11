@@ -129,11 +129,11 @@ namespace Gta5EyeTracking.Features
 
 				if (!(Math.Abs(freelookDeltaVector.Y) <= deadzoneHeight))
 				{
-					if //((_settings.FreelookDevice == FeeelookDevice.Gamepad && Game.Player.Character.IsInVehicle()) //gamepad + vehicle = no caps
-					   //	|| 
-						(((GameplayCamera.Rotation.X >= minPitchDeg) && (freelookDeltaVector.Y > 0)) //Limits for mouse
-							|| ((GameplayCamera.Rotation.X <= maxPitchDeg) && (freelookDeltaVector.Y < 0)))
-						//)
+					if ((_settings.FreelookDevice == FeeelookDevice.Gamepad && Game.Player.Character.IsInVehicle()) //gamepad + vehicle = no caps
+					   	|| 
+						!(((GameplayCamera.Rotation.X < minPitchDeg) && (freelookDeltaVector.Y > 0)) //Limits for mouse
+							|| ((GameplayCamera.Rotation.X > maxPitchDeg) && (freelookDeltaVector.Y < 0)))
+						)
 					{
 						deltaY = (freelookDeltaVector.Y - Math.Sign(freelookDeltaVector.Y) * deadzoneHeight) * (float)(_settings.ThirdPersonSensitivity);
 					}

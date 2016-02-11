@@ -193,18 +193,20 @@ namespace Gta5EyeTracking.HidEmulation
 
 			var rtXorig = state.Gamepad.RightThumbX;
 			var rtYorig = state.Gamepad.RightThumbY;
+			var deadzone = 8689;
+			if (Math.Abs(rtYorig) < deadzone) //deadzone for xbox controller
+			{
+				rtYorig = 0;
+			}
 
 			int rtX = rtXorig + (int)(DeltaX * 32676);
 			int rtY = rtYorig + (int)(-DeltaY * 32676);
 			rtX = Math.Max(Math.Min(rtX, short.MaxValue), short.MinValue);
 			rtY = Math.Max(Math.Min(rtY, short.MaxValue), short.MinValue);
-			//var deadzone = 10;
-			//if ((Math.Abs(state.Gamepad.RightThumbX) < deadzone)
-			//	&& (Math.Abs(state.Gamepad.RightThumbY) < deadzone))
-			{
-				state.Gamepad.RightThumbX = (short)rtX;
-				state.Gamepad.RightThumbY = (short)rtY;
-			}
+
+			state.Gamepad.RightThumbX = (short)rtX;
+			state.Gamepad.RightThumbY = (short)rtY;
+
 			return state;
 		}
 
