@@ -178,36 +178,42 @@ namespace Gta5EyeTracking.HidEmulation
 
 				return ERROR_SUCCESS;
 			}
-			catch
+			catch (Exception e)
 			{
+				Util.Log("XInputGetState_Hooked: " + e.Message);
 				return ERROR_DEVICE_NOT_CONNECTED;
 			}
 		}
 
 		private State ProcessState(State state)
 		{
-			var eventArgs = new ModifyStateEventArgs(state);
-			OnModifyState(this, eventArgs);
+			try { 
+				var eventArgs = new ModifyStateEventArgs(state);
+				OnModifyState(this, eventArgs);
 
-			state = eventArgs.State;
+				state = eventArgs.State;
 
-			var rtXorig = state.Gamepad.RightThumbX;
-			var rtYorig = state.Gamepad.RightThumbY;
-			var deadzone = 8689;
-			if (Math.Abs(rtYorig) < deadzone) //deadzone for xbox controller
-			{
-				rtYorig = 0;
+				int rtXorig = state.Gamepad.RightThumbX;
+				int rtYorig = state.Gamepad.RightThumbY;
+				int deadzone = 8689;
+				if (Math.Abs(rtYorig) < deadzone) //deadzone for xbox controller
+				{
+					rtYorig = 0;
+				}
+
+				int rtX = rtXorig + (int)(DeltaX * 32676);
+				int rtY = rtYorig + (int)(-DeltaY * 32676);
+				rtX = Math.Max(Math.Min(rtX, short.MaxValue), short.MinValue);
+				rtY = Math.Max(Math.Min(rtY, short.MaxValue), short.MinValue);
+
+				state.Gamepad.RightThumbX = (short)rtX;
+				state.Gamepad.RightThumbY = (short)rtY;
 			}
-
-			int rtX = rtXorig + (int)(DeltaX * 32676);
-			int rtY = rtYorig + (int)(-DeltaY * 32676);
-			rtX = Math.Max(Math.Min(rtX, short.MaxValue), short.MinValue);
-			rtY = Math.Max(Math.Min(rtY, short.MaxValue), short.MinValue);
-
-			state.Gamepad.RightThumbX = (short)rtX;
-			state.Gamepad.RightThumbY = (short)rtY;
-
-			return state;
+			catch (Exception e)
+			{
+				Util.Log("ProcessState: " + e.Message);
+			}
+            return state;
 		}
 
 
