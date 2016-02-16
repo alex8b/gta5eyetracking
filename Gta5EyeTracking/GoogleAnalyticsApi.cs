@@ -49,6 +49,7 @@ namespace Gta5EyeTracking
 					var request = (HttpWebRequest) WebRequest.Create("http://www.google-analytics.com/collect");
 					request.Method = "POST";
 					request.KeepAlive = false;
+					request.Timeout = 1000;
 
 					// the request body we want to send
 					var postData = new Dictionary<string, string>
