@@ -38,8 +38,10 @@ namespace Gta5EyeTracking
 		private void Track(HitType type, string category, string action, string label,
 			int? value = null)
 		{
-			if (string.IsNullOrEmpty(category)) return;
-			if (string.IsNullOrEmpty(action)) return;
+			try
+			{
+				if (string.IsNullOrEmpty(category)) return;
+				if (string.IsNullOrEmpty(action)) return;
 
 			var request = (HttpWebRequest) WebRequest.Create("http://www.google-analytics.com/collect");
 			request.Method = "POST";
@@ -82,8 +84,7 @@ namespace Gta5EyeTracking
 				writer.Write(postDataString);
 			}
 
-			try
-			{
+
 				using (var webResponse = (HttpWebResponse) request.GetResponse())
 				{
 					if (webResponse.StatusCode != HttpStatusCode.OK)
