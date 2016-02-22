@@ -100,6 +100,35 @@ namespace Gta5EyeTracking
             return resultCoord;
         }
 
+		public static bool IsOccluded(Entity entity, Vector3 target3D)
+		{
+			const float raycastToDist = 200.0f;
+			const float raycastFromDist = 1f;
+
+			var mView = Util.GetCameraMatrix();
+			var source3D = ViewMatrixToCameraPosition(mView);
+
+			Entity ignoreEntity = Game.Player.Character;
+			if (Game.Player.Character.IsInVehicle())
+			{
+				ignoreEntity = Game.Player.Character.CurrentVehicle;
+			}
+
+			var dir = (target3D - source3D);
+			dir.Normalize();
+			var raycastResults = World.Raycast(source3D + dir*raycastFromDist,
+				source3D + dir*raycastToDist,
+				(IntersectOptions) (1 | 16 | 256 | 2 | 4 | 8) // | peds + vehicles
+				, ignoreEntity);
+
+
+			if (raycastResults.DitHitEntity)
+			{
+				return raycastResults.HitEntity.Handle != entity.Handle;
+			}
+			return true;
+		}
+
 		public static Ped SearchPed(Vector2 screenCoords)
 		{
 			const double searchRange = 0.1;
@@ -124,6 +153,7 @@ namespace Gta5EyeTracking
 						if ((dist < mindist) && (dist < searchRange))
 						{
 							if (ped.IsOccluded) continue;
+							//if (IsOccluded(ped, headOffest)) continue;
 							mindist = dist;
 							foundPed = ped;
 						}
@@ -144,6 +174,7 @@ namespace Gta5EyeTracking
 
 					if (!(dist < mindist) || !(dist < searchRange)) continue;
 					if (ped.IsOccluded) continue;
+					//if (IsOccluded(ped, headOffest)) continue;
 					mindist = dist;
 					foundPed = ped;
 					if (dist < thresholdRange)
@@ -178,6 +209,7 @@ namespace Gta5EyeTracking
                 var dist = (screenCoords - vehScreenCoords).Length();
 			    if (!(dist < mindist) || !(dist < searchRange)) continue;
 				if (vehicle.IsOccluded) continue;
+				//if (IsOccluded(vehicle, vehOffset)) continue;
 				mindist = dist;
 			    foundVeh = vehicle;
 				if (dist < thresholdRange)

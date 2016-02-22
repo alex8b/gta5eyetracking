@@ -20,6 +20,11 @@ namespace Gta5EyeTracking
 			_missileLockedMinTime = TimeSpan.FromSeconds(0.75);
 		}
 
+		private int _frameSkip = 0;
+		private int _maxSkipFrames = 3;
+		private Ped _lastPed = null;
+		private Vehicle _lastVehicle = null;
+
 		public void FindGazeProjection(
 			Vector2 gazePoint,
 			Vector2 joystickDelta,
@@ -57,7 +62,15 @@ namespace Gta5EyeTracking
 			}
 			else
 			{
-				ped = Geometry.SearchPed(unfilteredGazePointPlusJoystickDelta); //Too slow :(
+				if (_frameSkip == 0)
+				{
+					ped = Geometry.SearchPed(unfilteredGazePointPlusJoystickDelta); //Too slow :(
+					_lastPed = ped;
+				}
+				else
+				{
+					ped = _lastPed;
+				}
 			}
 
 			if ((ped != null)
@@ -81,7 +94,15 @@ namespace Gta5EyeTracking
 				}
 				else
 				{
-					vehicle = Geometry.SearchVehicle(unfilteredGazePointPlusJoystickDelta); // Too slow :(
+					if (_frameSkip == 0)
+					{
+						vehicle = Geometry.SearchVehicle(unfilteredGazePointPlusJoystickDelta); // Too slow :(
+						_lastVehicle = vehicle;
+					}
+					else
+					{
+						vehicle = _lastVehicle;
+					}
 				}
 
 				if (vehicle != null
@@ -99,6 +120,11 @@ namespace Gta5EyeTracking
 			//Util.Log("F - " + DateTime.UtcNow.Ticks);
 
 			missileTarget = _missileTarget;
+			_frameSkip++;
+			if (_frameSkip > _maxSkipFrames)
+			{
+				_frameSkip = 0;
+			}
 		}
 
 		private void ProcessMissileLock(Entity target)
