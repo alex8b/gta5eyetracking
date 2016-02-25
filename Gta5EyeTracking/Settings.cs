@@ -50,8 +50,11 @@ namespace Gta5EyeTracking
 		public double FirstPersonDeadZoneWidth { get; set; }
 		public double FirstPersonMinPitchDeg { get; set; }
 		public double FirstPersonMaxPitchDeg { get; set; }
+		//
+		public double FovExtensionVertical { get; set; }
+		public double FovExtensionHorizontal { get; set; }
 
-        public bool FirstPersonFreelookDrivingEnabled { get; set; }
+		public bool FirstPersonFreelookDrivingEnabled { get; set; }
         public double FirstPersonMaxPitchDegDriving { get; set; }
         public double FirstPersonMinPitchDegDriving { get; set; }
         public double FirstPersonDeadZoneHeightDriving { get; set; }
@@ -72,6 +75,8 @@ namespace Gta5EyeTracking
 
 		[XmlArray("Deadzones"), XmlArrayItem(typeof(Deadzone), ElementName = "Deadzone")]
 		public List<Deadzone> Deadzones { get; set; }
+
+
 
 		public Settings()
 		{
@@ -119,7 +124,10 @@ namespace Gta5EyeTracking
             FirstPersonDeadZoneHeightDriving = 0.3;
             FirstPersonMinPitchDegDriving = -45;
             FirstPersonMaxPitchDegDriving = 33;
-			
+
+			FovExtensionVertical = 30;
+			FovExtensionHorizontal = 60;
+
 			AimingSensitivity = 0.4;
 			GazeFiltering = 0.5;
 			AimWithGazeEnabled = true;

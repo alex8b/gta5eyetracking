@@ -42,7 +42,7 @@ namespace Gta5EyeTracking
 
 		//Features
 		private Aiming _aiming;
-		private readonly Freelook _freelook;
+		private Freelook _freelook;
 		private readonly RadialMenu _radialMenu;
 		private readonly PedestrianInteraction _pedestrianInteraction;
 
@@ -209,6 +209,12 @@ namespace Gta5EyeTracking
 	            _aiming = null;
             }
 
+			if (_freelook != null)
+			{
+				_freelook.Dispose();
+				_freelook = null;
+			}
+			
 			//Hids
 			if (_controllerEmulation != null)
 			{
