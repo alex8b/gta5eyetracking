@@ -371,6 +371,20 @@ namespace Gta5EyeTracking
 			};
 		}
 
+		public static Vector3 OffsetRotation(Vector3 rotation, double pitchDeg, double yawDeg)
+		{
+			var quaturnion = Quaternion.RotationYawPitchRoll((float) DegToRad(rotation.Z), (float) DegToRad(rotation.X),
+				(float) DegToRad(rotation.Y));
+
+			var extraRotation = Quaternion.RotationYawPitchRoll((float)DegToRad(yawDeg), (float)DegToRad(pitchDeg), 0);
+
+			var finalQuaturnion = quaturnion*extraRotation;
+
+			var result = new Vector3();			
+
+			return result;
+		}
+
 		public static Vector3 DirectionToRotation(Vector3 direction)
 		{
 			direction.Normalize();
