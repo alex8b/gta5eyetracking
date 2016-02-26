@@ -10,6 +10,12 @@ using Tobii.EyeX.Client;
 
 namespace Gta5EyeTracking.Features
 {
+	public struct AnimationName
+	{
+		public string Group;
+		public string Name;
+	}
+
 	public class Aiming: DisposableBase
 	{
     	public bool AlwaysShowCrosshair { get; set; }
@@ -27,6 +33,7 @@ namespace Gta5EyeTracking.Features
 
 		private bool _wasShootingLastFrame;
 		private bool _wasShootingThisFrame;
+		private AnimationName _lastAnimation;
 		public Aiming(Settings settings)
 		{
 			_settings = settings;
@@ -36,6 +43,7 @@ namespace Gta5EyeTracking.Features
 			_homingMissilesHelper = new HomingMissilesHelper();
 			_missileLockCrosshair = new MissileLockCrosshair();
 			_dotCrosshair = new DotCrosshair();
+			_lastAnimation = new AnimationName();
 		}
 
 	    protected override void DisposeManagedResources()
@@ -65,14 +73,21 @@ namespace Gta5EyeTracking.Features
 			{
 				if (!_wasShootingLastFrame)
 				{
-					Util.PlayAnimation(Game.Player.Character, "weapons@heavy@minigun", "fire_med", 8.0f, -1, false, 0, true);
+					_lastAnimation = new AnimationName();
+					_lastAnimation.Group = "weapons@heavy@minigun";
+					_lastAnimation.Name = "fire_med";
+					Util.PlayAnimation(Game.Player.Character, _lastAnimation.Group, _lastAnimation.Name, 8.0f, -1, false, 0, true);
 					//TODO select right animation
 				}
 
 				var dir = target - Game.Player.Character.Position;
 				var headingToTarget = Geometry.DirectionToRotation(dir).Z;
 				Util.SetPedShootsAtCoord(Game.Player.Character, target);
-				Game.Player.Character.Heading = headingToTarget;
+				if (!(Game.Player.Character.IsWalking
+					|| Game.Player.Character.IsRunning))
+				{
+					Game.Player.Character.Heading = headingToTarget;
+				}
 
 				_wasShootingThisFrame = true;
 			}
@@ -229,9 +244,11 @@ namespace Gta5EyeTracking.Features
             _homingMissilesHelper.Process();
 			_drawCrosshair = false;
 			_wasShootingLastFrame = _wasShootingThisFrame;
-			if (!_wasShootingLastFrame)
+			if (!_wasShootingLastFrame 
+				|| (Game.Player.Character.Weapons.Current.AmmoInClip == 0))
 			{
-				Game.Player.Character.Task.ClearAnimation("weapons@heavy@minigun", "fire_med");
+				Game.Player.Character.Task.ClearAnimation(_lastAnimation.Group, _lastAnimation.Name);
+				_lastAnimation = new AnimationName();
 			}
 			_wasShootingThisFrame = false;
 		}
