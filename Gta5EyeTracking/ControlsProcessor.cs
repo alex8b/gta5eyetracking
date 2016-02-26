@@ -29,11 +29,14 @@ namespace Gta5EyeTracking
 		private bool _isPaused;
 		private bool _isInVehicle;
 		private bool _isInAircraft;
+		private bool _isInRadialMenu;
 
 		private int _injectRightTrigger;
 		private bool _menuOpen;
 		private bool _shutDownRequestFlag;
-		private int _i;
+		private bool _isMeleeWeapon;
+		private bool _isThrowableWeapon;
+
 
 		public ControlsProcessor(Settings settings, 
 			ControllerEmulation controllerEmulation, 
@@ -70,8 +73,10 @@ namespace Gta5EyeTracking
 			_isPaused = Game.IsPaused;
 			_isInVehicle = Game.Player.Character.IsInVehicle();
 			_isInAircraft = Game.Player.Character.IsInPlane || Game.Player.Character.IsInHeli;
+			_isMeleeWeapon = Util.IsMelee(Game.Player.Character.Weapons.Current.Hash);
+			_isThrowableWeapon = Util.IsThrowable(Game.Player.Character.Weapons.Current.Hash);
 
-			_menuOpen = _menuPool.IsAnyMenuOpen();
+            _menuOpen = _menuPool.IsAnyMenuOpen();
 
 			var controllerState = _controllerEmulation.ControllerState;
 
@@ -90,7 +95,7 @@ namespace Gta5EyeTracking
 				_freelook.Process(gazePoint, ped, aspectRatio);
 			}
 
-			var radialMenuActive = (!Game.Player.Character.IsInVehicle()
+			_isInRadialMenu = (!Game.Player.Character.IsInVehicle()
 								&& controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder));
 
 			if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftThumb)
@@ -128,8 +133,10 @@ namespace Gta5EyeTracking
 
 				if (_settings.AimWithGazeEnabled
 					&& ((!_isInVehicle
+						&& !_isMeleeWeapon
+						&& !_isThrowableWeapon
 						&& ((!_menuOpen && User32.IsKeyPressed(VirtualKeyStates.VK_LBUTTON))
-							|| (!radialMenuActive && controllerState.Gamepad.RightTrigger > 0))
+							|| (!_isInRadialMenu && controllerState.Gamepad.RightTrigger > 0))
 							|| (Game.IsKeyPressed(Keys.B)))
 						|| (_isInVehicle
 							&& (!_menuOpen && User32.IsKeyPressed(VirtualKeyStates.VK_LBUTTON)))
@@ -195,7 +202,7 @@ namespace Gta5EyeTracking
 				if (_settings.MissilesAtGazeEnabled
 					&& (Game.IsKeyPressed(Keys.N)
 					|| Game.IsKeyPressed(Keys.PageDown)
-					|| (!radialMenuActive && !_menuOpen && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.B))))
+					|| (!_isInRadialMenu && !_menuOpen && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.B))))
 				{
 					if (missileTarget != null)
 					{
@@ -251,7 +258,13 @@ namespace Gta5EyeTracking
 					{
 						disableRightStick = true;
 					}
-					disableRightTrigger = true;
+					if (!_isPaused
+					    && !_isInRadialMenu
+						&& !_isMeleeWeapon
+						&& !_isThrowableWeapon)
+					{
+						disableRightTrigger = true;
+					}
 				}
 				if (_settings.MissilesAtGazeEnabled) disableB = true;
 				if (_settings.TaseAtGazeEnabled) disableRightShoulder = true;

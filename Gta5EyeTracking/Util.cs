@@ -75,15 +75,32 @@ namespace Gta5EyeTracking
 			Function.Call(Hash.TASK_PLAY_ANIM, inputArgumentArray4);
 		}
 
-		public static bool IsThrowable(Weapon weapon)
+		public static bool IsThrowable(WeaponHash hash)
 		{
-			return weapon.Hash == WeaponHash.Grenade
-					|| weapon.Hash == WeaponHash.Molotov
-					|| weapon.Hash == WeaponHash.SmokeGrenade
-					|| weapon.Hash == WeaponHash.Snowball;
+			return hash == WeaponHash.Grenade
+					|| hash == WeaponHash.Molotov
+					|| hash == WeaponHash.SmokeGrenade
+					|| hash == WeaponHash.Snowball
+					|| hash == WeaponHash.BZGas
+					|| hash == WeaponHash.PetrolCan
+					|| hash == WeaponHash.StickyBomb
+					|| hash == WeaponHash.ProximityMine;
 		}
 
-	    public static double GetTimeCoef()
+		public static bool IsMelee(WeaponHash hash)
+		{
+			return hash == WeaponHash.Unarmed
+					|| hash == WeaponHash.GolfClub
+					|| hash == WeaponHash.Bat
+					|| hash == WeaponHash.Dagger
+					|| hash == WeaponHash.Crowbar
+					|| hash == WeaponHash.FireExtinguisher
+					|| hash == WeaponHash.Hammer
+					|| hash == WeaponHash.Hatchet
+					|| hash == WeaponHash.Knife;
+		}
+
+		public static double GetTimeCoef()
 	    {
 	        return 1.0; // change in slow motion;
 	    }

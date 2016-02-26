@@ -492,7 +492,7 @@ namespace Gta5EyeTracking
 		{
 			direction.Normalize();
 
-			var x = Math.Atan2(direction.Z, direction.Y);
+			var x = Math.Atan2(direction.Z, Math.Sqrt(direction.Y * direction.Y + direction.X * direction.X));
 			var y = 0;
 			var z = -Math.Atan2(direction.X, direction.Y);
 
