@@ -282,10 +282,10 @@ namespace Gta5EyeTracking.Features
 
 		            //_lastGazePoint = gazeNormalizedCenterDelta;
 		            _lastTime = DateTime.UtcNow;
-		            var rotation = Game.Player.Character.Rotation;
+		            var rotation = GameplayCamera.Rotation;
 
-					World.RenderingCamera.Rotation = Geometry.OffsetRotation(rotation,
-			            -_relativePitchVehicle*_settings.FovExtensionVertical,
+					World.RenderingCamera.Rotation = Geometry.OffsetRotation(rotation, 
+						- _relativePitchVehicle*_settings.FovExtensionVertical,
 			            -_relativeHeadingVehicle*_settings.FovExtensionHorizontal);
 	            }
             }

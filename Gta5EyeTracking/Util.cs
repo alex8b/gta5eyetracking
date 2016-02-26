@@ -18,7 +18,7 @@ namespace Gta5EyeTracking
 		}
 
 
-		public static void PlayAnimation(Ped mPed, string animSet, string animName, float speed, int duration, [MarshalAs(UnmanagedType.U1)] bool lastAnimation, float playbackRate)
+		public static void PlayAnimation(Ped mPed, string animSet, string animName, float speed, int duration, [MarshalAs(UnmanagedType.U1)] bool lastAnimation, float playbackRate, bool loop)
 		{
 			var inputArgumentArray1 = new InputArgument[1];
 			InputArgument inputArgument1 = new InputArgument(animSet);
@@ -62,7 +62,7 @@ namespace Gta5EyeTracking
 			inputArgumentArray4[4] = inputArgument8;
 			var inputArgument9 = new InputArgument(duration);
 			inputArgumentArray4[5] = inputArgument9;
-			var inputArgument10 = new InputArgument(48);
+			var inputArgument10 = new InputArgument(loop ? 49 : 48);
 			inputArgumentArray4[6] = inputArgument10;
 			InputArgument inputArgument11 = new InputArgument(playbackRate);
 			inputArgumentArray4[7] = inputArgument11;

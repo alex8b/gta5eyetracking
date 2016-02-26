@@ -5,6 +5,7 @@ using Gta5EyeTracking.HomingMissiles;
 using GTA;
 using GTA.Math;
 using GTA.Native;
+using GTA.NaturalMotion;
 using Tobii.EyeX.Client;
 
 namespace Gta5EyeTracking.Features
@@ -24,6 +25,8 @@ namespace Gta5EyeTracking.Features
 		private readonly Settings _settings;
 	    private readonly HomingMissilesHelper _homingMissilesHelper;
 
+		private bool _wasShootingLastFrame;
+		private bool _wasShootingThisFrame;
 		public Aiming(Settings settings)
 		{
 			_settings = settings;
@@ -49,17 +52,29 @@ namespace Gta5EyeTracking.Features
 			if (Game.Player.Character.IsInVehicle())
 			{
 				var vehicle = Game.Player.Character.CurrentVehicle;
-				weaponPos += vehicle.Velocity * 0.06f;
+				weaponPos += vehicle.Velocity*0.06f;
+				var fireRateTime = TimeSpan.FromSeconds(0.2);
+				if (_shootStopWatch.Elapsed > fireRateTime)
+				{
+					World.ShootBullet(weaponPos, target, Game.Player.Character, new Model(Game.Player.Character.Weapons.Current.Hash),
+						1);
+					_shootStopWatch.Restart();
+				}
 			}
-
-			var fireRateTime = TimeSpan.FromSeconds(0.2);
-			if (_shootStopWatch.Elapsed > fireRateTime)
+			else
 			{
-				//Util.PlayAnimation(Game.Player.Character, "weapons@rifle@lo@smg", "fire_med", 8.0f, -1, false, 0);
-				//Game.Player.Character.Task.ClearAll();
-				//Game.Player.Character.Task.ShootAt(target, (int)fireRateTime.TotalMilliseconds + 50);
-				World.ShootBullet(weaponPos, target, Game.Player.Character, new Model(Game.Player.Character.Weapons.Current.Hash), 1);
-				_shootStopWatch.Restart();
+				if (!_wasShootingLastFrame)
+				{
+					Util.PlayAnimation(Game.Player.Character, "weapons@heavy@minigun", "fire_med", 8.0f, -1, false, 0, true);
+					//TODO select right animation
+				}
+
+				var dir = target - Game.Player.Character.Position;
+				var headingToTarget = Geometry.DirectionToRotation(dir).Z;
+				Util.SetPedShootsAtCoord(Game.Player.Character, target);
+				Game.Player.Character.Heading = headingToTarget;
+
+				_wasShootingThisFrame = true;
 			}
 		}
 
@@ -78,12 +93,9 @@ namespace Gta5EyeTracking.Features
 			var directionVector = (target - weaponPos);
 			directionVector.Normalize();
 			var shockPos = target - directionVector;
-
 			var fireRateTime = TimeSpan.FromSeconds(0.2);
 			if (_shootStopWatch.Elapsed > fireRateTime)
 			{
-				//Util.PlayAnimation(Game.Player.Character, "weapons@rifle@lo@smg", "fire_med", 8.0f, -1, false, 0);
-
 				World.ShootBullet(shockPos, target, Game.Player.Character, WeaponHash.StunGun, 1);
 				_shootStopWatch.Restart();
 			}
@@ -216,6 +228,12 @@ namespace Gta5EyeTracking.Features
 		    
             _homingMissilesHelper.Process();
 			_drawCrosshair = false;
+			_wasShootingLastFrame = _wasShootingThisFrame;
+			if (!_wasShootingLastFrame)
+			{
+				Game.Player.Character.Task.ClearAnimation("weapons@heavy@minigun", "fire_med");
+			}
+			_wasShootingThisFrame = false;
 		}
 
 	    public void MoveCrosshair(Vector2 screenCoords)

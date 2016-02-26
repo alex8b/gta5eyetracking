@@ -6,6 +6,7 @@ using Gta5EyeTracking.HidEmulation;
 using Gta5EyeTracking.Menu;
 using GTA;
 using GTA.Math;
+using GTA.Native;
 using NativeUI;
 using SharpDX.XInput;
 using Tobii.EyeX.Client;
@@ -32,6 +33,7 @@ namespace Gta5EyeTracking
 		private int _injectRightTrigger;
 		private bool _menuOpen;
 		private bool _shutDownRequestFlag;
+		private int _i;
 
 		public ControlsProcessor(Settings settings, 
 			ControllerEmulation controllerEmulation, 
@@ -133,12 +135,7 @@ namespace Gta5EyeTracking
 							&& (!_menuOpen && User32.IsKeyPressed(VirtualKeyStates.VK_LBUTTON)))
 						))
 				{
-					Util.SetPedShootsAtCoord(Game.Player.Character, shootCoord);
-					
-					//var dir = shootCoord - Game.Player.Character.Position;
-					//var headingToTarget = Geometry.DirectionToRotation(dir).Z;
-					//Game.Player.Character.Heading = headingToTarget;
-					//Game.Player.Character.Rotation = new Vector3(Game.Player.Character.Rotation.X, Game.Player.Character.Rotation.Y, headingToTarget);
+					_aiming.Shoot(shootCoord);
 				}
 
 				if ((_settings.MissilesAtGazeEnabled
@@ -228,6 +225,7 @@ namespace Gta5EyeTracking
 			var disableLeftThumb = false;
 			var disableRightStick = false;
 			var disableStart = false;
+			var disableRightTrigger = false;
 
 			if (_isInVehicle)
 			{
@@ -253,6 +251,7 @@ namespace Gta5EyeTracking
 					{
 						disableRightStick = true;
 					}
+					disableRightTrigger = true;
 				}
 				if (_settings.MissilesAtGazeEnabled) disableB = true;
 				if (_settings.TaseAtGazeEnabled) disableRightShoulder = true;
@@ -277,6 +276,11 @@ namespace Gta5EyeTracking
 			if (_injectRightTrigger > 0)
 			{
 				state.Gamepad.RightTrigger = 255;
+			}
+
+			if (disableRightTrigger)
+			{
+				state.Gamepad.RightTrigger = 0;
 			}
 
 			if (disableStart && state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.Start))
