@@ -79,8 +79,8 @@ namespace Gta5EyeTracking.Features
 			{
 				_controllerEmulation.DeltaX = 0;
 				_controllerEmulation.DeltaY = 0;
-				_mouseEmulation.DeltaX = deltaX * _freelookVelocityPixelsPerSec * 0.05; //deltaTime?
-				_mouseEmulation.DeltaY = deltaY * _freelookVelocityPixelsPerSec * 0.05;
+				_mouseEmulation.DeltaX = deltaX * _freelookVelocityPixelsPerSec * 0.05; //timeDelta.TotalSeconds
+                _mouseEmulation.DeltaY = deltaY * _freelookVelocityPixelsPerSec * 0.05;  //timeDelta.TotalSeconds
 			}
 		}
 
@@ -328,6 +328,9 @@ namespace Gta5EyeTracking.Features
 			var time = DateTime.UtcNow;
 			_timeDelta = time - _lastTime;
 			_lastTime = time;
+			var aimingWithMouse = User32.IsKeyPressed(VirtualKeyStates.VK_LBUTTON)
+							|| User32.IsKeyPressed(VirtualKeyStates.VK_RBUTTON);
+
 			if (Game.Player.Character.IsInVehicle())
 			{
 				//vehicle
@@ -349,7 +352,11 @@ namespace Gta5EyeTracking.Features
 					if (GameplayCamera.IsAimCamActive)
 					{
 						//fps aim
-						FirstPersonAimFreelook(gazeNormalizedCenterDelta, ped, aspectRatio);
+						
+						if (!aimingWithMouse)
+						{
+							FirstPersonAimFreelook(gazeNormalizedCenterDelta, ped, aspectRatio);
+						}		
 					}
 					else
 					{
@@ -364,7 +371,10 @@ namespace Gta5EyeTracking.Features
 						if (GameplayCamera.IsAimCamActive)
 						{
 							//aim
-							ThirdPersonAimFreelook(gazeNormalizedCenterDelta, ped, aspectRatio);
+							if (!aimingWithMouse)
+							{
+								ThirdPersonAimFreelook(gazeNormalizedCenterDelta, ped, aspectRatio);
+							}
 						}
 						else
 						{
@@ -407,21 +417,30 @@ namespace Gta5EyeTracking.Features
 				var velocity = 3;
 				var deltaX = -deltaHeading * velocity * (float)_timeDelta.TotalSeconds;
 				var deltaY = -deltaPitch * velocity * (float)_timeDelta.TotalSeconds;
-				if ((_lastDeltaX != 0) 
-					&& (Math.Sign(_lastDeltaX) != Math.Sign(deltaX)))
+				var emulateDeltaX = deltaX;
+				var emulateDeltaY = deltaY;
+				if ((Math.Abs(_lastDeltaX) > float.Epsilon)
+				    && (Math.Sign(_lastDeltaX) != Math.Sign(deltaX)))
 				{
-					deltaX = 0;
+					emulateDeltaX = 0;
 				}
-				if ((_lastDeltaY != 0)
+				else
+				{
+					_lastDeltaX = deltaX;
+				}
+				if ((Math.Abs(_lastDeltaY) > float.Epsilon)
 					&& (Math.Sign(_lastDeltaY) != Math.Sign(deltaY)))
 				{
-					deltaY = 0;
+					emulateDeltaY = 0;
 				}
-				EmulateHid(deltaX, deltaY);
-				_lastDeltaX = deltaX;
-				_lastDeltaY = deltaY;
+				else
+				{
+					_lastDeltaY = deltaY;
+				}
+				EmulateHid(emulateDeltaX, emulateDeltaY);
 				return true;
 			}
+			
 			_lastDeltaX = 0;
 			_lastDeltaY = 0;
 			return false;

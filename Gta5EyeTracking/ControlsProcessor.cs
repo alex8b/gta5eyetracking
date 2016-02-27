@@ -142,7 +142,7 @@ namespace Gta5EyeTracking
 				{
 					if (!_lastAimCameraAtTarget)
 					{
-						_freelook.AimCameraAtTarget(shootCoord);
+						_freelook.AimCameraAtTarget(shootCoordSnap);
 					}
 					_lastAimCameraAtTarget = true;
 				}
@@ -153,7 +153,8 @@ namespace Gta5EyeTracking
 
 				//If you use mouse - shoot in the middle of the screen
 				if (!_isInVehicle
-					&& User32.IsKeyPressed(VirtualKeyStates.VK_LBUTTON))
+					&& (User32.IsKeyPressed(VirtualKeyStates.VK_LBUTTON)
+                        || User32.IsKeyPressed(VirtualKeyStates.VK_RBUTTON)))
 				{
 					Vector3 camPoint;
 					Geometry.ScreenRelToWorld(new Vector2(0, 0), out camPoint, out shootCoord);
