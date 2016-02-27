@@ -225,10 +225,14 @@ namespace Gta5EyeTracking.Features
 			_lastTime = time;
 			var isMeleeWeapon = Util.IsMelee(Game.Player.Character.Weapons.Current.Hash);
 			var isThrowableWeapon = Util.IsThrowable(Game.Player.Character.Weapons.Current.Hash);
+			var isSniperWeaponAndZoomed = Util.IsSniper(Game.Player.Character.Weapons.Current.Hash)
+                && (GameplayCamera.IsFirstPersonAimCamActive);
+
 			if ((_settings.AimWithGazeEnabled 
 					&& GameplayCamera.IsAimCamActive
 					&& !isMeleeWeapon
-					&& !isThrowableWeapon)
+					&& !isThrowableWeapon
+					&& !isSniperWeaponAndZoomed)
                 || AlwaysShowCrosshair)
             {
 				_drawCrosshair = true;

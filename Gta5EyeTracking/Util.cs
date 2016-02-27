@@ -47,26 +47,41 @@ namespace Gta5EyeTracking
 		public static bool IsThrowable(WeaponHash hash)
 		{
 			return hash == WeaponHash.Grenade
-					|| hash == WeaponHash.Molotov
-					|| hash == WeaponHash.SmokeGrenade
-					|| hash == WeaponHash.Snowball
-					|| hash == WeaponHash.BZGas
-					|| hash == WeaponHash.PetrolCan
-					|| hash == WeaponHash.StickyBomb
-					|| hash == WeaponHash.ProximityMine;
+				|| hash == WeaponHash.StickyBomb
+				|| hash == WeaponHash.ProximityMine
+				|| hash == WeaponHash.SmokeGrenade //Tear Gas
+				|| hash == WeaponHash.BZGas
+				|| hash == WeaponHash.Molotov
+				|| hash == WeaponHash.FireExtinguisher
+				|| hash == WeaponHash.PetrolCan
+				|| hash == WeaponHash.Snowball
+				;
 		}
 
 		public static bool IsMelee(WeaponHash hash)
 		{
 			return hash == WeaponHash.Unarmed
-					|| hash == WeaponHash.GolfClub
-					|| hash == WeaponHash.Bat
-					|| hash == WeaponHash.Dagger
-					|| hash == WeaponHash.Crowbar
-					|| hash == WeaponHash.FireExtinguisher
-					|| hash == WeaponHash.Hammer
-					|| hash == WeaponHash.Hatchet
-					|| hash == WeaponHash.Knife;
+				|| hash == WeaponHash.Knife
+				|| hash == WeaponHash.Nightstick
+				|| hash == WeaponHash.Hammer				
+				|| hash == WeaponHash.Bat
+				|| hash == WeaponHash.Crowbar
+				|| hash == WeaponHash.GolfClub
+				|| hash == WeaponHash.Dagger
+				|| hash == WeaponHash.Hatchet
+				|| hash == WeaponHash.KnuckleDuster
+				//|| hash == WeaponHash.Machete
+				//|| hash == WeaponHash.Flashlight
+				//|| hash == WeaponHash.Blade
+				;
+		}
+
+		public static bool IsSniper(WeaponHash hash)
+		{
+			return hash == WeaponHash.SniperRifle
+			    || hash == WeaponHash.HeavySniper
+				|| hash == WeaponHash.MarksmanRifle
+				   ;
 		}
 
 		public static double GetTimeCoef()
@@ -188,5 +203,5 @@ namespace Gta5EyeTracking
             }
 
         }
-    }
+	}
 }
