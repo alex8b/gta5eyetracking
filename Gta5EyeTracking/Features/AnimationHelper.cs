@@ -105,7 +105,7 @@ namespace Gta5EyeTracking.Features
 				var animation = new AnimationName();
 				animation.Group = "random@mugging3";
 				animation.Name = "handsup_standing_base";
-				Util.PlayAnimation(Game.Player.Character, animation.Group, animation.Name, 20.0f, -1, false, 0, true);
+				Util.PlayAnimation(Game.Player.Character, animation.Group, animation.Name, 40.0f, -1, false, 0, true);
 				_lastAnimation = animation;
 			}
 			_wasPlayingAnimationThisFrame = true;

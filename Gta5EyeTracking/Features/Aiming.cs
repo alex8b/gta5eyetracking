@@ -66,28 +66,34 @@ namespace Gta5EyeTracking.Features
 			else
 			{
 				var dir = target - Game.Player.Character.GetBoneCoord(Bone.SKEL_R_Hand);
-				var headingToTarget = Geometry.DirectionToRotation(dir).Z;
 				var pitchToTarget = Geometry.DirectionToRotation(dir).X;
 
 				_animationHelper.PlayShootingAnimation(pitchToTarget);
 
 				Util.SetPedShootsAtCoord(Game.Player.Character, target);
-				if (!(Game.Player.Character.IsWalking
-					|| Game.Player.Character.IsRunning)
-					&& dir.Length() > 1.5)
+				RotatePlayerCharacterTowardsTarget(target);
+			}
+		}
+
+		private void RotatePlayerCharacterTowardsTarget(Vector3 target)
+		{
+			var dir = target - Game.Player.Character.GetBoneCoord(Bone.SKEL_R_Hand);
+			var headingToTarget = Geometry.DirectionToRotation(dir).Z;
+			if (!(Game.Player.Character.IsWalking
+			      || Game.Player.Character.IsRunning)
+			    && dir.Length() > 1.5)
+			{
+				var dist = headingToTarget - Game.Player.Character.Heading;
+				if (dist > 180)
 				{
-					var dist = headingToTarget - Game.Player.Character.Heading;
-					if (dist > 180)
-					{
-						dist = dist - 360;
-					}
-					if (dist < -180)
-					{
-						dist = dist + 360;
-					}
-					var velocity = 6;
-					Game.Player.Character.Heading += dist * velocity * (float)_timeDelta.TotalSeconds;
+					dist = dist - 360;
 				}
+				if (dist < -180)
+				{
+					dist = dist + 360;
+				}
+				var velocity = 6;
+				Game.Player.Character.Heading += dist*velocity*(float) _timeDelta.TotalSeconds;
 			}
 		}
 
@@ -134,7 +140,9 @@ namespace Gta5EyeTracking.Features
 				//World.ShootBullet(weaponPos, target, Game.Player.Character, WeaponHash.HomingLauncher, 1);
                 _homingMissilesHelper.Launch(target);
 				_shootStopWatch.Restart();
+				
 			}
+			RotatePlayerCharacterTowardsTarget(target);
 			_animationHelper.PlayMindControlAnimation();
 		}
 		private static Vector3 PutAboveGround(Vector3 shootMissileCoord)
@@ -176,6 +184,7 @@ namespace Gta5EyeTracking.Features
                 _homingMissilesHelper.Launch(target);
                 _shootStopWatch.Restart();
 			}
+			RotatePlayerCharacterTowardsTarget(target.Position);
 			_animationHelper.PlayMindControlAnimation();
         }
 
@@ -255,7 +264,7 @@ namespace Gta5EyeTracking.Features
 		    {
 			    _missileLockCrosshair.Render();
             }
-		    
+
             _homingMissilesHelper.Process();
 			_drawCrosshair = false;
 		}

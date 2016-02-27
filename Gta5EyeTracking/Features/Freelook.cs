@@ -24,9 +24,13 @@ namespace Gta5EyeTracking.Features
 	    private double _relativeHeadingVehicle;
         private double _relativePitchVehicle;
 		private Camera _freelookCamera;
-		//private Vector2 _lastGazePoint;
-		private DateTime _lastTime;
 
+		private DateTime _lastTime;
+		private TimeSpan _timeDelta;
+		private Vector3 _lastAimCameraTarget;
+		private DateTime _lastAimCameraAtTargetTime;
+		private float _lastDeltaX;
+		private float _lastDeltaY;
 
 		public Freelook(ControllerEmulation controllerEmulation,
 			MouseEmulation mouseEmulation,
@@ -321,6 +325,9 @@ namespace Gta5EyeTracking.Features
 
 		public void Process(Vector2 gazeNormalizedCenterDelta, Ped ped, double aspectRatio)
 		{
+			var time = DateTime.UtcNow;
+			_timeDelta = time - _lastTime;
+			_lastTime = time;
 			if (Game.Player.Character.IsInVehicle())
 			{
 				//vehicle
@@ -352,18 +359,72 @@ namespace Gta5EyeTracking.Features
 				}
 				else
 				{
-					if (GameplayCamera.IsAimCamActive)
+					if (!ProcessAimCameraAtTarget())
 					{
-						//aim
-						ThirdPersonAimFreelook(gazeNormalizedCenterDelta, ped, aspectRatio);
-					}
-					else
-					{
-						//normal
-						ThirdPersonFreelook(gazeNormalizedCenterDelta, aspectRatio);
+						if (GameplayCamera.IsAimCamActive)
+						{
+							//aim
+							ThirdPersonAimFreelook(gazeNormalizedCenterDelta, ped, aspectRatio);
+						}
+						else
+						{
+							//normal
+							ThirdPersonFreelook(gazeNormalizedCenterDelta, aspectRatio);
+						}
 					}
 				}
+				
 			}
+		}
+
+		public void AimCameraAtTarget(Vector3 target)
+		{
+			_lastAimCameraAtTargetTime = DateTime.UtcNow;
+			_lastAimCameraTarget = target;
+		}
+
+		private bool ProcessAimCameraAtTarget()
+		{
+			var timeSince = DateTime.UtcNow - _lastAimCameraAtTargetTime;
+			if (timeSince > TimeSpan.FromSeconds(0)
+				&& timeSince < TimeSpan.FromSeconds(1))
+			{
+				var dir = _lastAimCameraTarget - GameplayCamera.Position;
+				var headingToTarget = Geometry.DirectionToRotation(dir).Z;
+				var pitchToTarget = Geometry.DirectionToRotation(dir).X;
+				var pitch = GameplayCamera.Rotation.X;
+				var deltaHeading = headingToTarget - (Game.Player.Character.Heading + GameplayCamera.RelativeHeading);
+				var deltaPitch = pitchToTarget - pitch;
+				if (deltaHeading > 180)
+				{
+					deltaHeading = deltaHeading - 360;
+				}
+				if (deltaHeading < -180)
+				{
+					deltaHeading = deltaHeading + 360;
+				}
+
+				var velocity = 3;
+				var deltaX = -deltaHeading * velocity * (float)_timeDelta.TotalSeconds;
+				var deltaY = -deltaPitch * velocity * (float)_timeDelta.TotalSeconds;
+				if ((_lastDeltaX != 0) 
+					&& (Math.Sign(_lastDeltaX) != Math.Sign(deltaX)))
+				{
+					deltaX = 0;
+				}
+				if ((_lastDeltaY != 0)
+					&& (Math.Sign(_lastDeltaY) != Math.Sign(deltaY)))
+				{
+					deltaY = 0;
+				}
+				EmulateHid(deltaX, deltaY);
+				_lastDeltaX = deltaX;
+				_lastDeltaY = deltaY;
+				return true;
+			}
+			_lastDeltaX = 0;
+			_lastDeltaY = 0;
+			return false;
 		}
 
 		public void Dispose()

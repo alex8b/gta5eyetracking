@@ -22,6 +22,7 @@ namespace Gta5EyeTracking
 		private readonly RadialMenu _radialMenu;
 		private readonly SettingsMenu _settingsMenu;
 		private readonly MenuPool _menuPool;
+		private readonly GazeProjector _gazeProjector;
 		private DateTime _lastTickTime;
 		private readonly DebugOutput _debugOutput;
 
@@ -37,6 +38,7 @@ namespace Gta5EyeTracking
 		private bool _isMeleeWeapon;
 		private bool _isThrowableWeapon;
 		private bool _isSniperWeaponAndZoomed;
+		private bool _lastAimCameraAtTarget;
 
 
 		public ControlsProcessor(Settings settings, 
@@ -129,6 +131,35 @@ namespace Gta5EyeTracking
 				_injectRightTrigger = injectRightTrigger;
 
 				if (_settings.AimWithGazeEnabled
+				    && ((!_isInVehicle
+				         && !_isMeleeWeapon
+				         && !_isThrowableWeapon
+				         && !_isSniperWeaponAndZoomed
+				         && ((!_isInRadialMenu && controllerState.Gamepad.LeftTrigger > 0)
+				             || User32.IsKeyPressed(VirtualKeyStates.VK_RBUTTON)
+					         )
+					    )))
+				{
+					if (!_lastAimCameraAtTarget)
+					{
+						_freelook.AimCameraAtTarget(shootCoord);
+					}
+					_lastAimCameraAtTarget = true;
+				}
+				else
+				{
+					_lastAimCameraAtTarget = false;
+				}
+
+				//If you use mouse - shoot in the middle of the screen
+				if (!_isInVehicle
+					&& User32.IsKeyPressed(VirtualKeyStates.VK_LBUTTON))
+				{
+					Vector3 camPoint;
+					Geometry.ScreenRelToWorld(new Vector2(0, 0), out camPoint, out shootCoord);
+				}
+
+				if (_settings.AimWithGazeEnabled
 					&& ((!_isInVehicle
 							&& !_isMeleeWeapon
 							&& !_isThrowableWeapon
@@ -149,6 +180,8 @@ namespace Gta5EyeTracking
 				{
 					_aiming.Shoot(shootCoord);
 				}
+
+
 
 				if ((_settings.MissilesAtGazeEnabled
 						&& Game.Player.Character.IsInVehicle())
@@ -184,7 +217,7 @@ namespace Gta5EyeTracking
 						|| Game.IsKeyPressed(Keys.PageDown)
 						|| (!_isInAircraft && !_menuOpen && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.RightShoulder))))
 				{
-					_aiming.Tase(shootCoordSnap);
+                    _aiming.Tase(shootCoordSnap);
 				}
 
 				if (Game.IsKeyPressed(Keys.U))

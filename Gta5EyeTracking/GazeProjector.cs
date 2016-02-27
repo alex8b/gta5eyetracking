@@ -21,7 +21,7 @@ namespace Gta5EyeTracking
 		}
 
 		private int _frameSkip = 0;
-		private int _maxSkipFrames = 3;
+		private int _maxSkipFrames = 4;
 		private Ped _lastPed = null;
 		private Vehicle _lastVehicle = null;
 
