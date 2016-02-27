@@ -118,7 +118,10 @@ namespace Gta5EyeTracking.Features
 				World.ShootBullet(shockPos, target, Game.Player.Character, WeaponHash.StunGun, 1);
 				_shootStopWatch.Restart();				
 			}
-			_animationHelper.PlayMindControlAnimation();
+			if (!Game.Player.Character.IsInVehicle())
+			{
+				_animationHelper.PlayMindControlAnimation();
+			}
 		}
 
 		public void ShootMissile(Vector3 target)
@@ -142,8 +145,11 @@ namespace Gta5EyeTracking.Features
 				_shootStopWatch.Restart();
 				
 			}
-			RotatePlayerCharacterTowardsTarget(target);
-			_animationHelper.PlayMindControlAnimation();
+			if (!Game.Player.Character.IsInVehicle())
+			{
+				RotatePlayerCharacterTowardsTarget(target);
+				_animationHelper.PlayMindControlAnimation();
+			}
 		}
 		private static Vector3 PutAboveGround(Vector3 shootMissileCoord)
 		{
@@ -184,16 +190,22 @@ namespace Gta5EyeTracking.Features
                 _homingMissilesHelper.Launch(target);
                 _shootStopWatch.Restart();
 			}
-			RotatePlayerCharacterTowardsTarget(target.Position);
-			_animationHelper.PlayMindControlAnimation();
-        }
+			if (!Game.Player.Character.IsInVehicle())
+			{
+				RotatePlayerCharacterTowardsTarget(target.Position);
+				_animationHelper.PlayMindControlAnimation();
+			}
+		}
 
 		public void Incinerate(Vector3 target)
 		{
 			//var dist = (target - Game.Player.Character.Position).Length();
 			//if (dist > 3)
 			World.AddExplosion(target, ExplosionType.Molotov1, 2, 0);
-			_animationHelper.PlayMindControlAnimation();
+			if (!Game.Player.Character.IsInVehicle())
+			{
+				_animationHelper.PlayMindControlAnimation();
+			}
 		}
 
 		public void Water(Vector3 target)
@@ -203,7 +215,10 @@ namespace Gta5EyeTracking.Features
 			if (dist > 3)
 			{
 				World.AddExplosion(target, ExplosionType.WaterHydrant, 2, 0);
-				_animationHelper.PlayMindControlAnimation();
+				if (!Game.Player.Character.IsInVehicle())
+				{
+					_animationHelper.PlayMindControlAnimation();
+				}
 			}
 		}
 

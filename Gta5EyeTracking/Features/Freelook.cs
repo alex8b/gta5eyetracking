@@ -250,42 +250,36 @@ namespace Gta5EyeTracking.Features
 			if (_settings.FirstPersonFreelookDrivingEnabled)
             {
 				World.RenderingCamera = _freelookCamera;
-	            var timeDelta = DateTime.UtcNow - _lastTime;
+
 	            if (!IsInFixedDeadzone(gazeNormalizedCenterDelta, aspectRatio))
 	            {
-		            if (timeDelta < TimeSpan.FromMilliseconds(1000))
-		            {
-			            var freelookDeltaVector = new Vector2((float) (gazeNormalizedCenterDelta.X - _relativeHeadingVehicle),
-				            (float) (gazeNormalizedCenterDelta.Y - _relativePitchVehicle));
+			        var freelookDeltaVector = new Vector2((float) (gazeNormalizedCenterDelta.X - _relativeHeadingVehicle),
+				        (float) (gazeNormalizedCenterDelta.Y - _relativePitchVehicle));
 
-			            //var deadzoneWidth = _settings.FirstPersonDeadZoneWidthDriving;
-			            //var deadzoneHeight = _settings.FirstPersonDeadZoneHeightDriving;
-			            //if (!(Math.Abs(freelookDeltaVector.X) <= deadzoneWidth))
-			            //{
-			            deltaX = (freelookDeltaVector.X /*- Math.Sign(freelookDeltaVector.X) * deadzoneWidth*/)*
-								SensitivityTransform(freelookDeltaVector.Length());
-			            //}
+			        //var deadzoneWidth = _settings.FirstPersonDeadZoneWidthDriving;
+			        //var deadzoneHeight = _settings.FirstPersonDeadZoneHeightDriving;
+			        //if (!(Math.Abs(freelookDeltaVector.X) <= deadzoneWidth))
+			        //{
+			        deltaX = (freelookDeltaVector.X /*- Math.Sign(freelookDeltaVector.X) * deadzoneWidth*/)*
+							SensitivityTransform(freelookDeltaVector.Length());
+			        //}
 
-			            //if (!(Math.Abs(freelookDeltaVector.Y) <= deadzoneHeight))
-			            //{
-			            deltaY = (freelookDeltaVector.Y /*- Math.Sign(freelookDeltaVector.Y) * deadzoneHeight*/)*
-								SensitivityTransform(freelookDeltaVector.Length());
-			            //}
+			        //if (!(Math.Abs(freelookDeltaVector.Y) <= deadzoneHeight))
+			        //{
+			        deltaY = (freelookDeltaVector.Y /*- Math.Sign(freelookDeltaVector.Y) * deadzoneHeight*/)*
+							SensitivityTransform(freelookDeltaVector.Length());
+			        //}
 
 
-			            _relativeHeadingVehicle += deltaX*timeDelta.TotalSeconds*_freelookVelocityCam;
-			            _relativeHeadingVehicle = _relativeHeadingVehicle.Clamp(-1, 1);
+			        _relativeHeadingVehicle += deltaX*_timeDelta.TotalSeconds*_freelookVelocityCam;
+			        _relativeHeadingVehicle = _relativeHeadingVehicle.Clamp(-1, 1);
 
-			            _relativePitchVehicle += deltaY*timeDelta.TotalSeconds*_freelookVelocityCam;
-			            _relativePitchVehicle = _relativePitchVehicle.Clamp(-1, 1);
-		            }
-		            else
-		            {
-						_freelookCamera.AttachTo(Game.Player.Character, (int)Bone.SKEL_Neck_1, new Vector3(0, 0.2f, 0.2f));
-					}
+			        _relativePitchVehicle += deltaY*_timeDelta.TotalSeconds*_freelookVelocityCam;
+			        _relativePitchVehicle = _relativePitchVehicle.Clamp(-1, 1);
+
+					_freelookCamera.AttachTo(Game.Player.Character, (int)Bone.SKEL_Neck_1, new Vector3(0, 0.2f, 0.2f));
 
 		            //_lastGazePoint = gazeNormalizedCenterDelta;
-		            _lastTime = DateTime.UtcNow;
 		            var rotation = GameplayCamera.Rotation;
 
 					World.RenderingCamera.Rotation = Geometry.OffsetRotation(rotation, 
