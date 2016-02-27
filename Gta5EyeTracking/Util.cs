@@ -70,9 +70,9 @@ namespace Gta5EyeTracking
 				|| hash == WeaponHash.Dagger
 				|| hash == WeaponHash.Hatchet
 				|| hash == WeaponHash.KnuckleDuster
-				//|| hash == WeaponHash.Machete
-				//|| hash == WeaponHash.Flashlight
-				//|| hash == WeaponHash.Blade
+				|| hash == WeaponHash.Machete
+				|| hash == WeaponHash.Flashlight
+				|| hash == WeaponHash.SwitchBlade
 				;
 		}
 
@@ -81,7 +81,8 @@ namespace Gta5EyeTracking
 			return hash == WeaponHash.SniperRifle
 			    || hash == WeaponHash.HeavySniper
 				|| hash == WeaponHash.MarksmanRifle
-				   ;
+				|| hash == WeaponHash.HomingLauncher //special
+				;
 		}
 
 		public static double GetTimeCoef()
