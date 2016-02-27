@@ -317,7 +317,7 @@ namespace Gta5EyeTracking
 
 			//Util.Log("4 - " + DateTime.UtcNow.Ticks);
 
-			_aiming.Process();
+			
 			_animationHelper.Process();
 			//Util.Log("5 - " + DateTime.UtcNow.Ticks);
 

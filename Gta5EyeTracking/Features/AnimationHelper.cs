@@ -48,6 +48,8 @@ namespace Gta5EyeTracking.Features
 			{
 				animation.Name = "fire_med";
 			}
+
+			animation.Group = "weapons@rifle@hi@";
 			//Heavy
 			if (hash == WeaponHash.GrenadeLauncher)
 			{
@@ -207,8 +209,7 @@ namespace Gta5EyeTracking.Features
 			{
 				animation.Group = "weapons@rifle@hi@sniper_rifle";
 			}
-
-			animation.Group = "weapons@rifle@hi@";
+			
 			return animation;
 		}
 

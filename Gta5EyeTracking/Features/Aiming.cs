@@ -75,6 +75,30 @@ namespace Gta5EyeTracking.Features
 			}
 		}
 
+		public void ShootBullet(Vector3 target)
+		{
+			_drawCrosshair = true;
+			var weaponPos = Game.Player.Character.Position;
+
+			//take velocity into account
+			if (Game.Player.Character.IsInVehicle())
+			{
+				var vehicle = Game.Player.Character.CurrentVehicle;
+				weaponPos += vehicle.Velocity * 0.06f;
+			}
+
+			var fireRateTime = TimeSpan.FromSeconds(0.2);
+			if (_shootStopWatch.Elapsed > fireRateTime)
+			{
+				World.ShootBullet(weaponPos, target, Game.Player.Character, Game.Player.Character.Weapons.Current.Hash, 1);
+				_shootStopWatch.Restart();
+			}
+			if (!Game.Player.Character.IsInVehicle())
+			{
+				_animationHelper.PlayMindControlAnimation();
+			}
+		}
+
 		private void RotatePlayerCharacterTowardsTarget(Vector3 target)
 		{
 			var dir = target - Game.Player.Character.GetBoneCoord(Bone.SKEL_R_Hand);
@@ -242,7 +266,7 @@ namespace Gta5EyeTracking.Features
 			}
 		}
 
-		public void Process()
+		public void Process(bool isInRadialMenu)
 		{
 			var time = DateTime.UtcNow;
 			_timeDelta = time - _lastTime;
@@ -252,11 +276,13 @@ namespace Gta5EyeTracking.Features
 			var isSniperWeaponAndZoomed = Util.IsSniper(Game.Player.Character.Weapons.Current.Hash)
                 && (GameplayCamera.IsFirstPersonAimCamActive);
 
+
 			if ((_settings.AimWithGazeEnabled 
 					&& GameplayCamera.IsAimCamActive
 					&& !isMeleeWeapon
 					&& !isThrowableWeapon
-					&& !isSniperWeaponAndZoomed)
+					&& !isSniperWeaponAndZoomed
+					&& !isInRadialMenu)
                 || AlwaysShowCrosshair)
             {
 				_drawCrosshair = true;
