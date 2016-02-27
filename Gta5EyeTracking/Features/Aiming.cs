@@ -9,13 +9,14 @@ using Tobii.EyeX.Client;
 
 namespace Gta5EyeTracking.Features
 {
-	public struct AnimationName
+	public class AnimationName
 	{
 		public string Group;
 		public string Name;
 
 		public bool Equals(AnimationName other)
 		{
+			if (other == null) return false;
 			return string.Equals(Group, other.Group) && string.Equals(Name, other.Name);
 		}
 
@@ -43,8 +44,8 @@ namespace Gta5EyeTracking.Features
 		private readonly Settings _settings;
 	    private readonly HomingMissilesHelper _homingMissilesHelper;
 
-		private bool _wasShootingLastFrame;
-		private bool _wasShootingThisFrame;
+		private bool _wasPlayingAnimationLastFrame;
+		private bool _wasPlayingAnimationThisFrame;
 		private AnimationName _lastAnimation;
 		public Aiming(Settings settings)
 		{
@@ -119,7 +120,7 @@ namespace Gta5EyeTracking.Features
 				var headingToTarget = Geometry.DirectionToRotation(dir).Z;
 				var pitchToTarget = Geometry.DirectionToRotation(dir).X;
 
-				var animation = _lastAnimation;
+				var animation = new AnimationName();
 				animation.Group = GetWeaponGroup(Game.Player.Character.Weapons.Current.Hash);
 				if (pitchToTarget < -45)
 				{
@@ -133,11 +134,14 @@ namespace Gta5EyeTracking.Features
 				{
 					animation.Name = "fire_med";
 				}
-				if ((!_wasShootingLastFrame
+				if ((!_wasPlayingAnimationLastFrame
 						|| !animation.Equals(_lastAnimation))
 					&& (Game.Player.Character.Weapons.Current.AmmoInClip > 0))
 				{
-					Game.Player.Character.Task.ClearAnimation(_lastAnimation.Group, _lastAnimation.Name);
+					if (_lastAnimation != null)
+					{
+						Game.Player.Character.Task.ClearAnimation(_lastAnimation.Group, _lastAnimation.Name);
+					}
 					Util.PlayAnimation(Game.Player.Character, animation.Group, animation.Name, 8.0f, -1, false, 0, true);
 					_lastAnimation = animation;
 				}
@@ -150,12 +154,13 @@ namespace Gta5EyeTracking.Features
 					Game.Player.Character.Heading = headingToTarget;
 				}
 
-				_wasShootingThisFrame = true;
+				_wasPlayingAnimationThisFrame = true;
 			}
 		}
 
 		public void Tase(Vector3 target)
 		{
+			
 			_drawCrosshair = true;
 			var weaponPos = Game.Player.Character.Position;
 
@@ -173,8 +178,9 @@ namespace Gta5EyeTracking.Features
 			if (_shootStopWatch.Elapsed > fireRateTime)
 			{
 				World.ShootBullet(shockPos, target, Game.Player.Character, WeaponHash.StunGun, 1);
-				_shootStopWatch.Restart();
+				_shootStopWatch.Restart();				
 			}
+			PlayMindControlAnimation();
 		}
 
 		public void ShootMissile(Vector3 target)
@@ -197,6 +203,7 @@ namespace Gta5EyeTracking.Features
                 _homingMissilesHelper.Launch(target);
 				_shootStopWatch.Restart();
 			}
+			PlayMindControlAnimation();
 		}
 		private static Vector3 PutAboveGround(Vector3 shootMissileCoord)
 		{
@@ -236,16 +243,16 @@ namespace Gta5EyeTracking.Features
                 //World.ShootBullet(weaponPos, target, Game.Player.Character, WeaponHash.HomingLauncher, 1);
                 _homingMissilesHelper.Launch(target);
                 _shootStopWatch.Restart();
-            }
+			}
+			PlayMindControlAnimation();
         }
 
 		public void Incinerate(Vector3 target)
 		{
 			//var dist = (target - Game.Player.Character.Position).Length();
 			//if (dist > 3)
-			{
-				World.AddExplosion(target, ExplosionType.Molotov1, 2, 0);
-			}
+			World.AddExplosion(target, ExplosionType.Molotov1, 2, 0);
+			PlayMindControlAnimation();
 		}
 
 		public void Water(Vector3 target)
@@ -255,7 +262,23 @@ namespace Gta5EyeTracking.Features
 			if (dist > 3)
 			{
 				World.AddExplosion(target, ExplosionType.WaterHydrant, 2, 0);
+				PlayMindControlAnimation();
 			}
+		}
+
+		private void PlayMindControlAnimation()
+		{
+			if (Game.Player.Character.IsInVehicle()) return;
+
+			if (_lastAnimation == null)
+			{
+				var animation = new AnimationName();
+				animation.Group = "random@mugging3";
+				animation.Name = "handsup_standing_base";
+				Util.PlayAnimation(Game.Player.Character, animation.Group, animation.Name, 8.0f, -1, false, 0, true);
+				_lastAnimation = animation;
+			}
+			_wasPlayingAnimationThisFrame = true;
 		}
 
 		private void TurnHead(Ped ped, Vector3 shootCoord)
@@ -309,14 +332,15 @@ namespace Gta5EyeTracking.Features
 		    
             _homingMissilesHelper.Process();
 			_drawCrosshair = false;
-			_wasShootingLastFrame = _wasShootingThisFrame;
-			if (!_wasShootingLastFrame 
-				|| (Game.Player.Character.Weapons.Current.AmmoInClip == 0))
+			_wasPlayingAnimationLastFrame = _wasPlayingAnimationThisFrame;
+			if ((!_wasPlayingAnimationLastFrame 
+					|| (Game.Player.Character.Weapons.Current.AmmoInClip == 0))
+				&& (_lastAnimation != null))
 			{
 				Game.Player.Character.Task.ClearAnimation(_lastAnimation.Group, _lastAnimation.Name);
-				_lastAnimation = new AnimationName();
+				_lastAnimation = null;
 			}
-			_wasShootingThisFrame = false;
+			_wasPlayingAnimationThisFrame = false;
 		}
 
 	    public void MoveCrosshair(Vector2 screenCoords)
