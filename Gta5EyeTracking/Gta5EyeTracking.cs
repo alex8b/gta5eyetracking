@@ -70,6 +70,7 @@ namespace Gta5EyeTracking
 		//Disposing
         private bool _shutDownRequestFlag;
         private readonly ManualResetEvent _shutDownRequestedEvent;
+		private readonly AnimationHelper _animationHelper;
 
 		public Gta5EyeTracking()
 		{
@@ -113,7 +114,8 @@ namespace Gta5EyeTracking
 			_controllerEmulation = new ControllerEmulation();
 
 			//Features
-			_aiming = new Aiming(_settings);
+			_animationHelper = new AnimationHelper();
+			_aiming = new Aiming(_settings, _animationHelper);
 			_freelook = new Freelook(_controllerEmulation, _mouseEmulation, _settings);
 			_radialMenu = new RadialMenu(_controllerEmulation);
 			_pedestrianInteraction = new PedestrianInteraction(_settings);
@@ -316,7 +318,7 @@ namespace Gta5EyeTracking
 			//Util.Log("4 - " + DateTime.UtcNow.Ticks);
 
 			_aiming.Process();
-
+			_animationHelper.Process();
 			//Util.Log("5 - " + DateTime.UtcNow.Ticks);
 
 			if (_debugOutput.Visible)
