@@ -51,13 +51,12 @@ namespace Gta5EyeTracking
 		public double FirstPersonMinPitchDeg { get; set; }
 		public double FirstPersonMaxPitchDeg { get; set; }
 		//
-		public double FovExtensionVertical { get; set; }
-		public double FovExtensionHorizontal { get; set; }
+		public double FirstPersonFovExtensionVertical { get; set; }
+		public double FirstPersonFovExtensionHorizontal { get; set; }
 
 		public bool FirstPersonFreelookDrivingEnabled { get; set; }
-        public double FirstPersonMaxPitchDegDriving { get; set; }
-        public double FirstPersonMinPitchDegDriving { get; set; }
-        public double FirstPersonDeadZoneHeightDriving { get; set; }
+
+		public double FirstPersonDeadZoneHeightDriving { get; set; }
         public double FirstPersonDeadZoneWidthDriving { get; set; }
 
         public double FirstPersonSensitivityDriving { get; set; }
@@ -120,13 +119,11 @@ namespace Gta5EyeTracking
 		    FirstPersonFreelookDrivingEnabled = true;
             FirstPersonSensitivityDriving = 0.5;
 
-            FirstPersonDeadZoneWidthDriving = 0.2;
-            FirstPersonDeadZoneHeightDriving = 0.3;
-            FirstPersonMinPitchDegDriving = -45;
-            FirstPersonMaxPitchDegDriving = 33;
+            FirstPersonDeadZoneWidthDriving = 0.0;
+            FirstPersonDeadZoneHeightDriving = 0.0;
 
-			FovExtensionVertical = 30;
-			FovExtensionHorizontal = 60;
+			FirstPersonFovExtensionVertical = 30;
+			FirstPersonFovExtensionHorizontal = 60;
 
 			AimingSensitivity = 0.4;
 			GazeFiltering = 0.5;

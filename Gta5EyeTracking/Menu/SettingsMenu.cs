@@ -221,25 +221,25 @@ namespace Gta5EyeTracking.Menu
 	                };
                 FirstPersonFreelookMenu.AddItem(firstPersonDeadZoneHeightDrivingSlider);
 
-	            var firstPersonMinPitchDrivingSlider = new UIMenuListItem("FPS Min Pitch Driving", _valuesMinus70To0,
-	                (int) Math.Round((_settings.FirstPersonMinPitchDegDriving + 70)/1), "Freelook min pitch angle");
-	            firstPersonMinPitchDrivingSlider.OnListChanged +=
+	            var fovExtensionVerticalSlider = new UIMenuListItem("FPS View Extension Vertical", _values0To70,
+	                (int) Math.Round((_settings.FirstPersonFovExtensionVertical)/1), "Freelook view extension vertical");
+	            fovExtensionVerticalSlider.OnListChanged +=
 	                (sender, args) =>
 	                {
-	                    _settings.FirstPersonMinPitchDegDriving =
-	                        firstPersonMinPitchDrivingSlider.IndexToItem(firstPersonMinPitchDrivingSlider.Index);
+	                    _settings.FirstPersonFovExtensionVertical =
+	                        fovExtensionVerticalSlider.IndexToItem(fovExtensionVerticalSlider.Index);
 	                };
-                FirstPersonFreelookMenu.AddItem(firstPersonMinPitchDrivingSlider);
+                FirstPersonFreelookMenu.AddItem(fovExtensionVerticalSlider);
 
-	            var firstPersonMaxPitchDrivingSlider = new UIMenuListItem("FPS Max Pitch Driving", _values0To70,
-	                (int) Math.Round((_settings.FirstPersonMaxPitchDegDriving)/1), "Freelook max pitch angle");
-	            firstPersonMaxPitchDrivingSlider.OnListChanged +=
+	            var fovExtensionHorizontalSlider = new UIMenuListItem("FPS View Extension Horizontal", _values0To70,
+	                (int) Math.Round((_settings.FirstPersonFovExtensionHorizontal)/1), "Freelook view extension horizontal");
+	            fovExtensionHorizontalSlider.OnListChanged +=
 	                (sender, args) =>
 	                {
-	                    _settings.FirstPersonMaxPitchDegDriving =
-	                        firstPersonMaxPitchDrivingSlider.IndexToItem(firstPersonMaxPitchDrivingSlider.Index);
+	                    _settings.FirstPersonFovExtensionHorizontal =
+	                        fovExtensionHorizontalSlider.IndexToItem(fovExtensionHorizontalSlider.Index);
 	                };
-                FirstPersonFreelookMenu.AddItem(firstPersonMaxPitchDrivingSlider);
+                FirstPersonFreelookMenu.AddItem(fovExtensionHorizontalSlider);
 	        }
             FirstPersonFreelookMenu.RefreshIndex();
             _menuPool.Add(FirstPersonFreelookMenu);
