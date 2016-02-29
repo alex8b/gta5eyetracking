@@ -476,13 +476,15 @@ namespace Gta5EyeTracking
 
 		public static Vector3 OffsetRotation(Vector3 rotationDeg, double pitchDeg, double yawDeg)
 		{
-			var quaturnion = EulerDegToQuaturnion((float)DegToRad(rotationDeg.Z),
-				(float)DegToRad(rotationDeg.X),
-				(float) DegToRad(rotationDeg.Y));
-			var extraRotation = EulerDegToQuaturnion((float)DegToRad(yawDeg), (float)DegToRad(pitchDeg), 0);
-			var finalQuaturnion = quaturnion * extraRotation;
-			finalQuaturnion.Normalize();
-			var result = QuaturnionToEulerDeg(quaturnion);
+			//var quaturnion = EulerDegToQuaturnion((float)DegToRad(rotationDeg.Z),
+			//	(float)DegToRad(rotationDeg.X),
+			//	(float) DegToRad(rotationDeg.Y));
+			//var extraRotation = EulerDegToQuaturnion((float)DegToRad(yawDeg), (float)DegToRad(pitchDeg), 0);
+			//var finalQuaturnion = quaturnion * extraRotation;
+			//finalQuaturnion.Normalize();
+			var result = rotationDeg;
+			result.X += (float)pitchDeg;
+			result.Z += (float)yawDeg * (float)Math.Cos(DegToRad(rotationDeg.Y));
 			UI.ShowSubtitle(Math.Round(rotationDeg.X,0) + " | " + Math.Round(rotationDeg.Y, 0) + " | " + Math.Round(rotationDeg.Z, 0)
 				+ " | " + Math.Round(result.X, 0) + " | " + Math.Round(result.Y, 0) + " | " + Math.Round(result.Z, 0));
 			return result;
