@@ -485,8 +485,8 @@ namespace Gta5EyeTracking
 			var result = rotationDeg;
 			result.X += (float)pitchDeg;
 			result.Z += (float)yawDeg * (float)Math.Cos(DegToRad(rotationDeg.Y));
-			UI.ShowSubtitle(Math.Round(rotationDeg.X,0) + " | " + Math.Round(rotationDeg.Y, 0) + " | " + Math.Round(rotationDeg.Z, 0)
-				+ " | " + Math.Round(result.X, 0) + " | " + Math.Round(result.Y, 0) + " | " + Math.Round(result.Z, 0));
+			//UI.ShowSubtitle(Math.Round(rotationDeg.X,0) + " | " + Math.Round(rotationDeg.Y, 0) + " | " + Math.Round(rotationDeg.Z, 0)
+			//	+ " | " + Math.Round(result.X, 0) + " | " + Math.Round(result.Y, 0) + " | " + Math.Round(result.Z, 0));
 			return result;
 		}
 

@@ -43,7 +43,7 @@ namespace Gta5EyeTracking.Features
 
 			_freelookVelocityJoystick = 2;
 			_freelookVelocityPixelsPerSec = 1500;
-			_freelookVelocityCam = 8;
+			_freelookVelocityCam = 6;
 			CreateFirstPersonDrivingCamera();
 		}
 
@@ -278,11 +278,15 @@ namespace Gta5EyeTracking.Features
 			        _relativePitchVehicle = _relativePitchVehicle.Clamp(-1, 1);
 
 					_freelookCamera.AttachTo(Game.Player.Character, (int)Bone.SKEL_Neck_1, new Vector3(0, 0.2f, 0.2f));
+					//_freelookCamera.Position = GameplayCamera.Position;
 
+					if (Game.Player.Character.IsInPlane)
+		            {
+			            _relativeHeadingVehicle = 0;
+		            }
 		            //_lastGazePoint = gazeNormalizedCenterDelta;
-		            var rotation = GameplayCamera.Rotation;
-
-					World.RenderingCamera.Rotation = Geometry.OffsetRotation(rotation, 
+		            var rotation = Game.Player.Character.CurrentVehicle.Rotation;
+					_freelookCamera.Rotation = Geometry.OffsetRotation(rotation, 
 						- _relativePitchVehicle*_settings.FovExtensionVertical,
 			            -_relativeHeadingVehicle*_settings.FovExtensionHorizontal);
 	            }
