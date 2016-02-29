@@ -238,8 +238,8 @@ namespace Gta5EyeTracking.Features
 			if (_lastAnimation == null)
 			{
 				var animation = new AnimationName();
-				animation.Group = "random@mugging3";
-				animation.Name = "handsup_standing_base";
+				animation.Group = "gestures@f@standing@casual";
+				animation.Name = "gesture_shrug_soft";
 				Util.PlayAnimation(Game.Player.Character, animation.Group, animation.Name, 40.0f, -1, false, 0, true);
 				_lastAnimation = animation;
 			}
