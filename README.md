@@ -38,24 +38,40 @@ https://us.msi.com/product/notebook/GT72S-G-Tobii-6th-Gen-GTX-980M.html
 **You need to have an XBOX 360 Controller (or any other XInput compatible).**
 
 ## Installation
+### All-in-one installer
+Installer will install all the required components. Download the latest version here:  
+https://github.com/alex8b/gta5eyetracking/releases
 
-1. Install Microsoft .NET Framework 4.5.2 
-Use Internet Explorer to download
-2. Install Microsoft Visual C++ Redistributable Package for Visual Studio 2015 (x64) 
-Use Internet Explorer to download
-3. Install Script Hook V 
-Extract these files to Grand Theft Auto V\ 
-ScriptHookV.dll 
-dinput8.dll 
-NativeTrainer.asi 
-4. Install Script Hook V .NET 2.3 
-Extract ScriptHookVDotNet.asi to Grand Theft Auto V\ 
-5. Install NativeUI 1.5 
-Extract NativeUI.dll to Grand Theft Auto V\scripts\ 
-6. Install the mod 
-Extract the files to Grand Theft Auto V\scripts\ 
-(e.g. d:\Program Files (x86)\Steam\SteamApps\common\Grand Theft Auto V\scripts\ ) 
-7. **Disable joystick deadzone in the gamepad settings in GTA**
+### Manual installation
+1. Install Microsoft .NET Framework 4.5.2  
+   https://www.microsoft.com/download/details.aspx?id=42642
+
+2. Install Microsoft Visual C++ Redistributable Package for Visual Studio 2013 (x64)  
+   https://www.microsoft.com/download/details.aspx?id=40784  
+
+3. Install Microsoft Visual C++ Redistributable Package for Visual Studio 2015 (x64)  
+   https://www.microsoft.com/download/details.aspx?id=48145  
+
+4. Install Script Hook V  
+   http://dev-c.com/gtav/scripthookv/  
+   Extract these files to Grand Theft Auto V\  
+   ScriptHookV.dll  
+   dinput8.dll  
+   NativeTrainer.asi  
+
+5. Install Script Hook V .NET 2.5.1  
+   https://github.com/crosire/scripthookvdotnet/releases/  
+   Extract ScriptHookVDotNet.asi to Grand Theft Auto V\  
+
+6. Install NativeUI 1.6.1  
+   https://github.com/Guad/NativeUI/releases/  
+   Extract NativeUI.dll to Grand Theft Auto V\scripts\  
+
+7. Install the mod  
+   Extract the files to Grand Theft Auto V\scripts\  
+   (e.g. d:\Program Files (x86)\Steam\SteamApps\common\Grand Theft Auto V\scripts\ )  
+
+8. **Disable joystick deadzone in the gamepad settings in GTA**
 
 ## Controls
 ### Cheats
