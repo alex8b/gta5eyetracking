@@ -1,4 +1,6 @@
 # GTA V Eye Tracking Mod
+[![Appveyor](https://ci.appveyor.com/api/projects/status/github/alex8b/gta5eyetracking?svg=true)](https://ci.appveyor.com/project/alex8b/gta5eyetracking)
+
 [![GTA V Eye Tracking Mod Review](https://i.ytimg.com/vi_webp/RqayFa_nSXs/mqdefault.webp)](https://www.youtube.com/watch?v=6UQdwbOINm4)
 
 ## Dependencies
