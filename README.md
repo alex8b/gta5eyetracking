@@ -40,8 +40,10 @@ If any skilled mod developers want to help me working on this mod then Tobii wil
 
 ## Installation
 ### All-in-one installer
-Installer will install all the required components. Download the latest version here:  
-https://github.com/alex8b/gta5eyetracking/releases
+1. Installer will install all the required components. Download the latest version here:  
+   https://github.com/alex8b/gta5eyetracking/releases
+2. **Disable joystick deadzone in gamepad settings in GTA**  
+![Disable joystick deadzone](http://i.imgur.com/FV7PfOv.png)
 
 ### Manual installation
 1. Install Microsoft .NET Framework 4.5.2  
@@ -72,7 +74,8 @@ https://github.com/alex8b/gta5eyetracking/releases
    Extract the files to Grand Theft Auto V\scripts\  
    (e.g. d:\Program Files (x86)\Steam\SteamApps\common\Grand Theft Auto V\scripts\ )  
 
-8. **Disable joystick deadzone in the gamepad settings in GTA**
+8. **Disable joystick deadzone in gamepad settings in GTA**  
+![Disable joystick deadzone](http://i.imgur.com/FV7PfOv.png)
 
 ## Controls
 ### Cheats
