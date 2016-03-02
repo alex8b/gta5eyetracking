@@ -5,17 +5,18 @@
 
 ## Dependencies
 
-1.	EasyHook – https://github.com/EasyHook/EasyHook/
+1.	Tobii EyeX SDK – http://developer.tobii.com/
 
-2.	SharpDx – http://sharpdx.org/
+2.	ScriptHook V – http://www.dev-c.com/gtav/scripthookv/
 
 3.	ScriptHook .NET – https://github.com/crosire/scripthookvdotnet/
 
-4.	Tobii EyeX SDK – http://developer.tobii.com/
+4.	NativeUI – https://github.com/Guad/NativeUI/
+	
+5.	EasyHook – https://github.com/EasyHook/EasyHook/
 
-5.	ScriptHook V – http://www.dev-c.com/gtav/scripthookv/
+6.	SharpDx – http://sharpdx.org/
 
-6.	NativeUI – https://github.com/Guad/NativeUI/
 
 ## Description
 
@@ -43,7 +44,7 @@ If any skilled mod developers want to help me working on this mod then Tobii wil
 1. Installer will install all the required components. Download the latest version here:  
    https://github.com/alex8b/gta5eyetracking/releases
 2. **Disable joystick deadzone in gamepad settings in GTA**  
-![Disable joystick deadzone](http://i.imgur.com/FV7PfOv.png)
+   ![Disable joystick deadzone](http://i.imgur.com/FV7PfOv.png)
 
 ### Manual installation
 1. Install Microsoft .NET Framework 4.5.2  
@@ -63,19 +64,19 @@ If any skilled mod developers want to help me working on this mod then Tobii wil
    NativeTrainer.asi  
 
 5. Install Script Hook V .NET 2.5.1  
-   https://github.com/crosire/scripthookvdotnet/releases/  
+   https://github.com/crosire/scripthookvdotnet/releases  
    Extract ScriptHookVDotNet.asi to Grand Theft Auto V\  
 
 6. Install NativeUI 1.6.1  
-   https://github.com/Guad/NativeUI/releases/  
+   https://github.com/Guad/NativeUI/releases  
    Extract NativeUI.dll to Grand Theft Auto V\scripts\  
 
 7. Install the mod  
+   https://github.com/alex8b/gta5eyetracking/releases  
    Extract the files to Grand Theft Auto V\scripts\  
-   (e.g. d:\Program Files (x86)\Steam\SteamApps\common\Grand Theft Auto V\scripts\ )  
 
 8. **Disable joystick deadzone in gamepad settings in GTA**  
-![Disable joystick deadzone](http://i.imgur.com/FV7PfOv.png)
+   ![Disable joystick deadzone](http://i.imgur.com/FV7PfOv.png)
 
 ## Controls
 ### Cheats
