@@ -92,7 +92,14 @@ namespace Gta5EyeTracking.Features
 			if (_settings.ThirdPersonFreelookEnabled)
 			{
 				World.RenderingCamera = _freelookCamera;
-
+				if (!Game.Player.Character.IsInVehicle())
+				{
+					_freelookCamera.AttachTo(Game.Player.Character, (int) Bone.SKEL_Neck_1, new Vector3(1, 1, 0));
+				}
+				else
+				{
+					_freelookCamera.AttachTo(Game.Player.Character.CurrentVehicle, new Vector3(1, 1, 0));
+				}
 				if (!IsInFixedDeadzone(gazeNormalizedCenterDelta, aspectRatio))
 				{
 					var freelookDeltaVector = new Vector2((float)(gazeNormalizedCenterDelta.X - _relativeHeadingVehicle),
@@ -119,9 +126,8 @@ namespace Gta5EyeTracking.Features
 					_relativePitchVehicle += deltaY * _timeDelta.TotalSeconds * _freelookVelocityCam;
 					_relativePitchVehicle = _relativePitchVehicle.Clamp(-1, 1);
 
-					//_freelookCamera.AttachTo(Game.Player.Character, (int)Bone.SKEL_Neck_1, new Vector3(0, 0.2f, 0.2f));
-					_freelookCamera.Detach();
-					_freelookCamera.Position = GameplayCamera.Position;
+					
+					//_freelookCamera.Position = GameplayCamera.RelativeHeading;
 
 					if (Game.Player.Character.IsInPlane)
 					{
@@ -132,9 +138,13 @@ namespace Gta5EyeTracking.Features
 					_freelookCamera.Rotation = Geometry.OffsetRotation(rotation,
 						-_relativePitchVehicle * _settings.FirstPersonFovExtensionVertical,
 						-_relativeHeadingVehicle * _settings.FirstPersonFovExtensionHorizontal);
-					EmulateHid(0, 0);
 				}
 			}
+			else
+			{
+				World.RenderingCamera = null;
+			}
+			EmulateHid(0, 0);
 			//         _relativeHeadingVehicle = 0;
 			//         _relativePitchVehicle = 0;
 			//World.RenderingCamera = null;
@@ -297,51 +307,55 @@ namespace Gta5EyeTracking.Features
             double deltaY = 0;
 
 			if (_settings.FirstPersonFreelookDrivingEnabled)
-            {
+			{
 				World.RenderingCamera = _freelookCamera;
 
-	            if (!IsInFixedDeadzone(gazeNormalizedCenterDelta, aspectRatio))
-	            {
-			        var freelookDeltaVector = new Vector2((float) (gazeNormalizedCenterDelta.X - _relativeHeadingVehicle),
-				        (float) (gazeNormalizedCenterDelta.Y - _relativePitchVehicle));
+				if (!IsInFixedDeadzone(gazeNormalizedCenterDelta, aspectRatio))
+				{
+					var freelookDeltaVector = new Vector2((float) (gazeNormalizedCenterDelta.X - _relativeHeadingVehicle),
+						(float) (gazeNormalizedCenterDelta.Y - _relativePitchVehicle));
 
-			        //var deadzoneWidth = _settings.FirstPersonDeadZoneWidthDriving;
-			        //var deadzoneHeight = _settings.FirstPersonDeadZoneHeightDriving;
-			        //if (!(Math.Abs(freelookDeltaVector.X) <= deadzoneWidth))
-			        //{
-			        deltaX = (freelookDeltaVector.X /*- Math.Sign(freelookDeltaVector.X) * deadzoneWidth*/)*
+					//var deadzoneWidth = _settings.FirstPersonDeadZoneWidthDriving;
+					//var deadzoneHeight = _settings.FirstPersonDeadZoneHeightDriving;
+					//if (!(Math.Abs(freelookDeltaVector.X) <= deadzoneWidth))
+					//{
+					deltaX = (freelookDeltaVector.X /*- Math.Sign(freelookDeltaVector.X) * deadzoneWidth*/)*
 							SensitivityTransform(freelookDeltaVector.Length());
-			        //}
+					//}
 
-			        //if (!(Math.Abs(freelookDeltaVector.Y) <= deadzoneHeight))
-			        //{
-			        deltaY = (freelookDeltaVector.Y /*- Math.Sign(freelookDeltaVector.Y) * deadzoneHeight*/)*
+					//if (!(Math.Abs(freelookDeltaVector.Y) <= deadzoneHeight))
+					//{
+					deltaY = (freelookDeltaVector.Y /*- Math.Sign(freelookDeltaVector.Y) * deadzoneHeight*/)*
 							SensitivityTransform(freelookDeltaVector.Length());
-			        //}
+					//}
 
 
-			        _relativeHeadingVehicle += deltaX*_timeDelta.TotalSeconds*_freelookVelocityCam;
-			        _relativeHeadingVehicle = _relativeHeadingVehicle.Clamp(-1, 1);
+					_relativeHeadingVehicle += deltaX*_timeDelta.TotalSeconds*_freelookVelocityCam;
+					_relativeHeadingVehicle = _relativeHeadingVehicle.Clamp(-1, 1);
 
-			        _relativePitchVehicle += deltaY*_timeDelta.TotalSeconds*_freelookVelocityCam;
-			        _relativePitchVehicle = _relativePitchVehicle.Clamp(-1, 1);
+					_relativePitchVehicle += deltaY*_timeDelta.TotalSeconds*_freelookVelocityCam;
+					_relativePitchVehicle = _relativePitchVehicle.Clamp(-1, 1);
 
-					_freelookCamera.AttachTo(Game.Player.Character, (int)Bone.SKEL_Neck_1, new Vector3(0, 0.2f, 0.2f));
+					_freelookCamera.AttachTo(Game.Player.Character, (int) Bone.SKEL_Neck_1, new Vector3(0, 0.2f, 0.2f));
 					//_freelookCamera.Position = GameplayCamera.Position;
 
 					if (Game.Player.Character.IsInPlane)
-		            {
-			            _relativeHeadingVehicle = 0;
-		            }
-		            //_lastGazePoint = gazeNormalizedCenterDelta;
-		            var rotation = Game.Player.Character.CurrentVehicle.Rotation;
-					_freelookCamera.Rotation = Geometry.OffsetRotation(rotation, 
-						- _relativePitchVehicle*_settings.FirstPersonFovExtensionVertical,
-			            -_relativeHeadingVehicle*_settings.FirstPersonFovExtensionHorizontal);
-					EmulateHid(0, 0);
+					{
+						_relativeHeadingVehicle = 0;
+					}
+					//_lastGazePoint = gazeNormalizedCenterDelta;
+					var rotation = Game.Player.Character.CurrentVehicle.Rotation;
+					_freelookCamera.Rotation = Geometry.OffsetRotation(rotation,
+						-_relativePitchVehicle*_settings.FirstPersonFovExtensionVertical,
+						-_relativeHeadingVehicle*_settings.FirstPersonFovExtensionHorizontal);
 				}
 			}
-        }
+			else
+			{
+				World.RenderingCamera = null;
+			}
+			EmulateHid(0, 0);
+		}
 
 		public void FirstPersonAimFreelook(Vector2 gazeNormalizedCenterDelta, Ped ped, double aspectRatio)
 		{
