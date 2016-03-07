@@ -67,8 +67,10 @@ namespace Gta5EyeTracking.Features
 			{
 				var dir = target - Game.Player.Character.GetBoneCoord(Bone.SKEL_R_Hand);
 				var pitchToTarget = Geometry.DirectionToRotation(dir).X;
-
-				_animationHelper.PlayShootingAnimation(pitchToTarget);
+				if (!GameplayCamera.IsAimCamActive)
+				{
+					_animationHelper.PlayShootingAnimation(pitchToTarget);
+				}
 
 				Util.SetPedShootsAtCoord(Game.Player.Character, target);
 				RotatePlayerCharacterTowardsTarget(target);
