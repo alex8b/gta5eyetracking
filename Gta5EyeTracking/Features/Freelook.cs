@@ -23,7 +23,8 @@ namespace Gta5EyeTracking.Features
 		private bool _lastInVehicle;
 	    private double _relativeHeadingVehicle;
         private double _relativePitchVehicle;
-		private Camera _freelookCamera;
+		private Camera _freelookCamera1;
+		private Camera _freelookCamera2;
 
 		private DateTime _lastTime;
 		private TimeSpan _timeDelta;
@@ -31,6 +32,7 @@ namespace Gta5EyeTracking.Features
 		private DateTime _lastAimCameraAtTargetTime;
 		private float _lastDeltaX;
 		private float _lastDeltaY;
+		private bool _cameraSwap;
 
 		public Freelook(ControllerEmulation controllerEmulation,
 			MouseEmulation mouseEmulation,
@@ -49,7 +51,8 @@ namespace Gta5EyeTracking.Features
 
 		private void CreateFirstPersonDrivingCamera()
 		{
-			_freelookCamera = World.CreateCamera(new Vector3(), Vector3.Zero, 60f);
+			_freelookCamera1 = World.CreateCamera(new Vector3(), Vector3.Zero, 60f);
+			_freelookCamera2 = World.CreateCamera(new Vector3(), Vector3.Zero, 60f);
 		}
 
 		public bool IsInFixedDeadzone(Vector2 screenCoord, double aspectRatio)
@@ -84,21 +87,37 @@ namespace Gta5EyeTracking.Features
 			}
 		}
 
+		public Vector3 RotateAround(float radius, float relativeHeading, float relativePitch)
+		{
+			float x = radius * (float)Math.Sin(Geometry.DegToRad(relativeHeading));
+			float y = - radius * (float)Math.Cos(Geometry.DegToRad(relativeHeading));
+			float z = - radius * (float)Math.Sin(Geometry.DegToRad(relativePitch));
+			return new Vector3(x, y, z);
+		}
+
 		public void ThirdPersonFreelook(Vector2 gazeNormalizedCenterDelta, double aspectRatio)
 		{
 			double deltaX = 0;
 			double deltaY = 0;
+			_cameraSwap = !_cameraSwap;
 
 			if (_settings.ThirdPersonFreelookEnabled)
 			{
-				World.RenderingCamera = _freelookCamera;
+				if (World.RenderingCamera == null)
+				{
+					World.RenderingCamera = _cameraSwap ? _freelookCamera1 : _freelookCamera2;
+				}
+				var cam = !_cameraSwap ? _freelookCamera1 : _freelookCamera2;
+				var offset = RotateAround(5, 
+					(float) (GameplayCamera.RelativeHeading - _relativeHeadingVehicle * _settings.FirstPersonFovExtensionHorizontal), 
+					(float) (GameplayCamera.RelativePitch - _relativePitchVehicle * _settings.FirstPersonFovExtensionVertical));
 				if (!Game.Player.Character.IsInVehicle())
 				{
-					_freelookCamera.AttachTo(Game.Player.Character, (int) Bone.SKEL_Neck_1, new Vector3(1, 1, 0));
+					cam.AttachTo(Game.Player.Character, offset);
 				}
 				else
 				{
-					_freelookCamera.AttachTo(Game.Player.Character.CurrentVehicle, new Vector3(1, 1, 0));
+					cam.AttachTo(Game.Player.Character.CurrentVehicle, offset);
 				}
 				if (!IsInFixedDeadzone(gazeNormalizedCenterDelta, aspectRatio))
 				{
@@ -127,17 +146,19 @@ namespace Gta5EyeTracking.Features
 					_relativePitchVehicle = _relativePitchVehicle.Clamp(-1, 1);
 
 					
-					//_freelookCamera.Position = GameplayCamera.RelativeHeading;
+					//_freelookCamera1.Position = GameplayCamera.RelativeHeading;
 
 					if (Game.Player.Character.IsInPlane)
 					{
 						_relativeHeadingVehicle = 0;
 					}
 					//_lastGazePoint = gazeNormalizedCenterDelta;
+					
 					var rotation = GameplayCamera.Rotation;//Game.Player.Character.CurrentVehicle.Rotation;
-					_freelookCamera.Rotation = Geometry.OffsetRotation(rotation,
+					cam.Rotation = Geometry.OffsetRotation(rotation,
 						-_relativePitchVehicle * _settings.FirstPersonFovExtensionVertical,
 						-_relativeHeadingVehicle * _settings.FirstPersonFovExtensionHorizontal);
+					World.RenderingCamera.InterpTo(cam, 5, true, true);
 				}
 			}
 			else
@@ -308,7 +329,7 @@ namespace Gta5EyeTracking.Features
 
 			if (_settings.FirstPersonFreelookDrivingEnabled)
 			{
-				World.RenderingCamera = _freelookCamera;
+				World.RenderingCamera = _freelookCamera1;
 
 				if (!IsInFixedDeadzone(gazeNormalizedCenterDelta, aspectRatio))
 				{
@@ -336,8 +357,8 @@ namespace Gta5EyeTracking.Features
 					_relativePitchVehicle += deltaY*_timeDelta.TotalSeconds*_freelookVelocityCam;
 					_relativePitchVehicle = _relativePitchVehicle.Clamp(-1, 1);
 
-					_freelookCamera.AttachTo(Game.Player.Character, (int) Bone.SKEL_Neck_1, new Vector3(0, 0.2f, 0.2f));
-					//_freelookCamera.Position = GameplayCamera.Position;
+					_freelookCamera1.AttachTo(Game.Player.Character, (int) Bone.SKEL_Neck_1, new Vector3(0, 0.2f, 0.2f));
+					//_freelookCamera1.Position = GameplayCamera.Position;
 
 					if (Game.Player.Character.IsInPlane)
 					{
@@ -345,7 +366,7 @@ namespace Gta5EyeTracking.Features
 					}
 					//_lastGazePoint = gazeNormalizedCenterDelta;
 					var rotation = Game.Player.Character.CurrentVehicle.Rotation;
-					_freelookCamera.Rotation = Geometry.OffsetRotation(rotation,
+					_freelookCamera1.Rotation = Geometry.OffsetRotation(rotation,
 						-_relativePitchVehicle*_settings.FirstPersonFovExtensionVertical,
 						-_relativeHeadingVehicle*_settings.FirstPersonFovExtensionHorizontal);
 				}
