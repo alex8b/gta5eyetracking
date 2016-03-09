@@ -3,6 +3,7 @@
 #pragma once
 #include "include.h"
 #using <SharpDX.dll>
+#using <SharpDX.Mathematics.dll>
 
 using namespace SharpDX;
 

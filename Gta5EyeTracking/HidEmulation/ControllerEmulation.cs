@@ -293,30 +293,30 @@ namespace Gta5EyeTracking.HidEmulation
 			return ERROR_SUCCESS;
 		}
 
-		[UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode, SetLastError = true)]
-		delegate uint DXInputGetDSoundAudioDeviceGuids(int dwUserIndex, out Guid pDSoundRenderGuid, out Guid pDSoundCaptureGuid);
-		delegate void DXInputGetDSoundAudioDeviceGuidsAsync(int dwUserIndex, out Guid pDSoundRenderGuid, out Guid pDSoundCaptureGuid);
-		uint XInputGetDSoundAudioDeviceGuids_Hooked(int dwUserIndex, out Guid pDSoundRenderGuid, out Guid pDSoundCaptureGuid)
-		{
-			pDSoundRenderGuid = new Guid();
-			pDSoundCaptureGuid = new Guid();
+		//[UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode, SetLastError = true)]
+		//delegate uint DXInputGetDSoundAudioDeviceGuids(int dwUserIndex, out Guid pDSoundRenderGuid, out Guid pDSoundCaptureGuid);
+		//delegate void DXInputGetDSoundAudioDeviceGuidsAsync(int dwUserIndex, out Guid pDSoundRenderGuid, out Guid pDSoundCaptureGuid);
+		//uint XInputGetDSoundAudioDeviceGuids_Hooked(int dwUserIndex, out Guid pDSoundRenderGuid, out Guid pDSoundCaptureGuid)
+		//{
+		//	pDSoundRenderGuid = new Guid();
+		//	pDSoundCaptureGuid = new Guid();
 
-			var controller = new Controller((UserIndex)dwUserIndex);
-			if (controller.IsConnected)
-			{
-				try
-				{
-					pDSoundRenderGuid = controller.SoundRenderGuid;
-					pDSoundCaptureGuid = controller.SoundCaptureGuid;
-				}
-				catch
-				{
-					return ERROR_DEVICE_NOT_CONNECTED;
-				}
-			}
+		//	var controller = new Controller((UserIndex)dwUserIndex);
+		//	if (controller.IsConnected)
+		//	{
+		//		try
+		//		{
+		//			pDSoundRenderGuid = controller..SoundRenderGuid;
+		//			pDSoundCaptureGuid = controller.SoundCaptureGuid;
+		//		}
+		//		catch
+		//		{
+		//			return ERROR_DEVICE_NOT_CONNECTED;
+		//		}
+		//	}
 			
-			return ERROR_SUCCESS;
-		}
+		//	return ERROR_SUCCESS;
+		//}
 
 		[UnmanagedFunctionPointer(CallingConvention.StdCall, CharSet = CharSet.Unicode, SetLastError = true)]
 		delegate uint DXInputEnable(bool enable);
