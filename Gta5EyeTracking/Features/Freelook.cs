@@ -84,6 +84,14 @@ namespace Gta5EyeTracking.Features
 			}
 		}
 
+		public Vector3 RotateAround(float radius, float relativeHeading, float relativePitch)
+		{
+			float x = radius * (float)Math.Sin(Geometry.DegToRad(relativeHeading));
+			float y = -radius * (float)Math.Cos(Geometry.DegToRad(relativeHeading));
+			float z = -radius * (float)Math.Sin(Geometry.DegToRad(relativePitch));
+			return new Vector3(x, y, z);
+		}
+
 		public void ThirdPersonFreelook(Vector2 gazeNormalizedCenterDelta, double aspectRatio)
 		{
 			double deltaX = 0;
@@ -92,13 +100,18 @@ namespace Gta5EyeTracking.Features
 			if (_settings.ThirdPersonFreelookEnabled)
 			{
 				World.RenderingCamera = _freelookCamera;
+
+                var offset = RotateAround(5, 
+                      (float) (GameplayCamera.RelativeHeading - _relativeHeadingVehicle * _settings.FirstPersonFovExtensionHorizontal), 
+                      (float) (-20 + GameplayCamera.RelativePitch - _relativePitchVehicle * _settings.FirstPersonFovExtensionVertical));
+
 				if (!Game.Player.Character.IsInVehicle())
 				{
-					_freelookCamera.AttachTo(Game.Player.Character, (int) Bone.SKEL_Neck_1, new Vector3(1, 1, 0));
+					_freelookCamera.AttachTo(Game.Player.Character, offset);
 				}
 				else
 				{
-					_freelookCamera.AttachTo(Game.Player.Character.CurrentVehicle, new Vector3(1, 1, 0));
+					_freelookCamera.AttachTo(Game.Player.Character.CurrentVehicle, offset);
 				}
 				if (!IsInFixedDeadzone(gazeNormalizedCenterDelta, aspectRatio))
 				{
@@ -120,10 +133,10 @@ namespace Gta5EyeTracking.Features
 					//}
 
 
-					_relativeHeadingVehicle += deltaX * _timeDelta.TotalSeconds * _freelookVelocityCam;
+					_relativeHeadingVehicle += deltaX * 0.01 * _freelookVelocityCam;
 					_relativeHeadingVehicle = _relativeHeadingVehicle.Clamp(-1, 1);
 
-					_relativePitchVehicle += deltaY * _timeDelta.TotalSeconds * _freelookVelocityCam;
+					_relativePitchVehicle += deltaY * 0.01 * _freelookVelocityCam;
 					_relativePitchVehicle = _relativePitchVehicle.Clamp(-1, 1);
 
 					
