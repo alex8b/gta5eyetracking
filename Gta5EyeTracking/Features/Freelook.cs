@@ -353,7 +353,7 @@ namespace Gta5EyeTracking.Features
 				}
 				//vehicle
 				var timeInVehicle = DateTime.UtcNow - _lastNotInVehicle;
-				if ((timeInVehicle > TimeSpan.FromSeconds(2))
+				if ((timeInVehicle > TimeSpan.FromSeconds(0.5))
 					&& Geometry.IsFirstPersonVehicleCameraActive())
 				{
 					FirstPersonFreelookVehicle(gazeNormalizedCenterDelta, aspectRatio);
