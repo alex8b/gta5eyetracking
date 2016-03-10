@@ -33,6 +33,7 @@ namespace Gta5EyeTracking.Features
 		private DateTime _lastAimCameraAtTargetTime;
 		private float _lastDeltaX;
 		private float _lastDeltaY;
+		private DateTime _lastNotInVehicle;
 
 		public Freelook(ControllerEmulation controllerEmulation,
 			MouseEmulation mouseEmulation,
@@ -263,23 +264,33 @@ namespace Gta5EyeTracking.Features
 					//if (!(Math.Abs(freelookDeltaVector.X) <= deadzoneWidth))
 					//{
 					deltaX = (freelookDeltaVector.X /*- Math.Sign(freelookDeltaVector.X) * deadzoneWidth*/)*
-					         SensitivityTransform(freelookDeltaVector.Length());
+							SensitivityTransform(freelookDeltaVector.Length());
 					//}
 
 					//if (!(Math.Abs(freelookDeltaVector.Y) <= deadzoneHeight))
 					//{
 					deltaY = (freelookDeltaVector.Y /*- Math.Sign(freelookDeltaVector.Y) * deadzoneHeight*/)*
-					         SensitivityTransform(freelookDeltaVector.Length());
+							SensitivityTransform(freelookDeltaVector.Length());
 					//}
 
 
-					_relativeHeadingVehicle += deltaX * _freelookVelocityCam * TimeDeltaConstant; //timeDelta.TotalSeconds
+					_relativeHeadingVehicle += deltaX*_freelookVelocityCam*TimeDeltaConstant; //timeDelta.TotalSeconds
 					_relativeHeadingVehicle = _relativeHeadingVehicle.Clamp(-1, 1);
 
-					_relativePitchVehicle += deltaY * _freelookVelocityCam * TimeDeltaConstant; //timeDelta.TotalSeconds
+					_relativePitchVehicle += deltaY*_freelookVelocityCam*TimeDeltaConstant; //timeDelta.TotalSeconds
 					_relativePitchVehicle = _relativePitchVehicle.Clamp(-1, 1);
 
-					_freelookCamera.AttachTo(Game.Player.Character, (int) Bone.SKEL_Neck_1, new Vector3(0, 0.2f, 0.2f));
+					if (Game.Player.Character.CurrentVehicle.ClassType == VehicleClass.Motorcycles
+						|| Game.Player.Character.CurrentVehicle.ClassType == VehicleClass.Cycles
+						|| Game.Player.Character.CurrentVehicle.ClassType == VehicleClass.Helicopters
+						|| Game.Player.Character.CurrentVehicle.ClassType == VehicleClass.Planes)
+					{
+						_freelookCamera.AttachTo(Game.Player.Character, (int)Bone.SKEL_Neck_1, new Vector3(0, 0.2f, 0.2f));
+					}
+					else
+					{
+						_freelookCamera.AttachTo(Game.Player.Character, (int)Bone.SKEL_ROOT, new Vector3(0, 0, 0.6f));
+					}
 					//_freelookCamera.Position = GameplayCamera.Position;
 
 					if (Game.Player.Character.IsInPlane)
@@ -334,12 +345,16 @@ namespace Gta5EyeTracking.Features
 			_lastTime = time;
 			var aimingWithMouse = User32.IsKeyPressed(VirtualKeyStates.VK_LBUTTON)
 							|| User32.IsKeyPressed(VirtualKeyStates.VK_RBUTTON);
-
 			if (Game.Player.Character.IsInVehicle())
 			{
+				if (Game.IsControlPressed(0, Control.NextCamera))
+				{
+					_lastNotInVehicle = DateTime.UtcNow;
+				}
 				//vehicle
-
-				if (Geometry.IsFirstPersonVehicleCameraActive())
+				var timeInVehicle = DateTime.UtcNow - _lastNotInVehicle;
+				if ((timeInVehicle > TimeSpan.FromSeconds(2))
+					&& Geometry.IsFirstPersonVehicleCameraActive())
 				{
 					FirstPersonFreelookVehicle(gazeNormalizedCenterDelta, aspectRatio);
 				}
@@ -350,6 +365,7 @@ namespace Gta5EyeTracking.Features
 			}
 			else
 			{
+				_lastNotInVehicle = DateTime.UtcNow;
 				//on foot
 				if (Geometry.IsFirstPersonPedCameraActive())
 				{
