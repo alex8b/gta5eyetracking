@@ -252,14 +252,14 @@ namespace Gta5EyeTracking.Features
 		{
 			if (ped != null && ped.Handle != Game.Player.Character.Handle)
 			{
-				if (!Geometry.IsFirstPersonCameraActive())
+				if (!Geometry.IsFirstPersonPedCameraActive())
 				{
 					Game.Player.Character.Task.LookAt(ped);
 				}
 			}
 			else
 			{
-				if (!Geometry.IsFirstPersonCameraActive())
+				if (!Geometry.IsFirstPersonPedCameraActive())
 				{
 					Game.Player.Character.Task.LookAt(shootCoord);
 				}

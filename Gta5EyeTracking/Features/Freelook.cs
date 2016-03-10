@@ -339,7 +339,7 @@ namespace Gta5EyeTracking.Features
 			{
 				//vehicle
 
-				if (Geometry.IsFirstPersonCameraActive())
+				if (Geometry.IsFirstPersonVehicleCameraActive())
 				{
 					FirstPersonFreelookVehicle(gazeNormalizedCenterDelta, aspectRatio);
 				}
@@ -351,7 +351,7 @@ namespace Gta5EyeTracking.Features
 			else
 			{
 				//on foot
-				if (Geometry.IsFirstPersonCameraActive())
+				if (Geometry.IsFirstPersonPedCameraActive())
 				{
 					if (GameplayCamera.IsAimCamActive)
 					{

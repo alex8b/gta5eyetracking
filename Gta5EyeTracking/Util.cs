@@ -117,7 +117,12 @@ namespace Gta5EyeTracking
             return Function.Call<int>(Hash.GET_FOLLOW_PED_CAM_VIEW_MODE);
         }
 
-        public static void SetGamePlayCamRawPitch(float pitch)
+		public static int GetFollowVehicleCamViewMode()
+		{
+			return Function.Call<int>(Hash.GET_FOLLOW_VEHICLE_CAM_VIEW_MODE);
+		}
+
+		public static void SetGamePlayCamRawPitch(float pitch)
         {
             Function.Call(Hash._SET_GAMEPLAY_CAM_RAW_PITCH, pitch);
         }

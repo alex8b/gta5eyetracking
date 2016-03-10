@@ -11,10 +11,16 @@ namespace Gta5EyeTracking
 {
 	public static class Geometry
 	{
-        public static bool IsFirstPersonCameraActive()
+        public static bool IsFirstPersonPedCameraActive()
 		{
             return Util.GetFollowPedCamViewMode() == 4;
 		}
+
+		public static bool IsFirstPersonVehicleCameraActive()
+		{
+			return Util.GetFollowVehicleCamViewMode() == 4;
+		}
+	
 
 		public static bool IsInFrontOfThePlayer(Vector3 shootCoord)
 		{
