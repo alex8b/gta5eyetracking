@@ -39,6 +39,9 @@ If any skilled mod developers want to help me working on this mod then Tobii wil
 
 **You need to have an XBOX 360 Controller (or any other XInput compatible).**
 
+**If you have a PS4 Controller you can use DS4Windows to emulate XInput.**  
+http://ds4windows.com/
+
 ## Installation
 ### All-in-one installer
 1. Installer will install all the required components. Download the latest version here:  
