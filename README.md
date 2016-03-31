@@ -104,6 +104,13 @@ http://ds4windows.com/
 ### Keyboard and mouse
 - F8 - Eye tracking settings menu (Freelook sensitivity, min/max pitch angles) 
 - ARROWS - Navigate the eye tracking menu 
+- B or LMOUSE (on foot) or XBUTTON1 (in vehicle) - Shoot at gaze
+- J or XBUTTON2 - Incinerate at gaze
+- N or PGUP - Shoot a missile at gaze
+- H or PGDOWN - Tase at gaze
+- U - Fountain at gaze
+- K - Debug info
+- L - Debug gaze cursor
 
 ## Forum topic
 http://gtaforums.com/topic/814604-vrelnet-gta-v-eye-tracking-mod/
