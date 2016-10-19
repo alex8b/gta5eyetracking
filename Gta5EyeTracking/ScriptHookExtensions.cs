@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Runtime.InteropServices;
 using GTA;
 using GTA.Math;
@@ -8,9 +7,17 @@ using Matrix = SharpDX.Matrix;
 
 namespace Gta5EyeTracking
 {
-	public static class Util
+	public static class ScriptHookExtensions
 	{
-        public const string SettingsPath = "Gta5EyeTracking";
+		public static void AttachCamToPedBone(Camera camera, Ped ped, int boneIndex, Vector3 offset)
+		{
+			Function.Call(Hash._0x61A3DBA14AB7F411, camera.Handle, ped.Handle, boneIndex, offset.X, offset.Y, offset.Z, false);
+		}
+
+		public static void AttachCamToEntity(Camera camera, Entity entity, Vector3 offset)
+		{
+			Function.Call(Hash._0xFEDB7D269E8C60E3, camera.Handle, entity.Handle, offset.X, offset.Y, offset.Z, false);
+		}
 
 		public static void SetPedShootsAtCoord(Ped ped, Vector3 target)
 		{
@@ -157,44 +164,7 @@ namespace Gta5EyeTracking
             return Function.Call<int>(Hash.GET_SOUND_ID);
         }
 
-        public static void Log(string message)
-	    {
-		    var now = DateTime.Now;
-            var folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), SettingsPath);
-			if (!Directory.Exists(folderPath))
-			{
-				Directory.CreateDirectory(folderPath);
-			}
-
-		
-            var logpath = Path.Combine(folderPath, "log.txt");
-
-		    try
-		    {
-			    var fs = new FileStream(logpath, FileMode.Append, FileAccess.Write, FileShare.Read);
-			    var sw = new StreamWriter(fs);
-
-			    try
-			    {
-				    sw.Write("[" + now.ToString("dd.MM.yyyy HH:mm:ss") + "] ");
-
-					sw.Write(message);
-
-				    sw.WriteLine();
-			    }
-			    finally
-			    {
-				    sw.Close();
-				    fs.Close();
-			    }
-		    }
-		    catch
-		    {
-			    return;
-		    }
-	    }
-
-        public static Matrix GetCameraMatrix()
+		public static Matrix GetCameraMatrix()
         {
             IntPtr baseAddress = System.Diagnostics.Process.GetCurrentProcess().MainModule.BaseAddress;
             int length = System.Diagnostics.Process.GetCurrentProcess().MainModule.ModuleMemorySize;
@@ -204,7 +174,7 @@ namespace Gta5EyeTracking
                 return matrix;
             else
             {
-                Log("ERROR: Matrix haven't returned anything!");
+	            Debug.Log("ERROR: Matrix haven't returned anything!");
                 return Matrix.Identity;
             }
 

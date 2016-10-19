@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Reflection;
 using GTA;
 using GTA.Native;
@@ -13,17 +12,18 @@ namespace Gta5EyeTracking
 	{
         public static bool IsFirstPersonPedCameraActive()
 		{
-            return Util.GetFollowPedCamViewMode() == 4;
+            return ScriptHookExtensions.GetFollowPedCamViewMode() == 4;
 		}
 
 		public static bool IsFirstPersonVehicleCameraActive()
 		{
-			return Util.GetFollowVehicleCamViewMode() == 4;
+			return ScriptHookExtensions.GetFollowVehicleCamViewMode() == 4;
 		}
 	
 
 		public static bool IsInFrontOfThePlayer(Vector3 shootCoord)
 		{
+            //TODO
 			return true;
 
 			//var playerRotation = Game.Player.Character.Rotation;
@@ -36,41 +36,45 @@ namespace Gta5EyeTracking
 
 		public static Vector3 RaycastEverything(Vector2 screenCoord, out Entity hitEntity, bool skipProjection)
 		{
-		    hitEntity = null;
-			const float raycastToDist = 200.0f;
-			const float raycastFromDist = 1f;
-		    const float defaultDist = 60.0f;
-
 		    Vector3 source3D;
 		    Vector3 target3D;
             ScreenRelToWorld(screenCoord, out source3D, out target3D);
 
+			return RaycastEverything(out hitEntity, target3D, source3D);
+		}
+
+		public static Vector3 RaycastEverything(out Entity hitEntity, Vector3 target3D, Vector3 source3D)
+		{
+			hitEntity = null;
+			const float raycastToDist = 200.0f;
+			const float raycastFromDist = 1f;
+			const float defaultDist = 60.0f;
 			Entity ignoreEntity = Game.Player.Character;
 			if (Game.Player.Character.IsInVehicle())
 			{
 				ignoreEntity = Game.Player.Character.CurrentVehicle;
-			} 
+			}
 
 			var dir = (target3D - source3D);
 			dir.Normalize();
-			var raycastResults = World.Raycast(source3D + dir * raycastFromDist,
-				source3D + dir * raycastToDist,
-				(IntersectOptions)(1 | 16 | 256 | 2 | 4 | 8)// | peds + vehicles
+			var raycastResults = World.Raycast(source3D + dir*raycastFromDist,
+				source3D + dir*raycastToDist,
+				(IntersectOptions) (1 | 16 | 256 | 2 | 4 | 8) // | peds + vehicles
 				, ignoreEntity);
 
 			if (raycastResults.DitHitAnything)
 			{
-			    if (raycastResults.DitHitEntity)
-			    {
-			        hitEntity = raycastResults.HitEntity;
-			    }
+				if (raycastResults.DitHitEntity)
+				{
+					hitEntity = raycastResults.HitEntity;
+				}
 				return raycastResults.HitCoords;
 			}
 
-			return source3D + dir * defaultDist;
+			return source3D + dir*defaultDist;
 		}
 
-        public static Vector3 ConecastPedsAndVehicles(Vector2 screenCoords, out  Entity hitEntity)
+		public static Vector3 ConecastPedsAndVehicles(Vector2 screenCoords, out  Entity hitEntity)
         {
             var numPoints = 5;
             var angleStep = Math.PI * 0.2;
@@ -92,9 +96,9 @@ namespace Gta5EyeTracking
                 }
 
                 if ((entity != null)
-                    && ((Util.IsEntityAPed(entity)
+                    && ((ScriptHookExtensions.IsEntityAPed(entity)
                             && entity.Handle != Game.Player.Character.Handle)
-                        || (Util.IsEntityAVehicle(entity)
+                        || (ScriptHookExtensions.IsEntityAVehicle(entity)
                             && !(Game.Player.Character.IsInVehicle()
                                 && entity.Handle == Game.Player.Character.CurrentVehicle.Handle))))
                 {
@@ -111,7 +115,7 @@ namespace Gta5EyeTracking
 			const float raycastToDist = 200.0f;
 			const float raycastFromDist = 1f;
 
-			var mView = Util.GetCameraMatrix();
+			var mView = ScriptHookExtensions.GetCameraMatrix();
 			var source3D = ViewMatrixToCameraPosition(mView);
 
 			Entity ignoreEntity = Game.Player.Character;
@@ -243,7 +247,7 @@ namespace Gta5EyeTracking
 
         public static bool WorldToScreenRel(Vector3 entityPosition, out Vector2 screenCoords)
         {
-            var mView = Util.GetCameraMatrix();
+            var mView = ScriptHookExtensions.GetCameraMatrix();
             mView.Transpose();
 
             var vForward = mView.Row4;
@@ -338,7 +342,7 @@ namespace Gta5EyeTracking
 	    }
         public static void ScreenRelToWorld(Vector2 screenCoordsRel, out Vector3 camPoint, out Vector3 farPoint)
 	    {
-            var mView = Util.GetCameraMatrix();
+            var mView = ScriptHookExtensions.GetCameraMatrix();
 
             camPoint = ViewMatrixToCameraPosition(mView);
             farPoint = ScreenRelToWorld(mView, screenCoordsRel);
@@ -362,6 +366,16 @@ namespace Gta5EyeTracking
 				BindingFlags.NonPublic | BindingFlags.Instance,
 				null, Type.EmptyTypes, null).Invoke(new[] {(object)result});
 			return obj;
+		}
+		public static Vector3 WorldToRelative(Vector3 worldPosition, Vector3 originPosition, Vector3 originRotation)
+		{
+			var worldDelta = worldPosition - originPosition;
+			var localDelta = new Vector3();
+			var yaw = DegToRad(originRotation.Z);
+			localDelta.X = 0;//(float) (Math.Cos(yaw) * worldDelta.X - Math.Sin(yaw) * worldDelta.Y);
+			localDelta.Y = -5;//(float) (Math.Sin(yaw) * worldDelta.X + Math.Cos(yaw) * worldDelta.Y);
+			localDelta.Z = worldDelta.Z;
+			return localDelta;
 		}
 
 		public static Vector3 RotationToDirection(Vector3 rotation)
@@ -474,9 +488,9 @@ namespace Gta5EyeTracking
 			double sqy = q.Y * q.Y;
 			double sqz = q.Z * q.Z;
 			Vector3 result;
-			result.X = (float)RadToDeg(Math.Asin(2f * (q.X * q.Z - q.W * q.Y)));                             // Pitch 
-			result.Z = (float)RadToDeg(Math.Atan2(2f * q.X * q.W + 2f * q.Y * q.Z, 1 - 2f * (sqz + sqw)));     // Yaw 
-			result.Y = (float)RadToDeg(Math.Atan2(2f * q.X * q.Y + 2f * q.Z * q.W, 1 - 2f * (sqy + sqz)));
+			result.X = RadToDeg((float)Math.Asin(2f * (q.X * q.Z - q.W * q.Y)));                             // Pitch 
+			result.Z = RadToDeg((float)Math.Atan2(2f * q.X * q.W + 2f * q.Y * q.Z, 1 - 2f * (sqz + sqw)));     // Yaw 
+			result.Y = RadToDeg((float)Math.Atan2(2f * q.X * q.Y + 2f * q.Z * q.W, 1 - 2f * (sqy + sqz)));
 			return result;
 		}
 
@@ -500,34 +514,44 @@ namespace Gta5EyeTracking
 		{
 			direction.Normalize();
 
-			var x = Math.Atan2(direction.Z, Math.Sqrt(direction.Y * direction.Y + direction.X * direction.X));
+			var x = (float)Math.Atan2(direction.Z, Math.Sqrt(direction.Y * direction.Y + direction.X * direction.X));
 			var y = 0;
-			var z = -Math.Atan2(direction.X, direction.Y);
+			var z = (float)-Math.Atan2(direction.X, direction.Y);
 
 			return new Vector3
 			{
-				X = (float)RadToDeg(x),
-				Y = (float)RadToDeg(y),
-				Z = (float)RadToDeg(z)
+				X = RadToDeg(x),
+				Y = RadToDeg(y),
+				Z = RadToDeg(z)
 			};
 		}
 
-		public static double DegToRad(double deg)
+		public static float DegToRad(float deg)
 		{
-			return deg * Math.PI / 180.0;
+			return (float) (deg * Math.PI / 180.0f);
 		}
 
-		public static double RadToDeg(double rad)
+		public static float RadToDeg(float rad)
 		{
-			return rad * 180.0 / Math.PI;
+			return (float) (rad * 180.0f / Math.PI);
 		}
 
-		public static double BoundRotationDeg(double angleDeg)
+		public static float BoundRotationDeg(float angleDeg)
 		{
-			var twoPi = (int)(angleDeg / 360);
-			var res = angleDeg - twoPi * 360;
-			if (res < 0) res += 360;
-			return res;
+			while (angleDeg > 180)
+			{
+				angleDeg -= 360;
+			}
+			while (angleDeg < -180)
+			{
+				angleDeg += 360;
+			}
+			return angleDeg;
 		}
-	}
+
+        public static Vector3 BoundRotationDeg(Vector3 angleDeg)
+        {
+            return new Vector3(BoundRotationDeg(angleDeg.X), BoundRotationDeg(angleDeg.Y), BoundRotationDeg(angleDeg.Z));
+        }
+    }
 }

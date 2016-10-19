@@ -1,67 +1,50 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Windows.Forms;
 using Gta5EyeTracking.Features;
 using Gta5EyeTracking.HidEmulation;
 using Gta5EyeTracking.Menu;
 using GTA;
 using GTA.Math;
-using GTA.Native;
-using NativeUI;
 using SharpDX.XInput;
-using Tobii.EyeX.Client;
 
 namespace Gta5EyeTracking
 {
-	public class ControlsProcessor: DisposableBase
+	public class ControlsProcessor: IDisposable
 	{
 		private readonly Settings _settings;
 		private readonly ControllerEmulation _controllerEmulation;
 		private readonly Aiming _aiming;
-		private readonly Freelook _freelook;
+		private readonly ExtendedView _extendedView;
 		private readonly RadialMenu _radialMenu;
 		private readonly SettingsMenu _settingsMenu;
-		private readonly MenuPool _menuPool;
-		private readonly GazeProjector _gazeProjector;
+		private readonly GameState _gameState;
 		private DateTime _lastTickTime;
 		private readonly DebugOutput _debugOutput;
+        private bool _shutDownRequestFlag;
+        private bool _lastAimCameraAtTarget;
 
-
-		private bool _isPaused;
-		private bool _isInVehicle;
-		private bool _isInAircraft;
-		private bool _isInRadialMenu;
-
-		private int _injectRightTrigger;
-		private bool _menuOpen;
-		private bool _shutDownRequestFlag;
-		private bool _isMeleeWeapon;
-		private bool _isThrowableWeapon;
-		private bool _isSniperWeaponAndZoomed;
-		private bool _lastAimCameraAtTarget;
-
-
-		public ControlsProcessor(Settings settings, 
+        public ControlsProcessor(Settings settings, 
 			ControllerEmulation controllerEmulation, 
 			Aiming aiming, 
-			Freelook freelook, 
+			ExtendedView extendedView, 
 			RadialMenu radialMenu, 
 			SettingsMenu settingsMenu, 
-			MenuPool menuPool, 
+            GameState gameState,
 			DebugOutput debugOutput)
 		{
 			_settings = settings;
 			_controllerEmulation = controllerEmulation;
 			_aiming = aiming;
-			_freelook = freelook;
+			_extendedView = extendedView;
 			_radialMenu = radialMenu;
 			_settingsMenu = settingsMenu;
-			_menuPool = menuPool;
-			_debugOutput = debugOutput;
+		    _gameState = gameState;
+
+		    _debugOutput = debugOutput;
 			_controllerEmulation.OnModifyState += OnModifyControllerState;
 		}
 
-		protected override void Dispose(bool disposing)
+		public void Dispose()
 		{
 			if (_controllerEmulation != null)
 			{
@@ -70,191 +53,198 @@ namespace Gta5EyeTracking
 			}
 		}
 
-		public void Process(DateTime tickStopwatch, Vector2 gazePoint, double aspectRatio, Vector3 shootCoord, Vector3 shootCoordSnap, Vector3 shootMissileCoord, Ped ped, Entity missileTarget)
+		public void Update(DateTime tickStopwatch, Vector3 shootCoord, Vector3 shootCoordSnap, Vector3 shootMissileCoord, Ped ped, Entity missileTarget)
 		{
 			_lastTickTime = tickStopwatch;
-			_isPaused = Game.IsPaused;
-			_isInVehicle = Game.Player.Character.IsInVehicle();
-			_isInAircraft = Game.Player.Character.IsInPlane || Game.Player.Character.IsInHeli;
-			_isMeleeWeapon = Util.IsMelee(Game.Player.Character.Weapons.Current.Hash);
-			_isThrowableWeapon = Util.IsThrowable(Game.Player.Character.Weapons.Current.Hash);
-			_isSniperWeaponAndZoomed = Util.IsSniper(Game.Player.Character.Weapons.Current.Hash)
-				&& (GameplayCamera.IsFirstPersonAimCamActive);
-			_menuOpen = _menuPool.IsAnyMenuOpen();
+			
+
+            if (_gameState.IsInCharacterSelectionMenu)
+			{
+                //Reset
+                _controllerEmulation.DeltaX = 0;
+                _controllerEmulation.DeltaY = 0;
+            }
+			else if (_gameState.IsInRadialMenu)
+			{
+                _radialMenu.Update();
+			}
+			else
+            {
+                //Reset
+                _controllerEmulation.DeltaX = 0;
+                _controllerEmulation.DeltaY = 0;
+
+                _extendedView.Update();
+			}
+
+			ProcessSettingsMenu();
+
+			ProcessAimAtGaze(_settings.SnapAtTargetsEnabled ? shootCoordSnap : shootCoord);
+
+			//Place crosshair in the center of the screen in some cases
+			var gazeShootCoord = shootCoord;
+			var crosshairCoord = ProcessShootCoord(shootCoord);
+		    var isShootAtCenter = gazeShootCoord == shootCoord;
+
+			ProcessFireAtGaze(crosshairCoord, gazeShootCoord);
+
+			ProcessIncinerateAtGaze(shootCoordSnap);
+
+			ProcessTaseAtGaze(shootCoordSnap);
+
+			ProcessMissileAtGaze(shootMissileCoord, missileTarget);
+
+			_aiming.Update(crosshairCoord, missileTarget, isShootAtCenter);
+		}
+
+
+
+	    private void ProcessMissileAtGaze(Vector3 shootMissileCoord, Entity missileTarget)
+	    {
+			if (!_settings.MissilesAtGazeEnabled) return;
+
+			if (!(shootMissileCoord.Length() > 0) || !Geometry.IsInFrontOfThePlayer(shootMissileCoord)) return;
+
+		    var controllerState = _controllerEmulation.ControllerState;
+
+		    if (Game.IsKeyPressed(Keys.N)
+				|| Game.IsKeyPressed(Keys.PageUp)
+				|| (!_gameState.IsInCharacterSelectionMenu && !_gameState.IsInRadialMenu && !_gameState.IsMenuOpen && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.B)))
+		    {
+			    if (missileTarget != null)
+			    {
+				    _aiming.ShootMissile(missileTarget);
+			    }
+			    else
+			    {
+				    _aiming.ShootMissile(shootMissileCoord);
+			    }
+		    }
+	    }
+
+	    private void ProcessFireAtGaze(Vector3 shootCoord, Vector3 gazeShootCoord)
+	    {
+			if (!(shootCoord.Length() > 0) || !Geometry.IsInFrontOfThePlayer(shootCoord)) return;
 
 			var controllerState = _controllerEmulation.ControllerState;
 
-			if (!_menuOpen
-				&& (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.DPadDown)
-				|| User32.IsKeyPressed(VirtualKeyStates.VK_LMENU)))
-			{
-				//character selection
-				_isInRadialMenu = true;
-			}
-			else if (!_isInVehicle && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder))
-			{
-				_isInRadialMenu = true;
-                _radialMenu.Process(gazePoint, aspectRatio);
-			}
-			else
-			{
-				_isInRadialMenu = false;
-				_freelook.Process(gazePoint, ped, aspectRatio);
-			}
-
-			if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftThumb)
-				&& controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.Start)
-				&& !_menuOpen)
-			{
-				_settingsMenu.OpenMenu();
-			}
-
-			if (shootCoord.Length() > 0 && Geometry.IsInFrontOfThePlayer(shootCoord))
-			{
-				var injectRightTrigger = 0;
-				if (_settings.FreelookDevice == FeeelookDevice.Gamepad
-					&& _settings.AimWithGazeEnabled
-					&& !Game.Player.Character.IsInVehicle()
-					&& Game.IsKeyPressed(Keys.B))
-				{
-					injectRightTrigger += 1;
-				}
-
-				if (_settings.FreelookDevice == FeeelookDevice.Gamepad
-					&& _settings.ThirdPersonFreelookEnabled
-					&& Game.Player.Character.IsInVehicle()
-					&& Game.IsKeyPressed(Keys.W))
-				{
-					_injectRightTrigger += 1; //TODO: block keyboard
-				}
-
-				_injectRightTrigger = injectRightTrigger;
-
-				if (_settings.AimWithGazeEnabled
-				    && ((!_isInVehicle
-				         && !_isMeleeWeapon
-				         && !_isThrowableWeapon
-				         && !_isSniperWeaponAndZoomed
-				         && ((!_isInRadialMenu && controllerState.Gamepad.LeftTrigger > 0)
-				             || User32.IsKeyPressed(VirtualKeyStates.VK_RBUTTON)
-					         )
-					    )))
-				{
-					if (!_lastAimCameraAtTarget)
-					{
-						_freelook.AimCameraAtTarget(shootCoordSnap);
-					}
-					_lastAimCameraAtTarget = true;
-				}
-				else
-				{
-					_lastAimCameraAtTarget = false;
-				}
-
-				//If you use mouse - shoot in the middle of the screen
-				if (!_isInVehicle
-					&& (User32.IsKeyPressed(VirtualKeyStates.VK_LBUTTON)
-                        || User32.IsKeyPressed(VirtualKeyStates.VK_RBUTTON)))
-				{
-					Vector3 camPoint;
-					Geometry.ScreenRelToWorld(new Vector2(0, 0), out camPoint, out shootCoord);
-				}
-
-				if (_settings.AimWithGazeEnabled
-					&& !_isInVehicle
-					&& (!_isMeleeWeapon
-						&& !_isThrowableWeapon
-						&& !_isSniperWeaponAndZoomed
-						&& ((!_isInRadialMenu && controllerState.Gamepad.RightTrigger > 0)
-							|| (Game.IsKeyPressed(Keys.B))
-							)
-						)
-					)
-				{
+		    if (!_gameState.IsInVehicle
+				&& !Geometry.IsFirstPersonPedCameraActive()
+				&& !_gameState.IsSniperWeaponAndZoomed
+				&& !_gameState.IsThrowableWeapon
+				&& !_gameState.IsMeleeWeapon)
+		    {
+			    if (_gameState.IsShootingWithGamepad
+					|| _gameState.IsShootingWithMouse)
+			    {
 					_aiming.Shoot(shootCoord);
 				}
+				else if (Game.IsKeyPressed(Keys.B)
+					|| (User32.IsKeyPressed(VirtualKeyStates.VK_XBUTTON1)))
 
-				if (_settings.AimWithGazeEnabled
-					&& _isInVehicle
-					&& ((!_menuOpen && User32.IsKeyPressed(VirtualKeyStates.VK_LBUTTON))
-								|| (Game.IsKeyPressed(Keys.B))
-								|| (User32.IsKeyPressed(VirtualKeyStates.VK_XBUTTON1))
-								|| (!_isInAircraft && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder))
-						)
-					)	
-				{
-					_aiming.ShootBullet(shootCoord);
-				}
-
-
-
-				if ((_settings.MissilesAtGazeEnabled
-						&& Game.Player.Character.IsInVehicle())
-						&& missileTarget != null)
-				{
-					Vector2 screenCoords;
-					if (Geometry.WorldToScreenRel(missileTarget.Position, out screenCoords))
-					{
-						_aiming.MoveCrosshair(screenCoords);
-						_aiming.MissileLockedCrosshairVisible = true;
-					}
-				}
-				else
-				{
-					Vector2 screenCoords;
-					if (Geometry.WorldToScreenRel(shootCoord, out screenCoords))
-					{
-						_aiming.MoveCrosshair(screenCoords);
-						_aiming.MissileLockedCrosshairVisible = false;
-					}
-				}
-
-				if (_settings.IncinerateAtGazeEnabled
-					&& (Game.IsKeyPressed(Keys.J)
-						|| (User32.IsKeyPressed(VirtualKeyStates.VK_XBUTTON2))
-						|| (!_menuOpen && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.A))))
-				{
-					_aiming.Incinerate(shootCoordSnap);
-				}
-
-				if (_settings.TaseAtGazeEnabled
-					&& (Game.IsKeyPressed(Keys.H)
-						|| Game.IsKeyPressed(Keys.PageDown)
-						|| (!_isInAircraft && !_menuOpen && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.RightShoulder))))
-				{
-                    _aiming.Tase(shootCoordSnap);
-				}
-
-				if (Game.IsKeyPressed(Keys.U))
-				{
-					_aiming.Water(shootCoord);
+				{ 
+					_aiming.Shoot(gazeShootCoord);
 				}
 			}
 
-			if (shootMissileCoord.Length() > 0 && Geometry.IsInFrontOfThePlayer(shootMissileCoord))
-			{
-				if (_settings.MissilesAtGazeEnabled
-					&& (Game.IsKeyPressed(Keys.N)
-					|| Game.IsKeyPressed(Keys.PageUp)
-					|| (!_isInRadialMenu && !_menuOpen && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.B))))
-				{
-					if (missileTarget != null)
-					{
-						_aiming.ShootMissile(missileTarget);
-					}
-					else
-					{
-						_aiming.ShootMissile(shootMissileCoord);
-					}
+		    if (_gameState.IsInVehicle)
+		    {
+				if ((!_gameState.IsMenuOpen && User32.IsKeyPressed(VirtualKeyStates.VK_LBUTTON))
+					|| (!_gameState.IsInAircraft && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftShoulder)))
+			    {
+					_aiming.ShootBullet(gazeShootCoord);
+					//TODO: separate flag in settings
 				}
-			}
-			_aiming.Process(_isInRadialMenu);
-		}
+				else if (Game.IsKeyPressed(Keys.B)
+					|| User32.IsKeyPressed(VirtualKeyStates.VK_XBUTTON1))
+			    {
+					_aiming.ShootBullet(gazeShootCoord);
+				}
+		    }
+	    }
 
-		private void OnModifyControllerState(object sender, ModifyStateEventArgs modifyStateEventArgs)
+	    private Vector3 ProcessShootCoord(Vector3 shootCoord)
+	    {
+	        if (!_gameState.IsInVehicle &&
+                (!_settings.FireAtGazeEnabled
+	            || _gameState.IsMeleeWeapon
+				|| _gameState.IsThrowableWeapon
+				|| _gameState.IsSniperWeaponAndZoomed
+				|| _gameState.IsAimingWithMouse
+				|| _gameState.IsShootingWithMouse))
+	        {
+	            var source3D = _extendedView.CameraPositionWithoutExtendedView;
+	            var rotation = _extendedView.CameraRotationWithoutExtendedView;
+	            var dir = Geometry.RotationToDirection(rotation);
+	            var target3D = source3D + dir*1000;
+
+	            Entity hitEntity;
+	            shootCoord = Geometry.RaycastEverything(out hitEntity, target3D, source3D);
+	        }
+	        return shootCoord;
+	    }
+
+	    private void ProcessAimAtGaze(Vector3 aimCoord)
+	    {
+	        if (_settings.AimAtGazeEnabled
+	            && !_gameState.IsInVehicle
+                && (_gameState.IsAimingWithGamepad || _gameState.IsAimingWithMouse))
+	        {
+	            if (!_lastAimCameraAtTarget)
+	            {
+		            _extendedView.AimCameraAtTarget(aimCoord);
+				}
+	            _lastAimCameraAtTarget = true;
+	        }
+	        else
+	        {
+	            _lastAimCameraAtTarget = false;
+	        }
+	    }
+
+	    private void ProcessSettingsMenu()
+	    {
+            var controllerState = _controllerEmulation.ControllerState;
+            if (controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftThumb)
+	            && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.Start)
+	            && !_gameState.IsMenuOpen)
+	        {
+	            _settingsMenu.OpenMenu();
+	        }
+	    }
+
+	    private void ProcessTaseAtGaze(Vector3 shootCoordSnap)
+	    {
+		    if (!_settings.TaseAtGazeEnabled) return;
+
+            var controllerState = _controllerEmulation.ControllerState;
+            if (Game.IsKeyPressed(Keys.H)
+	            || Game.IsKeyPressed(Keys.PageDown)
+	            || (!_gameState.IsInAircraft && !_gameState.IsMenuOpen && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.RightShoulder)))
+	        {
+	            _aiming.Tase(shootCoordSnap);
+	        }
+	    }
+
+	    private void ProcessIncinerateAtGaze(Vector3 shootCoordSnap)
+	    {
+			if (!_settings.IncinerateAtGazeEnabled) return;
+
+			var controllerState = _controllerEmulation.ControllerState;
+            if (Game.IsKeyPressed(Keys.J)
+	            || User32.IsKeyPressed(VirtualKeyStates.VK_XBUTTON2)
+	            || (!_gameState.IsMenuOpen && controllerState.Gamepad.Buttons.HasFlag(GamepadButtonFlags.A)))
+	        {
+	            _aiming.Incinerate(shootCoordSnap);
+	        }
+	    }
+
+
+
+	    private void OnModifyControllerState(object sender, ModifyStateEventArgs modifyStateEventArgs)
 		{
 			if (_shutDownRequestFlag) return;
-			if (_isPaused) return;
+			if (_gameState.IsPaused) return;
 			var timePausedThershold = TimeSpan.FromSeconds(0.5);
 			if (DateTime.UtcNow - _lastTickTime > timePausedThershold) return;
 
@@ -269,16 +259,16 @@ namespace Gta5EyeTracking
 			var disableStart = false;
 			var disableRightTrigger = false;
 
-			if (_isInVehicle)
+			if (_gameState.IsInVehicle)
 			{
-				if (_isInAircraft)
+				if (_gameState.IsInAircraft)
 				{
 					if (_settings.MissilesAtGazeEnabled) disableB = true;
 					if (_settings.IncinerateAtGazeEnabled) disableA = true;
 				}
 				else
 				{
-					if (_settings.AimWithGazeEnabled) disableLeftShoulder = true;
+					if (_settings.FireAtGazeEnabled) disableLeftShoulder = true;
 					if (_settings.MissilesAtGazeEnabled) disableB = true;
 					if (_settings.TaseAtGazeEnabled) disableRightShoulder = true;
 					if (_settings.IncinerateAtGazeEnabled) disableA = true;
@@ -286,18 +276,18 @@ namespace Gta5EyeTracking
 			}
 			else
 			{
-				if (_settings.AimWithGazeEnabled)
+				if (_settings.FireAtGazeEnabled)
 				{
 					disableLeftThumb = true;
 					if (state.Gamepad.Buttons.HasFlag(GamepadButtonFlags.LeftThumb))
 					{
 						disableRightStick = true;
 					}
-					if (!_isPaused
-					    && !_isInRadialMenu
-						&& !_isMeleeWeapon
-						&& !_isThrowableWeapon
-						&& !_isSniperWeaponAndZoomed)
+					if (!_gameState.IsPaused
+					    && !_gameState.IsInRadialMenu
+						&& !_gameState.IsMeleeWeapon
+						&& !_gameState.IsThrowableWeapon
+						&& !_gameState.IsSniperWeaponAndZoomed)
 					{
 						disableRightTrigger = true;
 					}
@@ -315,16 +305,11 @@ namespace Gta5EyeTracking
 				disableLeftThumb = true;
 			}
 
-			if (_menuOpen)
+			if (_gameState.IsMenuOpen)
 			{
 				disableA = false;
 				disableB = false;
 				//disableStart = false;
-			}
-
-			if (_injectRightTrigger > 0)
-			{
-				state.Gamepad.RightTrigger = 255;
 			}
 
 			if (disableRightTrigger)
@@ -377,14 +362,9 @@ namespace Gta5EyeTracking
 				_debugOutput.Visible = !_debugOutput.Visible;
 			}
 
-			if (e.KeyCode == Keys.L)
-			{
-				_aiming.AlwaysShowCrosshair = !_aiming.AlwaysShowCrosshair;
-			}
-
 			if (e.KeyCode == Keys.F8)
 			{
-				if (!_menuPool.IsAnyMenuOpen())
+				if (!_gameState.IsMenuOpen)
 				{
 					_settingsMenu.OpenMenu();
 				}

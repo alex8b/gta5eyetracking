@@ -57,7 +57,7 @@
       <HintPath>..\lib\EasyHook\NetFX4.0\EasyHook.dll</HintPath>
     </Reference>
     <Reference Include="EyeXFramework">
-      <HintPath>..\lib\EyeXSDK\lib\x64\EyeXFramework.dll</HintPath>
+      <HintPath>..\lib\TobiiEyeXSdk-DotNet\lib\x64\EyeXFramework.dll</HintPath>
     </Reference>
     <Reference Include="NativeUI">
       <HintPath>..\lib\NativeUI\NativeUI.dll</HintPath>
@@ -65,16 +65,16 @@
     <Reference Include="ScriptHookVDotNet">
       <HintPath>..\lib\ScriptHookVDotNet\ScriptHookVDotNet.dll</HintPath>
     </Reference>
-    <Reference Include="SharpDX, Version=3.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.3.0.1\lib\net45\SharpDX.dll</HintPath>
+    <Reference Include="SharpDX, Version=3.0.2.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpDX.3.0.2\lib\net45\SharpDX.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SharpDX.Mathematics, Version=3.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.Mathematics.3.0.1\lib\net45\SharpDX.Mathematics.dll</HintPath>
+    <Reference Include="SharpDX.Mathematics, Version=3.0.2.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpDX.Mathematics.3.0.2\lib\net45\SharpDX.Mathematics.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SharpDX.XInput, Version=3.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.XInput.3.0.1\lib\net45\SharpDX.XInput.dll</HintPath>
+    <Reference Include="SharpDX.XInput, Version=3.0.2.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpDX.XInput.3.0.2\lib\net45\SharpDX.XInput.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -88,24 +88,26 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="Tobii.EyeX.Client.Net20">
-      <HintPath>..\lib\EyeXSDK\lib\x64\Tobii.EyeX.Client.Net20.dll</HintPath>
+      <HintPath>..\lib\TobiiEyeXSdk-DotNet\lib\x64\Tobii.EyeX.Client.Net20.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Debug.cs" />
     <Compile Include="Features\Aiming.cs" />
     <Compile Include="ControlsProcessor.cs" />
     <Compile Include="Crosshairs\Crosshair.cs" />
-    <Compile Include="Crosshairs\DotCrosshair.cs" />
-    <Compile Include="Deadzones\Deadzone.cs" />
-    <Compile Include="Deadzones\DeadzoneEditor.cs" />
+    <Compile Include="Crosshairs\DefaultCrosshair.cs" />
     <Compile Include="DebugOutput.cs" />
     <Compile Include="Features\AnimationHelper.cs" />
     <Compile Include="ForegroundWindowWatcher.cs" />
-    <Compile Include="Features\Freelook.cs" />
+    <Compile Include="Features\ExtendedView.cs" />
+    <Compile Include="GameState.cs" />
     <Compile Include="GazeProjector.cs" />
     <Compile Include="Geometry.cs" />
     <Compile Include="GoogleAnalyticsApi.cs" />
     <Compile Include="Gta5EyeTracking.cs" />
+    <Compile Include="Gaze\ITobiiTracker.cs" />
+    <Compile Include="Gaze\TobiiInteractionEngineTracker.cs" />
     <Compile Include="HidEmulation\ControllerEmulation.cs" />
     <Compile Include="HidEmulation\IHidEmulation.cs" />
     <Compile Include="HomingMissiles\HomingMissile.cs" />
@@ -114,18 +116,18 @@
     <Compile Include="HidEmulation\MouseEmulation.cs" />
     <Compile Include="HidEmulation\MouseApi.cs" />
     <Compile Include="Crosshairs\MissileLockCrosshair.cs" />
+    <Compile Include="Mathf.cs" />
     <Compile Include="Menu\IntroScreen.cs" />
-    <Compile Include="PedestrianInteraction\PedestrianInteraction.cs" />
-    <Compile Include="PedestrianInteraction\PedInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Features\RadialMenu.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Menu\SettingsMenu.cs" />
     <Compile Include="SettingsStorage.cs" />
     <Compile Include="User32.cs" />
-    <Compile Include="Util.cs" />
+    <Compile Include="ScriptHookExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -146,9 +148,9 @@ xcopy "$(SolutionDir)licenses\*.*" "$(SolutionDir)bin\scripts\licenses\*.*"
 xcopy "$(SolutionDir)lib\EasyHook\NetFX4.0\EasyHook64.dll" "$(SolutionDir)bin\scripts\"
 xcopy "$(SolutionDir)lib\EasyHook\NetFX4.0\EasyHook.dll" "$(SolutionDir)bin\scripts\"
 
-xcopy "$(SolutionDir)lib\EyeXSDK\lib\x64\EyeXFramework.dll" "$(SolutionDir)bin\scripts\"
-xcopy "$(SolutionDir)lib\EyeXSDK\lib\x64\Tobii.EyeX.Client.Net20.dll" "$(SolutionDir)bin\scripts\"
-xcopy "$(SolutionDir)lib\EyeXSDK\lib\x64\Tobii.EyeX.Client.dll" "$(SolutionDir)bin\scripts\"
+xcopy "$(SolutionDir)lib\TobiiEyeXSdk-DotNet\lib\x64\EyeXFramework.dll" "$(SolutionDir)bin\scripts\"
+xcopy "$(SolutionDir)lib\TobiiEyeXSdk-DotNet\lib\x64\Tobii.EyeX.Client.Net20.dll" "$(SolutionDir)bin\scripts\"
+xcopy "$(SolutionDir)lib\TobiiEyeXSdk-DotNet\lib\x64\Tobii.EyeX.Client.dll" "$(SolutionDir)bin\scripts\"
 
 xcopy "$(ProjectDir)bin\x64\Release\SharpDX.dll" "$(SolutionDir)bin\scripts\"
 xcopy "$(ProjectDir)bin\x64\Release\SharpDX.XInput.dll" "$(SolutionDir)bin\scripts\"

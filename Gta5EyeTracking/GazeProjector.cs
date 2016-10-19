@@ -49,14 +49,14 @@ namespace Gta5EyeTracking
 			var hitUnfiltered = Geometry.ConecastPedsAndVehicles(unfilteredGazePointPlusJoystickDelta, out unfilteredEntity);
 			shootMissileCoord = hitUnfiltered;
 			shootCoordSnap = hitUnfiltered;
-			//Util.Log("B - " + DateTime.UtcNow.Ticks);
+
 
 			var hitFiltered = Geometry.RaycastEverything(filteredGazePointPlusJoystickDelta, out filteredEntity, true);
 			shootCoord = hitFiltered;
-			//Util.Log("C - " + DateTime.UtcNow.Ticks);
+
 
 			if (unfilteredEntity != null
-				&& Util.IsEntityAPed(unfilteredEntity))
+				&& ScriptHookExtensions.IsEntityAPed(unfilteredEntity))
 			{
 				ped = unfilteredEntity as Ped;
 			}
@@ -78,17 +78,17 @@ namespace Gta5EyeTracking
 			{
 				shootCoordSnap = ped.GetBoneCoord(Bone.SKEL_L_Clavicle);
 				target = ped;
-				if (_settings.SnapAtPedestriansEnabled)
+				if (_settings.SnapAtTargetsEnabled)
 				{
 					shootCoord = shootCoordSnap;
 				}
 			}
 			else
 			{
-				//Util.Log("D - " + DateTime.UtcNow.Ticks);
+
 				Vehicle vehicle;
 				if (unfilteredEntity != null
-					&& Util.IsEntityAVehicle(unfilteredEntity))
+					&& ScriptHookExtensions.IsEntityAVehicle(unfilteredEntity))
 				{
 					vehicle = unfilteredEntity as Vehicle;
 				}
@@ -114,10 +114,10 @@ namespace Gta5EyeTracking
 					target = vehicle;
 				}
 			}
-			//Util.Log("E - " + DateTime.UtcNow.Ticks);
+
 
 			ProcessMissileLock(target);
-			//Util.Log("F - " + DateTime.UtcNow.Ticks);
+
 
 			missileTarget = _missileTarget;
 			_frameSkip++;

@@ -21,25 +21,17 @@ namespace Gta5EyeTracking.Crosshairs
 
 		private void CreateUiContainer()
 		{
-			_uiContainer = new UIContainer(new Point(0, 0), new Size(40, 40), Color.FromArgb(0, 0, 0, 0));
-			var color = Color.FromArgb(220, 255, 50, 50);
-			var crosshair1 = new UIRectangle(new Point(0, 0), new Size(5, 2), color);
-			_uiContainer.Items.Add(crosshair1);
-			var crosshair2 = new UIRectangle(new Point(0, 38), new Size(5, 2), color);
-			_uiContainer.Items.Add(crosshair2);
-			var crosshair3 = new UIRectangle(new Point(0, 2), new Size(2, 3), color);
-			_uiContainer.Items.Add(crosshair3);
-			var crosshair4 = new UIRectangle(new Point(38, 2), new Size(2, 3), color);
-			_uiContainer.Items.Add(crosshair4);
+			UiContainer = new UIContainer(new Point(0, 0), new Size(40, 40), Color.FromArgb(0, 0, 0, 0));
 
-			var crosshair5 = new UIRectangle(new Point(35, 0), new Size(5, 2), color);
-			_uiContainer.Items.Add(crosshair5);
-			var crosshair6 = new UIRectangle(new Point(35, 38), new Size(5, 2), color);
-			_uiContainer.Items.Add(crosshair6);
-			var crosshair7= new UIRectangle(new Point(0, 35), new Size(2, 3), color);
-			_uiContainer.Items.Add(crosshair7);
-			var crosshair8 = new UIRectangle(new Point(38, 35), new Size(2, 3), color);
-			_uiContainer.Items.Add(crosshair8);
+			var color = Color.FromArgb(220, 255, 50, 50);
+			UiContainer.Items.Add(new UIRectangle(new Point(0, 0), new Size(5, 2), color));
+			UiContainer.Items.Add(new UIRectangle(new Point(0, 38), new Size(5, 2), color));
+			UiContainer.Items.Add(new UIRectangle(new Point(0, 2), new Size(2, 3), color));
+			UiContainer.Items.Add(new UIRectangle(new Point(38, 2), new Size(2, 3), color));
+			UiContainer.Items.Add(new UIRectangle(new Point(35, 0), new Size(5, 2), color));
+			UiContainer.Items.Add(new UIRectangle(new Point(35, 38), new Size(5, 2), color));
+			UiContainer.Items.Add(new UIRectangle(new Point(0, 35), new Size(2, 3), color));
+			UiContainer.Items.Add(new UIRectangle(new Point(38, 35), new Size(2, 3), color));
 		}
 
 		private void Animate()
@@ -73,7 +65,7 @@ namespace Gta5EyeTracking.Crosshairs
 			var g = color1.G + (color2.G - color1.G) * delta;
 			var b = color1.B + (color2.B - color1.B) * delta;
 			var color = Color.FromArgb((int) a, (int) r, (int) g, (int) b);
-			foreach (var el in _uiContainer.Items)
+			foreach (var el in UiContainer.Items)
 			{
 				el.Color = color;
 			}
@@ -81,7 +73,7 @@ namespace Gta5EyeTracking.Crosshairs
 
 		public override void Render()
 		{
-			_uiContainer.Draw();
+			UiContainer.Draw();
 			Animate();
 		}
 	}

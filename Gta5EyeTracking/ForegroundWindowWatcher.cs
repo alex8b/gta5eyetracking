@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Tobii.EyeX.Client;
 
 namespace Gta5EyeTracking
 {
@@ -29,7 +28,7 @@ namespace Gta5EyeTracking
 		public static extern IntPtr GetForegroundWindow();
     }
 
-    internal class ForegroundWindowWatcher : DisposableBase, IForegroundWindowWatcher
+    internal class ForegroundWindowWatcher : IDisposable, IForegroundWindowWatcher
     {
         public event EventHandler<ForegroundWindowChangedEventArgs> ForegroundWindowChanged = delegate { };
 
@@ -58,7 +57,7 @@ namespace Gta5EyeTracking
 			_gameWindowHandle = handle;
         }
 
-        protected override void DisposeManagedResources()
+		public void Dispose()
         {
             WinEventsNativeMethods.UnhookWinEvent(_eventHook);
         }

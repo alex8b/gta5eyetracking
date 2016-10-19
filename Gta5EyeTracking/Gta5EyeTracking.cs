@@ -1,20 +1,19 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using EyeXFramework;
 using Gta5EyeTracking.Crosshairs;
-using Gta5EyeTracking.Deadzones;
 using Gta5EyeTracking.Features;
 using Gta5EyeTracking.HidEmulation;
 using Gta5EyeTracking.Menu;
 using GTA;
 using GTA.Math;
 using NativeUI;
-using Tobii.EyeX.Framework;
+
+// TODO:
+// Windowed mode
+// Bug: stuck in fire animation
 
 namespace Gta5EyeTracking
 {
@@ -33,34 +32,27 @@ namespace Gta5EyeTracking
 		private readonly Settings _settings;
 		private readonly SettingsStorage _settingsStorage;
 
-		//Gaze
-		private EyeXHost _host;
-		private GazePointDataStream _lightlyFilteredGazePointDataProvider;
-		private DateTime _lastGazeTime;
-		private Vector2 _lastNormalizedCenterDelta;
-		private double _aspectRatio;
+        //Gaze
+        private ITobiiTracker _tobiiTracker;
 
-		//Features
+        //Features
+        private readonly GameState _gameState;
 		private Aiming _aiming;
-		private Freelook _freelook;
+		private ExtendedView _extendedView;
 		private readonly RadialMenu _radialMenu;
-		private readonly PedestrianInteraction _pedestrianInteraction;
 
 		//Hids
 		private readonly MouseEmulation _mouseEmulation;
 		private ControllerEmulation _controllerEmulation;
-		private bool _lastControllerConnected;
-		private bool _controllerEverConnected;
 
 		//Debug
-		private readonly DotCrosshair _debugGazeVisualization;
+		private readonly DefaultCrosshair _debugGazeVisualization;
 		private readonly DebugOutput _debugOutput;
 
 		//Menu
 		private readonly MenuPool _menuPool;
 		private bool _menuOpen;
 		private SettingsMenu _settingsMenu;
-		private readonly DeadzoneEditor _deadzoneEditor;
 		private readonly IntroScreen _introScreen;
 
 		//Window
@@ -72,9 +64,9 @@ namespace Gta5EyeTracking
         private readonly ManualResetEvent _shutDownRequestedEvent;
 		private readonly AnimationHelper _animationHelper;
 
-		public Gta5EyeTracking()
+	    public Gta5EyeTracking()
 		{
-            Util.Log("Begin Initialize");
+            Debug.Log("Begin Initialize");
 
 			//Disposing
 			_shutDownRequestedEvent = new ManualResetEvent(false);
@@ -88,37 +80,29 @@ namespace Gta5EyeTracking
 			var versionString = version.Major + "." + version.Minor + "." + version.Build;
 			_googleAnalyticsApi = new GoogleAnalyticsApi("UA-68420530-1", _settings.UserGuid, "GTA V Eye Tracking Mod", "gta5eyetracking", versionString);
 
-			//Gaze
-			_aspectRatio = 1;
-			_host = new EyeXHost();
-			_host.Start();
-			_lightlyFilteredGazePointDataProvider = _host.CreateGazePointDataStream(GazePointDataMode.LightlyFiltered);
-			_lightlyFilteredGazePointDataProvider.Next += NewGazePoint;
-			_lastGazeTime = DateTime.UtcNow;
+            //Gaze
+            _tobiiTracker = new TobiiInteractionEngineTracker();
 
-			//Menu
-			_menuPool = new MenuPool();
+            //Menu
+            _menuPool = new MenuPool();
 			_settingsMenu = new SettingsMenu(_menuPool, _settings);
-		    _deadzoneEditor = new DeadzoneEditor(_settings,_settingsMenu);
-			_settingsMenu.ShutDownRequested += SettingsMenuOnShutDownRequested;
 
 			_introScreen = new IntroScreen(_menuPool, _settings);
-			_introScreen.ShutDownRequested += SettingsMenuOnShutDownRequested;
 
 			//Debug
-			_debugGazeVisualization = new DotCrosshair(Color.FromArgb(220, 255, 0, 0), Color.FromArgb(220, 0, 255, 255));
+			_debugGazeVisualization = new DefaultCrosshair(Color.FromArgb(220, 255, 0, 0), Color.FromArgb(220, 0, 255, 255));
 			_debugOutput = new DebugOutput();
 
 			//Hids
 			_mouseEmulation = new MouseEmulation();
 			_controllerEmulation = new ControllerEmulation();
 
-			//Features
-			_animationHelper = new AnimationHelper();
-			_aiming = new Aiming(_settings, _animationHelper);
-			_freelook = new Freelook(_controllerEmulation, _mouseEmulation, _settings);
-			_radialMenu = new RadialMenu(_controllerEmulation);
-			_pedestrianInteraction = new PedestrianInteraction(_settings);
+            //Features
+            _gameState = new GameState(_controllerEmulation, _menuPool);
+            _animationHelper = new AnimationHelper();
+			_aiming = new Aiming(_settings, _animationHelper, _gameState);
+			_extendedView = new ExtendedView(_settings, _gameState, _tobiiTracker, _aiming);
+			_radialMenu = new RadialMenu(_controllerEmulation, _tobiiTracker);
 
 			//Window
 			_foregroundWindowWatcher = new ForegroundWindowWatcher();
@@ -127,18 +111,18 @@ namespace Gta5EyeTracking
 
 			//General
 			_gazeProjector = new GazeProjector(_settings);
-			_controlsProcessor = new ControlsProcessor(_settings,_controllerEmulation,_aiming,_freelook,_radialMenu,_settingsMenu, _menuPool, _debugOutput);
+			_controlsProcessor = new ControlsProcessor(_settings,_controllerEmulation,_aiming,_extendedView,_radialMenu,_settingsMenu, _gameState, _debugOutput);
 
 			KeyDown += OnKeyDown;
 			Tick += OnTick;
-			
-			Util.Log("End Initialize");
+			Aborted += OnAborted;
+			Debug.Log("End Initialize");
 		}
 
-	    private void SettingsMenuOnShutDownRequested(object sender, EventArgs eventArgs)
-	    {
-	        ShutDown();
-	    }
+		private void OnAborted(object sender, EventArgs eventArgs)
+		{
+			ShutDown();
+		}
 
 	    private void ForegroundWindowWatcherOnForegroundWindowChanged(object sender, ForegroundWindowChangedEventArgs foregroundWindowChangedEventArgs)
 		{
@@ -152,9 +136,9 @@ namespace Gta5EyeTracking
 
 	    protected override void Dispose(bool disposing)
 	    {
-			Util.Log("Begin Dispose");
+			Debug.Log("Begin Dispose");
 			ShutDown();
-			Util.Log("End Dispose");
+			Debug.Log("End Dispose");
 		}
 
         private void ShutDown()
@@ -164,7 +148,7 @@ namespace Gta5EyeTracking
 			Tick -= OnTick;
 
 			_shutDownRequestedEvent.WaitOne(100);
-            Util.Log("Begin ShutDown");
+            Debug.Log("Begin ShutDown");
 			_settingsStorage.SaveSettings(_settings);
 
 			//General
@@ -186,22 +170,7 @@ namespace Gta5EyeTracking
 			//Menu
             if (_settingsMenu != null)
             {
-                _settingsMenu.ShutDownRequested -= SettingsMenuOnShutDownRequested;
 	            _settingsMenu = null;
-            }
-
-			//Gaze
-            if (_lightlyFilteredGazePointDataProvider != null)
-            {
-                _lightlyFilteredGazePointDataProvider.Next -= NewGazePoint;
-                _lightlyFilteredGazePointDataProvider.Dispose();
-	            _lightlyFilteredGazePointDataProvider = null;
-            }
-
-            if (_host != null)
-            {
-                _host.Dispose();
-	            _host = null;
             }
 
 			//Features
@@ -211,10 +180,10 @@ namespace Gta5EyeTracking
 	            _aiming = null;
             }
 
-			if (_freelook != null)
+			if (_extendedView != null)
 			{
-				_freelook.Dispose();
-				_freelook = null;
+				_extendedView.Dispose();
+				_extendedView = null;
 			}
 			
 			//Hids
@@ -224,52 +193,29 @@ namespace Gta5EyeTracking
 				_controllerEmulation.RemoveHooks();
 				_controllerEmulation = null;
 			}
-			Util.Log("End ShutDown");
-		}
 
-		private void NewGazePoint(object sender, GazePointEventArgs gazePointEventArgs)
-		{
-			const double screenExtensionFactor = 0;
-			var screenExtensionX = _host.ScreenBounds.Value.Width * screenExtensionFactor;
-			var screenExtensionY = _host.ScreenBounds.Value.Height * screenExtensionFactor;
-
-			var gazePointX = gazePointEventArgs.X + screenExtensionX / 2;
-			var gazePointY = gazePointEventArgs.Y + screenExtensionY / 2;
-
-			var screenWidth = _host.ScreenBounds.Value.Width + screenExtensionX;
-			var screenHeight = _host.ScreenBounds.Value.Height + screenExtensionY;
-
-			if (screenHeight > 0)
-			{
-				_aspectRatio = screenWidth/screenHeight;
-			}
-
-			var normalizedGazePointX = (float)Math.Min(Math.Max((gazePointX / screenWidth), 0.0), 1.0);
-			var normalizedGazePointY = (float)Math.Min(Math.Max((gazePointY / screenHeight), 0.0), 1.0);
-
-			var normalizedCenterDeltaX = (normalizedGazePointX - 0.5f) * 2.0f;
-			var normalizedCenterDeltaY = (normalizedGazePointY - 0.5f) * 2.0f;
-			if (float.IsNaN(normalizedCenterDeltaX) || float.IsNaN(normalizedCenterDeltaY)) return;
-
-			_lastNormalizedCenterDelta = new Vector2(normalizedCenterDeltaX, normalizedCenterDeltaY);
-			_debugGazeVisualization.Move(_lastNormalizedCenterDelta);
-			_lastGazeTime = DateTime.UtcNow;
+            if (_tobiiTracker != null)
+            {
+                _tobiiTracker.Dispose();
+                _tobiiTracker = null;
+            }
+			Debug.Log("End ShutDown");
 		}
 
 		public void OnTick(object sender, EventArgs e)
 		{
 			if (_shutDownRequestFlag) return;
 
-			_controllerEmulation.Enabled = !Game.IsPaused;
+            _debugGazeVisualization.Move(new Vector2(UI.WIDTH * 0.5f + _tobiiTracker.GazeX * UI.WIDTH * 0.5f, UI.HEIGHT * 0.5f + _tobiiTracker.GazeY * UI.HEIGHT * 0.5f));
+
+            _controllerEmulation.Enabled = !Game.IsPaused;
 			_mouseEmulation.Enabled = !Game.IsPaused && !_menuPool.IsAnyMenuOpen() &&_isWindowForeground;
 
-			CheckFreelookDevice();
+			//CheckFreelookDevice();
 
 			SaveSettingsOnMenuClosed();
 
 			Game.Player.Character.CanBeKnockedOffBike = _settings.DontFallFromBikesEnabled; //Bug in Script hook
-
-			CheckUserPresense();
 
 			if (Game.IsPaused) return;
 
@@ -286,7 +232,6 @@ namespace Gta5EyeTracking
 			Ped ped;
 			Entity missileTarget;
 
-			//Util.Log("0 - " + DateTime.UtcNow.Ticks);
 
 			var controllerState = _controllerEmulation.ControllerState;
 			const float joystickRadius = 0.1f;
@@ -294,10 +239,10 @@ namespace Gta5EyeTracking
 			var joystickDelta = new Vector2(controllerState.Gamepad.RightThumbX, -controllerState.Gamepad.RightThumbY) *
 								(1.0f / 32768.0f) * joystickRadius;
 
-			//Util.Log("1 - " + DateTime.UtcNow.Ticks);
+            _gameState.Update();
 
-			_gazeProjector.FindGazeProjection(
-				_lastNormalizedCenterDelta,
+            _gazeProjector.FindGazeProjection(
+				new Vector2(_tobiiTracker.GazeX,_tobiiTracker.GazeY), 
 				joystickDelta,
                 out shootCoord, 
 				out shootCoordSnap, 
@@ -305,21 +250,15 @@ namespace Gta5EyeTracking
 				out ped, 
 				out missileTarget);
 
-			//Util.Log("2 - " + DateTime.UtcNow.Ticks);
+			
 
-			_controlsProcessor.Process(_lastTickTime, _lastNormalizedCenterDelta, _aspectRatio, shootCoord, shootCoordSnap, shootMissileCoord, ped, missileTarget);
-
-			//Util.Log("3 - " + DateTime.UtcNow.Ticks);
-
+			_controlsProcessor.Update(_lastTickTime, shootCoord, shootCoordSnap, shootMissileCoord, ped, missileTarget);
 
 			//_aiming.TurnHead(ped, shootCoord);
 			_menuPool.ProcessMenus();
 
-			//Util.Log("4 - " + DateTime.UtcNow.Ticks);
-
 			
 			_animationHelper.Process();
-			//Util.Log("5 - " + DateTime.UtcNow.Ticks);
 
 			if (_debugOutput.Visible)
 			{
@@ -328,18 +267,7 @@ namespace Gta5EyeTracking
 
 			_debugOutput.Process();
 
-			//Util.Log("6 - " + DateTime.UtcNow.Ticks);
-
-			_pedestrianInteraction.Process(ped, DateTime.UtcNow - _lastTickTime);
-
-			//Util.Log("7 - " + DateTime.UtcNow.Ticks);
-
-
-			_deadzoneEditor.Process();
-
 			_mouseEmulation.ProcessInput();
-
-			//Util.Log("8 - " + DateTime.UtcNow.Ticks);
 
 			_lastTickTime = DateTime.UtcNow;
 
@@ -354,8 +282,10 @@ namespace Gta5EyeTracking
 			if (!_settings.UserAgreementAccepted || !_settings.SendUsageStatistics || _gameSessionStartedRecorded) return;
 			
 			_googleAnalyticsApi.TrackEvent("gamesession", "started", "Game Session Started");
-			var trackingActive = (_host.EyeTrackingDeviceStatus.IsValid &&
-			                    _host.EyeTrackingDeviceStatus.Value == EyeTrackingDeviceStatus.Tracking);
+			var trackingActive = true;
+            //TODO
+			//(_tobiiTracker.EyeTrackingDeviceStatus.IsValid &&
+			//_tobiiTracker.EyeTrackingDeviceStatus.Value == EyeTrackingDeviceStatus.Tracking);
 			if (trackingActive)
 			{
 				_googleAnalyticsApi.TrackEvent("gamesession", "devicesconnected", "Device Connected", 1);
@@ -382,35 +312,6 @@ namespace Gta5EyeTracking
 			if (lastMenuOpen && !_menuOpen)
 			{
 				_settingsStorage.SaveSettings(_settings);
-			}
-		}
-
-		private void CheckFreelookDevice()
-		{
-			var controllerConnected = _controllerEmulation.ControllerConnected;
-			_controllerEverConnected = _controllerEverConnected || controllerConnected;
-			if (controllerConnected && !_lastControllerConnected)
-			{
-				_settings.FreelookDevice = FeeelookDevice.Gamepad;
-				_settingsMenu.ReloadSettings();
-			}
-
-			if (!_controllerEverConnected)
-			{
-				_settings.FreelookDevice = FeeelookDevice.Mouse;
-				_settingsMenu.ReloadSettings();
-			}
-
-			_lastControllerConnected = controllerConnected;
-		}
-
-		private void CheckUserPresense()
-		{
-			var maxAwayTime = TimeSpan.FromSeconds(2);
-			if (DateTime.UtcNow - _lastGazeTime > maxAwayTime)
-			{
-		//		_lastNormalizedCenterDelta = new Vector2();
-		//		if (!Game.IsPaused) Game.Pause(true); //TODO: doesn't work
 			}
 		}
 	}

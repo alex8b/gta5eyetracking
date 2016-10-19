@@ -55,3 +55,5 @@ ipch/
 # Guidance Automation Toolkit
 *.gpState
 
+*.db
+Gta5EyeTracking.VC.VC.opendb

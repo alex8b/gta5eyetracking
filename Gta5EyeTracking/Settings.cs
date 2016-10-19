@@ -1,141 +1,44 @@
 using System;
-using System.Collections.Generic;
-using System.Xml.Serialization;
-using Gta5EyeTracking.Deadzones;
 
 namespace Gta5EyeTracking
 {
-	public enum FeeelookDevice : int
-	{
-		Gamepad = 0,
-		Mouse = 1
-	}
-
 	public class Settings
 	{
-		public FeeelookDevice FreelookDevice { get; set; }
-		public bool ThirdPersonFreelookEnabled { get; set; }
-		public double ThirdPersonSensitivity { get; set; }
+		public bool ExtendedViewEnabled { get; set; }
+		public float ExtendedViewSensitivity { get; set; }
 
-		public double ThirdPersonYOffset { get; set; }
-		public double ThirdPersonDeadZoneHeight { get; set; }
-		public double ThirdPersonDeadZoneWidth { get; set; }
-		public double ThirdPersonMinPitchDeg { get; set; }
-		public double ThirdPersonMaxPitchDeg { get; set; }
-
-		public double ThirdPersonYOffsetDriving { get; set; }
-
-		public double ThirdPersonDeadZoneHeightDriving { get; set; }
-		public double ThirdPersonDeadZoneWidthDriving { get; set; }
-		public double ThirdPersonMinPitchDrivingDeg { get; set; }
-		public double ThirdPersonMaxPitchDrivingDeg { get; set; }
-
-		public double ThirdPersonYOffsetPlane { get; set; }
-		public double ThirdPersonDeadZoneHeightPlane { get; set; }
-		public double ThirdPersonDeadZoneWidthPlane { get; set; }
-		public double ThirdPersonMinPitchPlaneDeg { get; set; }
-		public double ThirdPersonMaxPitchPlaneDeg { get; set; }
-
-		public double ThirdPersonYOffsetHeli { get; set; }
-		public double ThirdPersonDeadZoneHeightHeli { get; set; }
-		public double ThirdPersonDeadZoneWidthHeli { get; set; }
-		public double ThirdPersonMinPitchHeliDeg { get; set; }
-		public double ThirdPersonMaxPitchHeliDeg { get; set; }
-
-		public double AimingSensitivity { get; set; }
-		public bool FirstPersonFreelookEnabled { get; set; }
-		public double FirstPersonSensitivity { get; set; }
-
-		public double FirstPersonDeadZoneHeight { get; set; }
-		public double FirstPersonDeadZoneWidth { get; set; }
-		public double FirstPersonMinPitchDeg { get; set; }
-		public double FirstPersonMaxPitchDeg { get; set; }
-		//
-		public double FirstPersonFovExtensionVertical { get; set; }
-		public double FirstPersonFovExtensionHorizontal { get; set; }
-
-		public bool FirstPersonFreelookDrivingEnabled { get; set; }
-
-		public double FirstPersonDeadZoneHeightDriving { get; set; }
-        public double FirstPersonDeadZoneWidthDriving { get; set; }
-
-        public double FirstPersonSensitivityDriving { get; set; }
-		public bool AimWithGazeEnabled { get; set; }
-		public bool SnapAtPedestriansEnabled { get; set; }
-		public double GazeFiltering { get; set; }
+		public bool AimAtGazeEnabled { get; set; }
+		public bool FireAtGazeEnabled { get; set; }
+		public bool SnapAtTargetsEnabled { get; set; }
+		public float GazeFiltering { get; set; }
 		public bool IncinerateAtGazeEnabled { get; set; }
 		public bool TaseAtGazeEnabled { get; set; }
 		public bool MissilesAtGazeEnabled { get; set; }
-		public bool PedestrianInteractionEnabled { get; set; }
-		public bool DontFallFromBikesEnabled { get; set; }
+        public bool AlwaysShowCrosshairEnabled { get; set; }
+        public bool DontFallFromBikesEnabled { get; set; }
 		public bool SendUsageStatistics { get; set; }
 		public bool UserAgreementAccepted { get; set; }
 		public string UserGuid { get; set; }
 
-		[XmlArray("Deadzones"), XmlArrayItem(typeof(Deadzone), ElementName = "Deadzone")]
-		public List<Deadzone> Deadzones { get; set; }
-
-
-
 		public Settings()
 		{
-			FreelookDevice = FeeelookDevice.Gamepad;
+			ExtendedViewEnabled = true;
+			ExtendedViewSensitivity = 0.5f;
 
-			ThirdPersonFreelookEnabled = true;
-			ThirdPersonSensitivity = 0.3;
+			GazeFiltering = 0.5f;
 
-			ThirdPersonYOffset = 0.1; 
-			ThirdPersonDeadZoneWidth = 0.1;
-			ThirdPersonDeadZoneHeight = 0.1;
-			ThirdPersonMinPitchDeg = -10;
-			ThirdPersonMaxPitchDeg = 33;
+            AimAtGazeEnabled = true;
 
-			ThirdPersonYOffsetDriving = 0.1;
-			ThirdPersonDeadZoneWidthDriving = 0.1;
-			ThirdPersonDeadZoneHeightDriving = 0.1;
-			ThirdPersonMinPitchDrivingDeg = -10;
-			ThirdPersonMaxPitchDrivingDeg = 0;
+            FireAtGazeEnabled = true;
+			SnapAtTargetsEnabled = false;
 
-			ThirdPersonYOffsetPlane = 0.0;
-			ThirdPersonDeadZoneWidthPlane = 0.3;
-			ThirdPersonDeadZoneHeightPlane = 0.1;
-			ThirdPersonMinPitchPlaneDeg = -60;
-			ThirdPersonMaxPitchPlaneDeg = 0;
-
-			ThirdPersonYOffsetHeli = 0.0;
-			ThirdPersonDeadZoneWidthHeli = 0.3;
-			ThirdPersonDeadZoneHeightHeli = 0.1;
-			ThirdPersonMinPitchHeliDeg = -60;
-			ThirdPersonMaxPitchHeliDeg = 0;
-
-			FirstPersonFreelookEnabled = true;
-			FirstPersonSensitivity = 0.5;
-
-			FirstPersonDeadZoneWidth = 0.2;
-			FirstPersonDeadZoneHeight = 0.3;
-			FirstPersonMinPitchDeg = -45;
-			FirstPersonMaxPitchDeg = 33;
-
-		    FirstPersonFreelookDrivingEnabled = true;
-            FirstPersonSensitivityDriving = 0.5;
-
-            FirstPersonDeadZoneWidthDriving = 0.0;
-            FirstPersonDeadZoneHeightDriving = 0.0;
-
-			FirstPersonFovExtensionVertical = 30;
-			FirstPersonFovExtensionHorizontal = 60;
-
-			AimingSensitivity = 0.4;
-			GazeFiltering = 0.5;
-			AimWithGazeEnabled = true;
-			SnapAtPedestriansEnabled = false;
-			IncinerateAtGazeEnabled = true;
-			TaseAtGazeEnabled = true;
+            IncinerateAtGazeEnabled = false;
+			TaseAtGazeEnabled = false;
 			MissilesAtGazeEnabled = true;
-			PedestrianInteractionEnabled = true;
-			DontFallFromBikesEnabled = true;
 
-			Deadzones = new List<Deadzone>();
+		    AlwaysShowCrosshairEnabled = false;
+
+            DontFallFromBikesEnabled = true;
 
 			SendUsageStatistics = false;
 			UserAgreementAccepted = false;

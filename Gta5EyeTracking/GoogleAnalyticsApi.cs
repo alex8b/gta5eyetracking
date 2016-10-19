@@ -93,7 +93,7 @@ namespace Gta5EyeTracking
 					{
 						if (webResponse.StatusCode != HttpStatusCode.OK)
 						{
-							Util.Log("Google Analytics tracking did not return OK 200");
+							Debug.Log("Google Analytics tracking did not return OK 200");
 						}
 						webResponse.Close();
 					}
@@ -101,7 +101,7 @@ namespace Gta5EyeTracking
 				}
 				catch (Exception e)
 				{
-					Util.Log(e.Message);
+					Debug.Log(e.Message);
 				}
 			});
 		}

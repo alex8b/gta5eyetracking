@@ -225,7 +225,7 @@ namespace Gta5EyeTracking.Features
 				{
 					Game.Player.Character.Task.ClearAnimation(_lastAnimation.Group, _lastAnimation.Name);
 				}
-				Util.PlayAnimation(Game.Player.Character, animation.Group, animation.Name, 8.0f, -1, false, 0, true);
+				ScriptHookExtensions.PlayAnimation(Game.Player.Character, animation.Group, animation.Name, 8.0f, -1, false, 0, true);
 				_lastAnimation = animation;
 			}
 			_wasPlayingAnimationThisFrame = true;
@@ -240,7 +240,7 @@ namespace Gta5EyeTracking.Features
 				var animation = new AnimationName();
 				animation.Group = "gestures@f@standing@casual";
 				animation.Name = "gesture_shrug_soft";
-				Util.PlayAnimation(Game.Player.Character, animation.Group, animation.Name, 40.0f, -1, false, 0, true);
+				ScriptHookExtensions.PlayAnimation(Game.Player.Character, animation.Group, animation.Name, 40.0f, -1, false, 0, true);
 				_lastAnimation = animation;
 			}
 			_wasPlayingAnimationThisFrame = true;

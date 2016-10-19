@@ -8,27 +8,29 @@ namespace Gta5EyeTracking.Features
 	public class RadialMenu
 	{
 		private readonly ControllerEmulation _controllerEmulation;
-		private readonly Stopwatch _newRadialMenuRegionStopwatch;
+	    private readonly ITobiiTracker _tobiiTracker;
+	    private readonly Stopwatch _newRadialMenuRegionStopwatch;
 		private int _lastRadialMenuRegion;
 
-		public RadialMenu(ControllerEmulation controllerEmulation)
+		public RadialMenu(ControllerEmulation controllerEmulation, ITobiiTracker tobiiTracker)
 		{
 			_controllerEmulation = controllerEmulation;
-			_lastRadialMenuRegion = -1;
+		    _tobiiTracker = tobiiTracker;
+		    _lastRadialMenuRegion = -1;
 			_newRadialMenuRegionStopwatch = new Stopwatch();
 		}
 
-		public void Process(Vector2 gazeNormalizedCenterDelta, double aspectRatio)
+		public void Update()
 		{
-			const double radialMenuYOffset = 0.17;
-			const double radialMenuInnerRadius = 0.23;
+			const float radialMenuYOffset = 0.17f;
+			const float radialMenuInnerRadius = 0.23f;
 			const int numberOfSectors = 8;
 			const int sectorSize = 360 / numberOfSectors;
 
-			var deltaVector = new Vector2((float)(gazeNormalizedCenterDelta.X * aspectRatio), (float)(gazeNormalizedCenterDelta.Y + radialMenuYOffset));
+			var deltaVector = new Vector2(_tobiiTracker.GazeX * _tobiiTracker.AspectRatio, (float)(_tobiiTracker.GazeY + radialMenuYOffset));
 			if (deltaVector.Length() < radialMenuInnerRadius) return;
 
-			var angleRad = Math.Atan2(-deltaVector.Y, deltaVector.X);
+			var angleRad = (float)Math.Atan2(-deltaVector.Y, deltaVector.X);
 			var angleDeg = Geometry.RadToDeg(angleRad);
 			var region = (int)Math.Floor(360 + angleDeg + sectorSize * 0.5) / sectorSize;
 			region = region % numberOfSectors;

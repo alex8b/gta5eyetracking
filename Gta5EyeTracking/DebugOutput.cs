@@ -5,14 +5,15 @@ namespace Gta5EyeTracking
 {
 	public class DebugOutput
 	{
-		private UIContainer _uiContainer;
 		public UIText DebugText1;
 		public UIText DebugText2;
 		public UIText DebugText3;
 		public UIText DebugText4;
 		public UIText DebugText5;
 
-		public DebugOutput()
+	    private UIContainer _uiContainer;
+
+        public DebugOutput()
 		{
 			CreateDebugWindow();
 		}

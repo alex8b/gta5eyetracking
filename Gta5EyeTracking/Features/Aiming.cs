@@ -1,53 +1,56 @@
 using System;
 using System.Diagnostics;
-using Gta5EyeTracking;
 using Gta5EyeTracking.Crosshairs;
 using Gta5EyeTracking.HomingMissiles;
 using GTA;
 using GTA.Math;
 using GTA.Native;
-using Tobii.EyeX.Client;
 
 namespace Gta5EyeTracking.Features
 {
-	public class Aiming: DisposableBase
+	public class Aiming: IDisposable
 	{
-    	public bool AlwaysShowCrosshair { get; set; }
-		public bool MissileLockedCrosshairVisible { get; set; }
+		public bool IsMissileLockedCrosshairVisible { get; private set; }
+        public bool IsCrosshairVisible { get; private set; }
+        public Vector2 CrosshairPosition { get; private set; }
+	    public bool IsCrosshairAtCenter { get; set; }
 
-		private readonly MissileLockCrosshair _missileLockCrosshair;
-		private readonly DotCrosshair _dotCrosshair;
+	    private readonly MissileLockCrosshair _missileLockCrosshair;
+		private readonly DefaultCrosshair _dotCrosshair;
 
 		private readonly Stopwatch _shootStopWatch;
 
-		private bool _drawCrosshair;
 		private Vector2 _crosshairPosition;
 		private readonly Settings _settings;
 		private readonly AnimationHelper _animationHelper;
-		private readonly HomingMissilesHelper _homingMissilesHelper;
+	    private readonly GameState _gameState;
+
+	    private readonly HomingMissilesHelper _homingMissilesHelper;
 		private DateTime _lastTime;
 		private TimeSpan _timeDelta;
 
-		public Aiming(Settings settings, AnimationHelper animationHelper)
+		public Aiming(Settings settings, AnimationHelper animationHelper, GameState gameState)
 		{
 			_settings = settings;
 			_animationHelper = animationHelper;
-			_shootStopWatch = new Stopwatch();
+		    _gameState = gameState;
+
+		    _shootStopWatch = new Stopwatch();
 			_shootStopWatch.Restart();
 
 			_homingMissilesHelper = new HomingMissilesHelper();
 			_missileLockCrosshair = new MissileLockCrosshair();
-			_dotCrosshair = new DotCrosshair();
+			_dotCrosshair = new DefaultCrosshair();
 		}
 
-	    protected override void DisposeManagedResources()
+		public void Dispose()
 	    {
 	        _homingMissilesHelper.Dispose();
 	    }
 
 		public void Shoot(Vector3 target)
 		{
-			_drawCrosshair = true;
+			IsCrosshairVisible = true;
 			var weaponPos = Game.Player.Character.Position;
 
 			//take velocity into account
@@ -70,14 +73,14 @@ namespace Gta5EyeTracking.Features
 
 				_animationHelper.PlayShootingAnimation(pitchToTarget);
 
-				Util.SetPedShootsAtCoord(Game.Player.Character, target);
+				ScriptHookExtensions.SetPedShootsAtCoord(Game.Player.Character, target);
 				RotatePlayerCharacterTowardsTarget(target);
 			}
 		}
 
 		public void ShootBullet(Vector3 target)
 		{
-			_drawCrosshair = true;
+			IsCrosshairVisible = true;
 			var weaponPos = Game.Player.Character.Position;
 
 			//take velocity into account
@@ -99,7 +102,7 @@ namespace Gta5EyeTracking.Features
 			}
 		}
 
-		private void RotatePlayerCharacterTowardsTarget(Vector3 target)
+		public void RotatePlayerCharacterTowardsTarget(Vector3 target)
 		{
 			var dir = target - Game.Player.Character.GetBoneCoord(Bone.SKEL_R_Hand);
 			var headingToTarget = Geometry.DirectionToRotation(dir).Z;
@@ -107,23 +110,16 @@ namespace Gta5EyeTracking.Features
 			      || Game.Player.Character.IsRunning)
 			    && dir.Length() > 1.5)
 			{
-				var dist = headingToTarget - Game.Player.Character.Heading;
-				if (dist > 180)
-				{
-					dist = dist - 360;
-				}
-				if (dist < -180)
-				{
-					dist = dist + 360;
-				}
+				var deltaHeading = headingToTarget - Game.Player.Character.Heading;
+			    var deltaHeadingBound = Geometry.BoundRotationDeg(deltaHeading);
 				var velocity = 6;
-				Game.Player.Character.Heading += dist*velocity*(float) _timeDelta.TotalSeconds;
+				Game.Player.Character.Heading += deltaHeadingBound * velocity*(float) _timeDelta.TotalSeconds;
 			}
 		}
 
 		public void Tase(Vector3 target)
 		{
-			_drawCrosshair = true;
+			IsCrosshairVisible = true;
 			var weaponPos = Game.Player.Character.Position;
 
 			//take velocity into account
@@ -151,7 +147,7 @@ namespace Gta5EyeTracking.Features
 		public void ShootMissile(Vector3 target)
 		{
 			target = PutAboveGround(target);
-			_drawCrosshair = true;
+			IsCrosshairVisible = true;
 			var weaponPos = Game.Player.Character.Position;
 
 			//take velocity into account
@@ -232,91 +228,84 @@ namespace Gta5EyeTracking.Features
 			}
 		}
 
-		public void Water(Vector3 target)
+		public void Update(Vector3 shootCoord, Entity missileTarget, bool isShootAtCenter)
 		{
-			_drawCrosshair = true;
-			var dist = (target - Game.Player.Character.Position).Length();
-			if (dist > 3)
-			{
-				World.AddExplosion(target, ExplosionType.WaterHydrant, 2, 0);
-				if (!Game.Player.Character.IsInVehicle())
-				{
-					_animationHelper.PlayMindControlAnimation();
-				}
-			}
-		}
+            var time = DateTime.UtcNow;
+            _timeDelta = time - _lastTime;
+            _lastTime = time;
 
+		    IsCrosshairAtCenter = isShootAtCenter;
 
-
-		private void TurnHead(Ped ped, Vector3 shootCoord)
-		{
-			if (ped != null && ped.Handle != Game.Player.Character.Handle)
-			{
-				if (!Geometry.IsFirstPersonPedCameraActive())
-				{
-					Game.Player.Character.Task.LookAt(ped);
-				}
-			}
-			else
-			{
-				if (!Geometry.IsFirstPersonPedCameraActive())
-				{
-					Game.Player.Character.Task.LookAt(shootCoord);
-				}
-			}
-		}
-
-		public void Process(bool isInRadialMenu)
-		{
-			var time = DateTime.UtcNow;
-			_timeDelta = time - _lastTime;
-			_lastTime = time;
-			var isMeleeWeapon = Util.IsMelee(Game.Player.Character.Weapons.Current.Hash);
-			var isThrowableWeapon = Util.IsThrowable(Game.Player.Character.Weapons.Current.Hash);
-			var isSniperWeaponAndZoomed = Util.IsSniper(Game.Player.Character.Weapons.Current.Hash)
-                && (GameplayCamera.IsFirstPersonAimCamActive);
-
-
-			if ((_settings.AimWithGazeEnabled 
-					&& GameplayCamera.IsAimCamActive
-					&& !isMeleeWeapon
-					&& !isThrowableWeapon
-					&& !isSniperWeaponAndZoomed
-					&& !isInRadialMenu)
-                || AlwaysShowCrosshair)
+            if (_settings.MissilesAtGazeEnabled
+                && Game.Player.Character.IsInVehicle()
+                && missileTarget != null)
             {
-				_drawCrosshair = true;
-			}
+                Vector2 screenCoords;
+                if (Geometry.WorldToScreenRel(missileTarget.Position, out screenCoords))
+                {
+                    MoveCrosshair(screenCoords);
+                    IsMissileLockedCrosshairVisible = true;
+                }
+            }
+            else
+            {
+                Vector2 screenCoords;
+                if (Geometry.WorldToScreenRel(shootCoord, out screenCoords))
+                {
+                    MoveCrosshair(screenCoords);
+                    IsMissileLockedCrosshairVisible = false;
+                }
+            }
 
-			if (_drawCrosshair)
+
+
+		    if (((_settings.ExtendedViewEnabled || _settings.FireAtGazeEnabled)
+		         && !(!_gameState.IsInVehicle && Geometry.IsFirstPersonPedCameraActive())
+		         &&
+		         (GameplayCamera.IsAimCamActive || _gameState.IsAimingWithMouse || _gameState.IsAimingWithGamepad ||
+		          _gameState.IsShootingWithMouse || _gameState.IsShootingWithGamepad)
+		         && !_gameState.IsMeleeWeapon
+		         && !_gameState.IsSniperWeaponAndZoomed
+		         && !_gameState.IsInRadialMenu)
+		        || _settings.AlwaysShowCrosshairEnabled)
+		    {
+		        IsCrosshairVisible = true;
+		    }
+		    else
+		    {
+                IsCrosshairVisible = false;
+            }
+
+			if (IsCrosshairVisible)
 			{
 				UI.HideHudComponentThisFrame((HudComponent)14);
 			}
 
-			if (_drawCrosshair
-				&& !MissileLockedCrosshairVisible)
+			if (IsCrosshairVisible
+				&& !IsMissileLockedCrosshairVisible)
 			{
 				_dotCrosshair.Render();
 			}
 
 		    if (_settings.MissilesAtGazeEnabled 
 				&& Game.Player.Character.IsInVehicle()
-				&& MissileLockedCrosshairVisible)
+				&& IsMissileLockedCrosshairVisible)
 		    {
 			    _missileLockCrosshair.Render();
             }
 
             _homingMissilesHelper.Process();
-			_drawCrosshair = false;
 		}
 
-	    public void MoveCrosshair(Vector2 screenCoords)
-		{
-			var uiWidth = UI.WIDTH;
+        private void MoveCrosshair(Vector2 screenCoords)
+	    {
+	        CrosshairPosition = screenCoords;
+
+            var uiWidth = UI.WIDTH;
 			var uiHeight = UI.HEIGHT;
 
 			var crosshairPosition = new Vector2(uiWidth * 0.5f + screenCoords.X * uiWidth * 0.5f, uiHeight * 0.5f + screenCoords.Y * uiHeight * 0.5f);
-			const float w = 1;//Filtering is done earlier 0.6f;
+			const float w = 1f;//Filtering is done earlier 0.6f;
 			_crosshairPosition = new Vector2(_crosshairPosition.X + (crosshairPosition.X - _crosshairPosition.X) * w,
 				_crosshairPosition.Y + (crosshairPosition.Y - _crosshairPosition.Y) * w);
 

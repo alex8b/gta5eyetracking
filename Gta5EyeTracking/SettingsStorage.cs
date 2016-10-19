@@ -5,6 +5,7 @@ namespace Gta5EyeTracking
 {
 	public class SettingsStorage
 	{
+		public const string SettingsPath = "Gta5EyeTracking";
 		private const string SettingsFileName = "settings.xml";
 
 		public Settings LoadSettings()
@@ -12,7 +13,7 @@ namespace Gta5EyeTracking
 			var result = new Settings();
 			try
 			{
-				var folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Util.SettingsPath);
+				var folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), SettingsPath);
 				var filePath = Path.Combine(folderPath, SettingsFileName);
 				System.Xml.Serialization.XmlSerializer reader = new System.Xml.Serialization.XmlSerializer(typeof(Settings));
 				var file = new StreamReader(filePath);
@@ -22,7 +23,7 @@ namespace Gta5EyeTracking
 			}
 			catch (Exception e)
 			{
-				Util.Log(e.Message);
+				Debug.Log(e.Message);
 				//Failed
 			}
 			return result;
@@ -33,7 +34,7 @@ namespace Gta5EyeTracking
 			try
 			{
 				var writer = new System.Xml.Serialization.XmlSerializer(typeof (Settings));
-				var folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Util.SettingsPath);
+				var folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), SettingsPath);
 				if (!Directory.Exists(folderPath))
 				{
 					Directory.CreateDirectory(folderPath);
@@ -46,7 +47,7 @@ namespace Gta5EyeTracking
 			}
 			catch (Exception e)
 			{
-				Util.Log(e.Message);
+				Debug.Log(e.Message);
 				//Failed
 			}
 		}

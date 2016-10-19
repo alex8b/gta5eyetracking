@@ -5,8 +5,6 @@ namespace Gta5EyeTracking.Menu
 {
 	public class IntroScreen
 	{
-		public event EventHandler<EventArgs> ShutDownRequested = delegate { };
-
 		private readonly MenuPool _menuPool;
 		private readonly Settings _settings;
 		private UIMenu _userAgreement;

@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 using EasyHook;
 using SharpDX.XInput;
-using Tobii.EyeX.Client;
 
 namespace Gta5EyeTracking.HidEmulation
 {
@@ -42,7 +40,7 @@ namespace Gta5EyeTracking.HidEmulation
 
 		private void CreateHooks()
 		{
-            Util.Log("Begin CreateHooks");
+            Debug.Log("Begin CreateHooks");
 			try
 			{
 				_hooks = new List<LocalHook>();
@@ -55,14 +53,14 @@ namespace Gta5EyeTracking.HidEmulation
 			}
 			catch
 			{
-                Util.Log("Failed to create hooks");
+                Debug.Log("Failed to create hooks");
 			}
-            Util.Log("End CreateHooks");
+            Debug.Log("End CreateHooks");
 		}
 
 	    public void RemoveHooks()
 	    {
-			Util.Log("Begin RemoveHooks");
+			Debug.Log("Begin RemoveHooks");
 			Thread.Sleep(100);
 			if (_hooks == null) return;
             foreach (var hook in _hooks)
@@ -75,13 +73,13 @@ namespace Gta5EyeTracking.HidEmulation
                     }
                     catch
                     {
-                        Util.Log("Disposing hook failed.");
+                        Debug.Log("Disposing hook failed.");
                     }
                 }
             }
 			_hooks.Clear();
 			NativeAPI.LhWaitForPendingRemovals();
-			Util.Log("End RemoveHooks");
+			Debug.Log("End RemoveHooks");
 		}
 
 
@@ -121,7 +119,7 @@ namespace Gta5EyeTracking.HidEmulation
 			catch
 			{
 				//Hooking failed
-                Util.Log("Hooking XInput failed.");
+                Debug.Log("Hooking XInput failed.");
 			}
 		}
 
@@ -180,7 +178,7 @@ namespace Gta5EyeTracking.HidEmulation
 			}
 			catch (Exception e)
 			{
-				Util.Log("XInputGetState_Hooked: " + e.Message);
+				Debug.Log("XInputGetState_Hooked: " + e.Message);
 				return ERROR_DEVICE_NOT_CONNECTED;
 			}
 		}
@@ -211,7 +209,7 @@ namespace Gta5EyeTracking.HidEmulation
 			}
 			catch (Exception e)
 			{
-				Util.Log("ProcessState: " + e.Message);
+				Debug.Log("ProcessState: " + e.Message);
 			}
             return state;
 		}

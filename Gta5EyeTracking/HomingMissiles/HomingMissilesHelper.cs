@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GTA;
 using GTA.Math;
-using Tobii.EyeX.Client;
 
 namespace Gta5EyeTracking.HomingMissiles
 {
-    public class HomingMissilesHelper: DisposableBase
+    public class HomingMissilesHelper: IDisposable
     {
         private List<HomingMissile> _missiles;
         private bool _initFlag;
@@ -40,7 +40,7 @@ namespace Gta5EyeTracking.HomingMissiles
         {
             if (_initFlag)
             {
-                Util.PtfxRequestAsset("scr_exile2");
+                ScriptHookExtensions.PtfxRequestAsset("scr_exile2");
                 _initFlag = false;
             }
             
@@ -55,7 +55,7 @@ namespace Gta5EyeTracking.HomingMissiles
             _missiles = _missiles.Where(missile => missile.Exists).ToList();
         }
 
-        protected override void DisposeManagedResources()
+        public void Dispose()
         {
             foreach (var missile in _missiles)
             {
