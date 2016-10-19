@@ -48,7 +48,7 @@ install:
 - 'echo Downloading Tobii ...'
 - appveyor DownloadFile https://www.dropbox.com/s/2lvqpotuqctg276/TobiiEyeXSdk-DotNet-1.7.489.zip?dl=1 -FileName Tobii.zip
 - echo Download completed. Extracting ...
-- 7z x .zip
+- 7z x Tobii.zip
 - echo Extraction completed. Compiling ...
 - cd ../../
 before_build:
