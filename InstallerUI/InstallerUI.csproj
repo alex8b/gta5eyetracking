@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\WiX.3.10.1\build\wix.props" Condition="Exists('..\packages\WiX.3.10.1\build\wix.props')" />
+  <Import Project="..\packages\WiX.3.10.3\build\wix.props" Condition="Exists('..\packages\WiX.3.10.3\build\wix.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -90,7 +90,7 @@
     </Reference>
     <Reference Include="Microsoft.Deployment.WindowsInstaller, Version=3.0.0.0, Culture=neutral, PublicKeyToken=ce35f76fcda82bad, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\WiX.3.10.1\tools\sdk\Microsoft.Deployment.WindowsInstaller.dll</HintPath>
+      <HintPath>..\packages\WiX.3.10.3\tools\Microsoft.Deployment.WindowsInstaller.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -160,7 +160,7 @@
   <PropertyGroup>
     <PostBuildEvent>rd /s /q "$(SolutionDir)bin\installer"
 xcopy "$(ProjectDir)bin\x86\Release\InstallerUI.dll" "$(SolutionDir)bin\installer\"
-xcopy "$(ProjectDir)bin\x86\Release\Microsoft.Deployment.WindowsInstaller.dll" "$(SolutionDir)bin\installer\"</PostBuildEvent>
+xcopy "$(ProjectDir)..\packages\WiX.3.10.3\tools\Microsoft.Deployment.WindowsInstaller.dll" "$(SolutionDir)bin\installer\"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>
@@ -170,7 +170,7 @@ xcopy "$(ProjectDir)bin\x86\Release\Microsoft.Deployment.WindowsInstaller.dll" "
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\WiX.3.10.1\build\wix.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\WiX.3.10.1\build\wix.props'))" />
+    <Error Condition="!Exists('..\packages\WiX.3.10.3\build\wix.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\WiX.3.10.3\build\wix.props'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
