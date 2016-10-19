@@ -138,7 +138,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>rd /s /q "$(SolutionDir)bin\"
+    <PostBuildEvent>rd /s /q "$(SolutionDir)bin\scripts\"
+rd /s /q "$(SolutionDir)bin\bundle\"
 
 xcopy "$(ProjectDir)bin\x64\Release\Gta5EyeTracking.dll" "$(SolutionDir)bin\scripts\"
 xcopy "$(ProjectDir)bin\x64\Release\MemoryAccess.dll" "$(SolutionDir)bin\scripts\"
