@@ -11,11 +11,6 @@ namespace Gta5EyeTracking.Features
         public Vector3 CameraRotationWithoutExtendedView { get; private set; }
         public Vector3 GameplayCameraRotationFiltered { get; private set; }
 
-        //Head
-		private const float HeadPositionSensitivity = 0.5f;
-		private const float HeadRotationSensitivity = 0.1f;
-		private const float HeadRotationScalar = 25f;
-
         //Gaze
         private const float ViewCenteringDeadzoneSize = 0.1f;
         private const float MaxEyeLeftYaw = 35.0f;
@@ -38,10 +33,6 @@ namespace Gta5EyeTracking.Features
 	    private readonly Aiming _aiming;
 	    private readonly ITobiiTracker _tobiiTracker;
 
-		private float _headYawFiltered;
-		private float _headPitchFiltered;
-		private float _headXFiltered;
-		private float _headYFiltered;
 		private float _gazeYaw;
         private float _gazePitch;
 
@@ -89,16 +80,9 @@ namespace Gta5EyeTracking.Features
 					World.RenderingCamera = _extendedViewCamera;
 				}
 
-                if (_tobiiTracker.IsHeadTracking)
-                {
-                    _scaleGazePitch = Math.Abs(_headPitchFiltered);
-                    _scaleGazeYaw = Math.Abs(_headYawFiltered);
-                }
-                else
-                {
-                    _scaleGazePitch = 1;
-					_scaleGazeYaw = 1;
-                }
+
+                _scaleGazePitch = 1;
+				_scaleGazeYaw = 1;
 
                 var extraOffset = new Vector3(0, 0, 1f);
 				if (Game.Player.Character.IsInVehicle())
@@ -154,16 +138,9 @@ namespace Gta5EyeTracking.Features
 
 			if (!_gameState.IsSniperWeaponAndZoomed && _settings.ExtendedViewEnabled)
 			{
-				if (_tobiiTracker.IsHeadTracking)
-				{
-					_scaleGazePitch = Math.Abs(_headPitchFiltered);
-					_scaleGazeYaw = Math.Abs(_headYawFiltered);
-				}
-				else
-				{
-					_scaleGazePitch = 1;
-					_scaleGazeYaw = 1;
-				}
+
+				_scaleGazePitch = 1;
+				_scaleGazeYaw = 1;
 
 				if (World.RenderingCamera != _extendedViewCamera)
 				{
@@ -270,8 +247,8 @@ namespace Gta5EyeTracking.Features
             }
 
             var rot = Geometry.OffsetRotation(GameplayCameraRotationFiltered,
-                (-_gazePitch * _scaleGazePitch + _headPitchFiltered * HeadRotationScalar) * _decayScale,
-                (-_gazeYaw * _scaleGazeYaw - _headYawFiltered * HeadRotationScalar) * _decayScale);
+                (-_gazePitch * _scaleGazePitch) * _decayScale,
+                (-_gazeYaw * _scaleGazeYaw) * _decayScale);
 
             rot = Geometry.BoundRotationDeg(rot);
 
@@ -379,8 +356,6 @@ namespace Gta5EyeTracking.Features
 
 		public void Update()
 		{
-			FilterHeadPos();
-
 			FilterGameplayCameraRotation();
 
 		    if (_settings.ExtendedViewEnabled)
@@ -443,14 +418,6 @@ namespace Gta5EyeTracking.Features
 				}
 				
 			}
-		}
-
-		private void FilterHeadPos()
-		{
-			_headYawFiltered = _headYawFiltered + (_tobiiTracker.Yaw - _headYawFiltered) * HeadRotationSensitivity;
-			_headPitchFiltered = _headPitchFiltered + (_tobiiTracker.Pitch - _headPitchFiltered) * HeadRotationSensitivity;
-			_headXFiltered = _headXFiltered + (_tobiiTracker.X - _headXFiltered) * HeadPositionSensitivity;
-			_headYFiltered = _headYFiltered + (_tobiiTracker.Y - _headYFiltered) * HeadPositionSensitivity;
 		}
 
 		public void AimCameraAtTarget(Vector3 target)
