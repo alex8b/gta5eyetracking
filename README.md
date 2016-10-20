@@ -35,7 +35,7 @@ If any skilled mod developers want to help me working on this mod then Tobii wil
 - MSI GT72 Tobii Gaming Laptop  
   https://www.msi.com/Laptop/GT72-6QE-DOMINATOR-PRO-G-tobii.html#hero-overview
 
-- Alienware 17 Gaming Laptop
+- Alienware 17 Gaming Laptop  
   http://www.dell.com/en-us/shop/productdetails/alienware-17-laptop
 
 **You need to have an XBOX 360 Controller (or any other XInput compatible).**
@@ -45,8 +45,8 @@ http://ds4windows.com/
 
 ## Installation
 ### All-in-one installer
-1. Installer will install all the required components. Download the latest version here:  
-   https://github.com/alex8b/gta5eyetracking/releases
+Installer will install all the required components. Download the latest version here:  
+https://github.com/alex8b/gta5eyetracking/releases
 
 ### Manual installation
 1. Install Microsoft .NET Framework 4.5.2  
