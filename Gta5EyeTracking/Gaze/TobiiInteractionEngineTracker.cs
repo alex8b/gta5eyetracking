@@ -4,9 +4,16 @@ using Tobii.EyeX.Framework;
 
 public class TobiiInteractionEngineTracker : ITobiiTracker, IDisposable
 {
+    public float Yaw { get; private set; }
+    public float Pitch { get; private set; }
+    public float Roll { get; private set; }
+    public float X { get; private set; }
+    public float Y { get; private set; }
+    public float Z { get; private set; }
     public float GazeY { get; private set; }
     public float GazeX { get; private set; }
     public float AspectRatio { get; private set; }
+    public bool IsHeadTracking { get; private set; }
 
     private EyeXHost _host;
     private GazePointDataStream _lightlyFilteredGazePointDataProvider;
@@ -19,6 +26,7 @@ public class TobiiInteractionEngineTracker : ITobiiTracker, IDisposable
         _lightlyFilteredGazePointDataProvider.Next += NewGazePoint;
 
         AspectRatio = 16f / 9f;
+	    IsHeadTracking = false;
 	}
 
     public void Dispose()

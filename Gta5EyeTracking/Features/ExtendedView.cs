@@ -11,8 +11,14 @@ namespace Gta5EyeTracking.Features
         public Vector3 CameraRotationWithoutExtendedView { get; private set; }
         public Vector3 GameplayCameraRotationFiltered { get; private set; }
 
-        //Gaze
-        private const float ViewCenteringDeadzoneSize = 0.1f;
+        //Head
+		private const float HeadPositionSensitivity = 0.5f;
+		private const float HeadRotationSensitivity = 0.1f;
+		private const float HeadRotationScalar = 25f;
+
+		//Gaze
+		private const float AimAtCrosshairDeadzoneSize = 0.05f;
+		private const float ViewCenteringDeadzoneSize = 0.1f;
         private const float MaxEyeLeftYaw = 35.0f;
         private const float MaxEyeRightYaw = 35.0f;
         private const float MaxEyeUpPitch = 25.0f;
@@ -33,6 +39,10 @@ namespace Gta5EyeTracking.Features
 	    private readonly Aiming _aiming;
 	    private readonly ITobiiTracker _tobiiTracker;
 
+		private float _headYawFiltered;
+		private float _headPitchFiltered;
+		private float _headXFiltered;
+		private float _headYFiltered;
 		private float _gazeYaw;
         private float _gazePitch;
 
@@ -42,16 +52,20 @@ namespace Gta5EyeTracking.Features
         private readonly Camera _forwardCamera;
 
 		private DateTime _lastAimCameraAtTargetTime;
-		private DateTime _lastNotInVehicle;
 		private float _distanceToCharacter;
         
 		private float _decayScale;
 		private float _scaleGazePitch;
 		private float _scaleGazeYaw;
 		private Vector3 _extraOffset;
-	    private Vector3 _lastTarget;
 
-	    public ExtendedView(Settings settings,
+		private Vector3? _lastTarget;
+		private float _pitchToTarget;
+		private float _yawOffset;
+		private float _pitchOffset;
+		private float _savedHeadPitchFiltered;
+
+		public ExtendedView(Settings settings,
             GameState gameState,
 			ITobiiTracker tobiiTracker,
             Aiming aiming
@@ -80,9 +94,16 @@ namespace Gta5EyeTracking.Features
 					World.RenderingCamera = _extendedViewCamera;
 				}
 
-
-                _scaleGazePitch = 1;
-				_scaleGazeYaw = 1;
+                if (_tobiiTracker.IsHeadTracking)
+                {
+                    _scaleGazePitch = Math.Abs(_headPitchFiltered);
+                    _scaleGazeYaw = Math.Abs(_headYawFiltered);
+                }
+                else
+                {
+                    _scaleGazePitch = 1;
+					_scaleGazeYaw = 1;
+                }
 
                 var extraOffset = new Vector3(0, 0, 1f);
 				if (Game.Player.Character.IsInVehicle())
@@ -121,7 +142,7 @@ namespace Gta5EyeTracking.Features
 
 	        var delta = new Vector3(extraOffset.X, (float) (_distanceToCharacter*-Math.Cos(pitch)),
 	            (float) (_distanceToCharacter*-Math.Sin(pitch)));
-	        delta.Z = Math.Max(delta.Z, 0) + extraOffset.Z;
+	        delta.Z = Math.Max(delta.Z, -1f) + extraOffset.Z;
 
 	        var extendedViewCameraOffset = delta;
 	        extendedViewCameraOffset.X = (float) (Math.Cos(yaw)*delta.X - Math.Sin(yaw)*delta.Y);
@@ -132,15 +153,22 @@ namespace Gta5EyeTracking.Features
 
 	    public void ProcessThirdPersonAim()
 		{
-			_decayScale = Math.Max(0.01f, _decayScale * DecayRate);
+		    _decayScale = Math.Max(0.01f, _decayScale*DecayRate);
 
 			Game.Player.Character.IsVisible = true;
 
 			if (!_gameState.IsSniperWeaponAndZoomed && _settings.ExtendedViewEnabled)
 			{
-
-				_scaleGazePitch = 1;
-				_scaleGazeYaw = 1;
+				if (_tobiiTracker.IsHeadTracking)
+				{
+					_scaleGazePitch = Math.Abs(_headPitchFiltered);
+					_scaleGazeYaw = Math.Abs(_headYawFiltered);
+				}
+				else
+				{
+					_scaleGazePitch = 1;
+					_scaleGazeYaw = 1;
+				}
 
 				if (World.RenderingCamera != _extendedViewCamera)
 				{
@@ -238,19 +266,33 @@ namespace Gta5EyeTracking.Features
 		{
             var timeSince = DateTime.UtcNow - _lastAimCameraAtTargetTime;
 		    var lerpScalar = 1f;
-            if (timeSince > TimeSpan.FromSeconds(0)
-		        && timeSince < _aimAtGazeRotationDuration)
-            {
-                lerpScalar = AimAtGazeRotationScalar;
+			if (timeSince > TimeSpan.FromSeconds(0)
+				&& timeSince < _aimAtGazeRotationDuration)
+			{
+				lerpScalar = AimAtGazeRotationScalar;
+				_pitchOffset = (-_gazePitch * _scaleGazePitch) * _decayScale - _savedHeadPitchFiltered * HeadRotationScalar + (_headPitchFiltered - _savedHeadPitchFiltered) * _decayScale;
 
-                RotateGameplayCameraTowardsTarget();
-            }
+				RotateGameplayCameraTowardsTarget();
+			}
+			else
+			{
+				//TODO: if in aim
+				if (_decayScale > 0.01f)
+				{
+					_pitchOffset = (-_gazePitch*_scaleGazePitch)*_decayScale - _headPitchFiltered*HeadRotationScalar;
+					_savedHeadPitchFiltered = _headPitchFiltered;
+				}
+				else
+				{
+					_pitchOffset = (-_gazePitch * _scaleGazePitch) * _decayScale - _savedHeadPitchFiltered * HeadRotationScalar + (_headPitchFiltered - _savedHeadPitchFiltered) * _decayScale;
+				}
+				_lastTarget = null;
+			}
+			_yawOffset = (-_gazeYaw*_scaleGazeYaw + _headYawFiltered*HeadRotationScalar)*_decayScale;
 
-            var rot = Geometry.OffsetRotation(GameplayCameraRotationFiltered,
-                (-_gazePitch * _scaleGazePitch) * _decayScale,
-                (-_gazeYaw * _scaleGazeYaw) * _decayScale);
+			var rot = Geometry.OffsetRotation(GameplayCameraRotationFiltered, _pitchOffset, _yawOffset);
 
-            rot = Geometry.BoundRotationDeg(rot);
+			rot = Geometry.BoundRotationDeg(rot);
 
             var deltaRot = rot - _extendedViewCamera.Rotation;
             var deltaRotBound = Geometry.BoundRotationDeg(deltaRot);
@@ -261,15 +303,17 @@ namespace Gta5EyeTracking.Features
 
 	    private void RotateGameplayCameraTowardsTarget()
 	    {
-	        var dir = _lastTarget - (_forwardCamera.Position);
+		    if (!_lastTarget.HasValue) return;
+
+	        var dir = _lastTarget.Value - (_forwardCamera.Position);
 	        var headingToTarget = Geometry.DirectionToRotation(dir).Z;
-	        var pitchToTarget = Geometry.DirectionToRotation(dir).X;
+	        _pitchToTarget = Geometry.DirectionToRotation(dir).X;
 
 	        Game.Player.Character.Heading = headingToTarget;
 
 	        GameplayCamera.RelativeHeading = 0;
-	        GameplayCamera.ClampPitch(pitchToTarget, pitchToTarget);
-	        GameplayCamera.RelativePitch = pitchToTarget;
+	        GameplayCamera.ClampPitch(_pitchToTarget, _pitchToTarget);
+	        GameplayCamera.RelativePitch = _pitchToTarget;
 	        GameplayCameraRotationFiltered = Geometry.DirectionToRotation(dir);
 	    }
 
@@ -356,6 +400,8 @@ namespace Gta5EyeTracking.Features
 
 		public void Update()
 		{
+			FilterHeadPos();
+
 			FilterGameplayCameraRotation();
 
 		    if (_settings.ExtendedViewEnabled)
@@ -372,15 +418,8 @@ namespace Gta5EyeTracking.Features
 
             if (Game.Player.Character.IsInVehicle())
 			{
-				if (Game.IsControlPressed(0, Control.NextCamera))
-				{
-					_lastNotInVehicle = DateTime.UtcNow;
-				}
-
 				//vehicle
-				var timeInVehicle = DateTime.UtcNow - _lastNotInVehicle;
-				if ((timeInVehicle > TimeSpan.FromSeconds(0.5))
-					&& Geometry.IsFirstPersonVehicleCameraActive())
+				if (Geometry.IsFirstPersonVehicleCameraActive())
 				{
 					ProcessFirstPersonVehicle();
 				}
@@ -391,8 +430,6 @@ namespace Gta5EyeTracking.Features
 			}
 			else
 			{
-				_lastNotInVehicle = DateTime.UtcNow;
-
                 //on foot
                 if (Geometry.IsFirstPersonPedCameraActive())
 				{
@@ -420,10 +457,18 @@ namespace Gta5EyeTracking.Features
 			}
 		}
 
+		private void FilterHeadPos()
+		{
+			_headYawFiltered = _headYawFiltered + (_tobiiTracker.Yaw - _headYawFiltered) * HeadRotationSensitivity;
+			_headPitchFiltered = _headPitchFiltered + (_tobiiTracker.Pitch - _headPitchFiltered) * HeadRotationSensitivity;
+			_headXFiltered = _headXFiltered + (_tobiiTracker.X - _headXFiltered) * HeadPositionSensitivity;
+			_headYFiltered = _headYFiltered + (_tobiiTracker.Y - _headYFiltered) * HeadPositionSensitivity;
+		}
+
 		public void AimCameraAtTarget(Vector3 target)
 		{
 		    if (Vector2.Distance(new Vector2(_tobiiTracker.GazeX, _tobiiTracker.GazeY), _aiming.CrosshairPosition) <
-		        ViewCenteringDeadzoneSize) return;
+				AimAtCrosshairDeadzoneSize) return;
 
             _lastTarget = target;
 		    _lastAimCameraAtTargetTime = DateTime.UtcNow;
