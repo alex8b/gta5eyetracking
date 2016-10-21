@@ -14,9 +14,9 @@ namespace Gta5EyeTracking
 			Function.Call(Hash._0x61A3DBA14AB7F411, camera.Handle, ped.Handle, boneIndex, offset.X, offset.Y, offset.Z, false);
 		}
 
-		public static void AttachCamToEntity(Camera camera, Entity entity, Vector3 offset)
+		public static void AttachCamToEntity(Camera camera, Entity entity, Vector3 offset, bool isRelative)
 		{
-			Function.Call(Hash._0xFEDB7D269E8C60E3, camera.Handle, entity.Handle, offset.X, offset.Y, offset.Z, false);
+			Function.Call(Hash._0xFEDB7D269E8C60E3, camera.Handle, entity.Handle, offset.X, offset.Y, offset.Z, isRelative);
 		}
 
 		public static void SetPedShootsAtCoord(Ped ped, Vector3 target)

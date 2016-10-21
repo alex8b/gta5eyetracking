@@ -101,7 +101,7 @@ namespace Gta5EyeTracking
             _gameState = new GameState(_controllerEmulation, _menuPool);
             _animationHelper = new AnimationHelper();
 			_aiming = new Aiming(_settings, _animationHelper, _gameState);
-			_extendedView = new ExtendedView(_settings, _gameState, _tobiiTracker, _aiming);
+			_extendedView = new ExtendedView(_settings, _gameState, _tobiiTracker, _aiming, _debugOutput);
 			_radialMenu = new RadialMenu(_controllerEmulation, _tobiiTracker);
 
 			//Window
