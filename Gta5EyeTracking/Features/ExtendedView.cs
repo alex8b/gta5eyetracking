@@ -14,10 +14,12 @@ namespace Gta5EyeTracking.Features
         //Head
 		private const float HeadPositionSensitivity = 0.5f;
 		private const float HeadRotationSensitivity = 0.1f;
-		private const float HeadRotationScalar = 25f;
+		private const float HeadRotationScalar = (float) (180 / Math.PI * 0.5f);
+		private const float HeadPositionScalar = 0.001f;
+        private const float HeadRotationDeadZoneDeg = 0;
 
-		//Gaze
-		private const float AimAtCrosshairDeadzoneSize = 0.05f;
+        //Gaze
+        private const float AimAtCrosshairDeadzoneSize = 0.05f;
 		private const float ViewCenteringDeadzoneSize = 0.1f;
         private const float MaxEyeLeftYaw = 35.0f;
         private const float MaxEyeRightYaw = 35.0f;
@@ -30,7 +32,7 @@ namespace Gta5EyeTracking.Features
         private const float TimeDeltaConstant = 0.015f;
         private const float GameplayCameraFiltering = 0.1f;
         private const float SensitivityScalar = 20;
-        private const float DecayRate = 0.7f;
+        private const float DecayRate = 0.05f;
 	    private const float AimAtGazeRotationScalar = 0.2f;
         private readonly TimeSpan _aimAtGazeRotationDuration = TimeSpan.FromSeconds(0.5);
 
@@ -52,6 +54,7 @@ namespace Gta5EyeTracking.Features
         private readonly Camera _forwardCamera;
 
 		private DateTime _lastAimCameraAtTargetTime;
+		private DateTime _lastNotInVehicle;
 		private float _distanceToCharacter;
         
 		private float _decayScale;
@@ -84,7 +87,7 @@ namespace Gta5EyeTracking.Features
 
 		public void ProcessThirdPerson()
 		{
-			_decayScale = Math.Min(1, _decayScale / DecayRate);
+			_decayScale = Math.Min(1, _decayScale + DecayRate);
 			Game.Player.Character.IsVisible = true;
 
 			if (!_gameState.IsSniperWeaponAndZoomed && _settings.ExtendedViewEnabled)
@@ -153,7 +156,7 @@ namespace Gta5EyeTracking.Features
 
 	    public void ProcessThirdPersonAim()
 		{
-		    _decayScale = Math.Max(0.01f, _decayScale*DecayRate);
+		    _decayScale = Math.Max(0.0f, _decayScale - DecayRate);
 
 			Game.Player.Character.IsVisible = true;
 
@@ -194,7 +197,7 @@ namespace Gta5EyeTracking.Features
 
 		public void ProcessFirstPersonVehicle()
 		{
-			_decayScale = Math.Min(1, _decayScale / DecayRate);
+			_decayScale = Math.Min(1, _decayScale + DecayRate);
 
 			if (_settings.ExtendedViewEnabled)
 			{
@@ -217,19 +220,11 @@ namespace Gta5EyeTracking.Features
 
 				ProcessExtendedView();
 
-				if (Game.Player.Character.CurrentVehicle.ClassType == VehicleClass.Motorcycles
-					|| Game.Player.Character.CurrentVehicle.ClassType == VehicleClass.Cycles
-					|| Game.Player.Character.CurrentVehicle.ClassType == VehicleClass.Helicopters
-					|| Game.Player.Character.CurrentVehicle.ClassType == VehicleClass.Planes)
-				{
-                    _extendedViewCamera.AttachTo(Game.Player.Character, (int)Bone.SKEL_ROOT, new Vector3(0, 0, 0.6f));
-                    _forwardCamera.AttachTo(Game.Player.Character, (int)Bone.SKEL_ROOT, new Vector3(0, 0, 0.6f));
-                }
-				else
-				{
-					_extendedViewCamera.AttachTo(Game.Player.Character, (int)Bone.SKEL_ROOT, new Vector3(0, 0, 0.6f));
-                    _forwardCamera.AttachTo(Game.Player.Character, (int)Bone.SKEL_ROOT, new Vector3(0, 0, 0.6f));
-                }
+				var headOffset = new Vector3(_headXFiltered * HeadPositionScalar, 0, 0);
+				var extraOffset = new Vector3(0, 0, 0.6f);
+
+                _extendedViewCamera.AttachTo(Game.Player.Character, (int)Bone.SKEL_ROOT, extraOffset + headOffset);
+                _forwardCamera.AttachTo(Game.Player.Character, (int)Bone.SKEL_ROOT, extraOffset + headOffset);
 			}
 			else
 			{
@@ -276,19 +271,10 @@ namespace Gta5EyeTracking.Features
 			}
 			else
 			{
-				//TODO: if in aim
-				if (_decayScale > 0.01f)
-				{
-					_pitchOffset = (-_gazePitch*_scaleGazePitch)*_decayScale - _headPitchFiltered*HeadRotationScalar;
-					_savedHeadPitchFiltered = _headPitchFiltered;
-				}
-				else
-				{
-					_pitchOffset = (-_gazePitch * _scaleGazePitch) * _decayScale - _savedHeadPitchFiltered * HeadRotationScalar + (_headPitchFiltered - _savedHeadPitchFiltered) * _decayScale;
-				}
 				_lastTarget = null;
 			}
-			_yawOffset = (-_gazeYaw*_scaleGazeYaw + _headYawFiltered*HeadRotationScalar)*_decayScale;
+            _pitchOffset = (-_gazePitch * _scaleGazePitch - _headPitchFiltered * HeadRotationScalar) * _decayScale;
+            _yawOffset = (-_gazeYaw*_scaleGazeYaw + Math.Sign(_headYawFiltered)*Math.Max(0, Math.Abs(_headYawFiltered * HeadRotationScalar) - HeadRotationDeadZoneDeg))*_decayScale;
 
 			var rot = Geometry.OffsetRotation(GameplayCameraRotationFiltered, _pitchOffset, _yawOffset);
 
@@ -418,8 +404,15 @@ namespace Gta5EyeTracking.Features
 
             if (Game.Player.Character.IsInVehicle())
 			{
+				if (Game.IsControlPressed(0, Control.NextCamera))
+				{
+					_lastNotInVehicle = DateTime.UtcNow;
+				}
+
 				//vehicle
-				if (Geometry.IsFirstPersonVehicleCameraActive())
+				var timeInVehicle = DateTime.UtcNow - _lastNotInVehicle;
+				if ((timeInVehicle > TimeSpan.FromSeconds(0.5))
+					&& Geometry.IsFirstPersonVehicleCameraActive())
 				{
 					ProcessFirstPersonVehicle();
 				}
@@ -430,6 +423,8 @@ namespace Gta5EyeTracking.Features
 			}
 			else
 			{
+				_lastNotInVehicle = DateTime.UtcNow;
+
                 //on foot
                 if (Geometry.IsFirstPersonPedCameraActive())
 				{
@@ -460,9 +455,9 @@ namespace Gta5EyeTracking.Features
 		private void FilterHeadPos()
 		{
 			_headYawFiltered = _headYawFiltered + (_tobiiTracker.Yaw - _headYawFiltered) * HeadRotationSensitivity;
-			_headPitchFiltered = _headPitchFiltered + (_tobiiTracker.Pitch - _headPitchFiltered) * HeadRotationSensitivity;
-			_headXFiltered = _headXFiltered + (_tobiiTracker.X - _headXFiltered) * HeadPositionSensitivity;
-			_headYFiltered = _headYFiltered + (_tobiiTracker.Y - _headYFiltered) * HeadPositionSensitivity;
+			_headPitchFiltered = _headPitchFiltered + (-_tobiiTracker.Pitch - _headPitchFiltered) * HeadRotationSensitivity;
+			_headXFiltered = _headXFiltered + (-_tobiiTracker.X - _headXFiltered) * HeadPositionSensitivity;
+			_headYFiltered = _headYFiltered + (-_tobiiTracker.Y - _headYFiltered) * HeadPositionSensitivity;
 		}
 
 		public void AimCameraAtTarget(Vector3 target)

@@ -152,9 +152,10 @@ namespace Gta5EyeTracking
 			foreach (var ped in peds)
 			{
 				if (ped.Handle == Game.Player.Character.Handle) continue;
-				//if (ped.IsOccluded) continue; slow?
+                if (!ped.IsAlive) continue;
+                //if (ped.IsOccluded) continue; slow?
 
-				{
+                {
 					var headOffest = ped.GetBoneCoord(Bone.SKEL_ROOT);
 					Vector2 pedScreenCoords;
 					if (WorldToScreenRel(headOffest, out pedScreenCoords))
@@ -210,7 +211,9 @@ namespace Gta5EyeTracking
 			//Util.Log("V - " + DateTime.UtcNow.Ticks);
 			foreach (var vehicle in vehs)
 			{
-				if ((Game.Player.Character.IsInVehicle()) && (vehicle.Handle == Game.Player.Character.CurrentVehicle.Handle)) continue; //you own veh
+				if (Game.Player.Character.IsInVehicle() && (vehicle.Handle == Game.Player.Character.CurrentVehicle.Handle)) continue; //you own veh
+			    if (!vehicle.IsAlive) continue;
+
 				var vehOffset = vehicle.Position;
 				Vector2 vehScreenCoords;
 			    

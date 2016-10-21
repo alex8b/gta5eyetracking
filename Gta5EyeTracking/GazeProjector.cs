@@ -56,7 +56,8 @@ namespace Gta5EyeTracking
 
 
 			if (unfilteredEntity != null
-				&& ScriptHookExtensions.IsEntityAPed(unfilteredEntity))
+				&& ScriptHookExtensions.IsEntityAPed(unfilteredEntity)
+                && unfilteredEntity.IsAlive)
 			{
 				ped = unfilteredEntity as Ped;
 			}
@@ -88,7 +89,8 @@ namespace Gta5EyeTracking
 
 				Vehicle vehicle;
 				if (unfilteredEntity != null
-					&& ScriptHookExtensions.IsEntityAVehicle(unfilteredEntity))
+					&& ScriptHookExtensions.IsEntityAVehicle(unfilteredEntity)
+                    && unfilteredEntity.IsAlive)
 				{
 					vehicle = unfilteredEntity as Vehicle;
 				}

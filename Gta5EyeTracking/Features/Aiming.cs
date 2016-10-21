@@ -301,14 +301,16 @@ namespace Gta5EyeTracking.Features
 	    {
 	        CrosshairPosition = screenCoords;
 
-            var uiWidth = UI.WIDTH;
-			var uiHeight = UI.HEIGHT;
-
-			var crosshairPosition = new Vector2(uiWidth * 0.5f + screenCoords.X * uiWidth * 0.5f, uiHeight * 0.5f + screenCoords.Y * uiHeight * 0.5f);
+			var crosshairPosition = new Vector2(UI.WIDTH * 0.5f + screenCoords.X * UI.WIDTH * 0.5f, UI.HEIGHT * 0.5f + screenCoords.Y * UI.HEIGHT * 0.5f);
 			const float w = 1f;//Filtering is done earlier 0.6f;
 			_crosshairPosition = new Vector2(_crosshairPosition.X + (crosshairPosition.X - _crosshairPosition.X) * w,
 				_crosshairPosition.Y + (crosshairPosition.Y - _crosshairPosition.Y) * w);
-
+	        var centerPosition = new Vector2(UI.WIDTH*0.5f, UI.HEIGHT*0.5f);
+	        var deadzone = 2f;
+            if ((_crosshairPosition - centerPosition).Length() < deadzone)
+            {
+                _crosshairPosition = centerPosition;
+            }
 		    _dotCrosshair.Move(_crosshairPosition);
 		    _missileLockCrosshair.Move(_crosshairPosition);
 		}

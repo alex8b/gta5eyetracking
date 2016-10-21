@@ -62,8 +62,8 @@ public class TobiiInteractionEngineTracker : ITobiiTracker, IDisposable
             AspectRatio = (float) (screenWidth / screenHeight);
         }
 
-        var normalizedGazePointX = (float)Math.Min(Math.Max((gazePointX / screenWidth), 0.0), 1.0);
-        var normalizedGazePointY = (float)Math.Min(Math.Max((gazePointY / screenHeight), 0.0), 1.0);
+        var normalizedGazePointX = (float)Math.Min(Math.Max(gazePointX / screenWidth, 0.0), 1.0);
+        var normalizedGazePointY = (float)Math.Min(Math.Max(gazePointY / screenHeight, 0.0), 1.0);
 
         var normalizedCenterDeltaX = (normalizedGazePointX - 0.5f) * 2.0f;
         var normalizedCenterDeltaY = (normalizedGazePointY - 0.5f) * 2.0f;
