@@ -347,7 +347,7 @@ namespace Gta5EyeTracking.Features
 
 	        var deltaPitch = _forwardCamera.Rotation.Z - _yawToTarget;
             var deltaYaw = _forwardCamera.Rotation.X - _pitchToTarget;
-	        var minAngle = 0.2f;
+	        var minAngle = 0.01f;
             if (Math.Abs(deltaYaw) < minAngle && Math.Abs(deltaPitch) < minAngle)
             {
                 _lastTarget = null;
