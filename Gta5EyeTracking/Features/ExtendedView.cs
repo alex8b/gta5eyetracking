@@ -292,14 +292,15 @@ namespace Gta5EyeTracking.Features
 			{
 			    if (_aimTransitionState > 0)
 			    {
-                    lerpScalar = AimTransitionLerpScalar;
-                    RotateGameplayCameraTowardsTarget();
-                }
+			        lerpScalar = AimTransitionLerpScalar;
+			        RotateGameplayCameraTowardsTarget();
+			    }
                 _pitchOffset = 0;
 			    _yawOffset = 0;
 			}
 			else
-			{
+            {
+                _lastTarget = null;
 			    if (_aimTransitionState < 1)
 			    {
                     lerpScalar = AimTransitionLerpScalar;
@@ -333,7 +334,7 @@ namespace Gta5EyeTracking.Features
 	    {
 		    if (!_lastTarget.HasValue) return;
 
-	        var dir = _lastTarget.Value - (_forwardCamera.Position);
+	        var dir = _lastTarget.Value - _forwardCamera.Position;
 	        _yawToTarget = Geometry.DirectionToRotation(dir).Z;
 	        _pitchToTarget = Geometry.DirectionToRotation(dir).X;
 
@@ -343,7 +344,15 @@ namespace Gta5EyeTracking.Features
 	        GameplayCamera.ClampPitch(_pitchToTarget, _pitchToTarget);
 	        GameplayCamera.RelativePitch = _pitchToTarget;
 	        GameplayCameraRotationFiltered = Geometry.DirectionToRotation(dir);
-	    }
+
+	        var deltaPitch = _forwardCamera.Rotation.Z - _yawToTarget;
+            var deltaYaw = _forwardCamera.Rotation.X - _pitchToTarget;
+	        var minAngle = 0.2f;
+            if (Math.Abs(deltaYaw) < minAngle && Math.Abs(deltaPitch) < minAngle)
+            {
+                _lastTarget = null;
+            }
+        }
 
         //This function will lerp the view target closer to the gaze point
         private void UpdateViewTarget(Vector2 normalizedCenteredGazeCoordinates)
