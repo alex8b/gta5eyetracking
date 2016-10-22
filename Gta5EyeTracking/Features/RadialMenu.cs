@@ -31,7 +31,7 @@ namespace Gta5EyeTracking.Features
 			if (deltaVector.Length() < radialMenuInnerRadius) return;
 
 			var angleRad = (float)Math.Atan2(-deltaVector.Y, deltaVector.X);
-			var angleDeg = Geometry.RadToDeg(angleRad);
+			var angleDeg = Mathf.Rad2Deg * angleRad;
 			var region = (int)Math.Floor(360 + angleDeg + sectorSize * 0.5) / sectorSize;
 			region = region % numberOfSectors;
 			if (region < 0) region += numberOfSectors;
@@ -52,7 +52,7 @@ namespace Gta5EyeTracking.Features
 			}
 
 			if (_lastRadialMenuRegion < 0) return;
-			var alpha = Geometry.DegToRad(_lastRadialMenuRegion * sectorSize);
+			var alpha = Mathf.Deg2Rad * (_lastRadialMenuRegion * sectorSize);
 			var freelookDeltaVector = new Vector2((float)(Math.Cos(alpha)), (float)(-Math.Sin(alpha)));
 			const double rotationalSpeed = 1;
 			_controllerEmulation.DeltaX = freelookDeltaVector.X * rotationalSpeed;

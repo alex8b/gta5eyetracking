@@ -129,7 +129,7 @@ namespace Gta5EyeTracking
 			var controllerState = _controllerEmulation.ControllerState;
 
 		    if (!_gameState.IsInVehicle
-				&& !Geometry.IsFirstPersonPedCameraActive()
+				&& !GameState.IsFirstPersonPedCameraActive()
 				&& !_gameState.IsSniperWeaponAndZoomed
 				&& !_gameState.IsThrowableWeapon
 				&& !_gameState.IsMeleeWeapon)

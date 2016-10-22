@@ -260,7 +260,7 @@ namespace Gta5EyeTracking.Features
 
 
 		    if (((_settings.ExtendedViewEnabled || _settings.FireAtGazeEnabled)
-		         && !(!_gameState.IsInVehicle && Geometry.IsFirstPersonPedCameraActive())
+		         && !(!_gameState.IsInVehicle && GameState.IsFirstPersonPedCameraActive())
 		         &&
 		         (GameplayCamera.IsAimCamActive || _gameState.IsAimingWithMouse || _gameState.IsAimingWithGamepad ||
 		          _gameState.IsShootingWithMouse || _gameState.IsShootingWithGamepad)

@@ -7,6 +7,16 @@ namespace Gta5EyeTracking
 {
     public class GameState
     {
+        public static bool IsFirstPersonPedCameraActive()
+        {
+            return ScriptHookExtensions.GetFollowPedCamViewMode() == 4;
+        }
+
+        public static bool IsFirstPersonVehicleCameraActive()
+        {
+            return ScriptHookExtensions.GetFollowVehicleCamViewMode() == 4;
+        }
+
         public bool IsPaused { get; private set; }
         public bool IsInVehicle { get; private set; }
         public bool IsInAircraft { get; private set; }

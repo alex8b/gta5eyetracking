@@ -12,6 +12,8 @@ using GTA.Math;
 using NativeUI;
 
 // TODO:
+// Roll and yaw after airplane
+// Aim at gaze in a single transition
 // Windowed mode
 // Bug: stuck in fire animation
 

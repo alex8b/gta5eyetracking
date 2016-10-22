@@ -22,9 +22,9 @@ namespace Gta5EyeTracking
 
 		private void CreateDebugWindow()
 		{
-			_uiContainer = new UIContainer(new Point(0, 0), new Size(1280, 720), Color.FromArgb(25, 237, 239, 241));
+			_uiContainer = new UIContainer(new Point(0, 0), new Size(1280, 720), Color.FromArgb(0, 0, 0, 0));
 			_uiContainer.Items.Add(new UIRectangle(new Point(0, 0), new Size(400, 30), Color.FromArgb(255, 26, 188, 156)));
-			_uiContainer.Items.Add(new UIText("Tobii Eye tracking", new Point(200, 4), 0.5f, Color.WhiteSmoke, 0, true));
+			_uiContainer.Items.Add(new UIText("Tobii Eye Tracking", new Point(200, 4), 0.5f, Color.WhiteSmoke, 0, true));
 			_uiContainer.Items.Add(new UIRectangle(new Point(0, 30), new Size(400, 150), Color.FromArgb(135, 26, 187, 155)));
 
 			DebugText1 = new UIText("Debug", new Point(200, 34), 0.4f, Color.Black, 0, true);

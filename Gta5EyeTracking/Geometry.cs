@@ -10,15 +10,7 @@ namespace Gta5EyeTracking
 {
 	public static class Geometry
 	{
-        public static bool IsFirstPersonPedCameraActive()
-		{
-            return ScriptHookExtensions.GetFollowPedCamViewMode() == 4;
-		}
 
-		public static bool IsFirstPersonVehicleCameraActive()
-		{
-			return ScriptHookExtensions.GetFollowVehicleCamViewMode() == 4;
-		}
 	
 
 		public static bool IsInFrontOfThePlayer(Vector3 shootCoord)
@@ -343,22 +335,13 @@ namespace Gta5EyeTracking
             var epsilon = 0.0000001;
             return Math.Abs(det) < epsilon ? new Vector3() : new Vector3(detx / det, dety / det, detz / det);
 	    }
+
         public static void ScreenRelToWorld(Vector2 screenCoordsRel, out Vector3 camPoint, out Vector3 farPoint)
 	    {
             var mView = ScriptHookExtensions.GetCameraMatrix();
 
             camPoint = ViewMatrixToCameraPosition(mView);
             farPoint = ScreenRelToWorld(mView, screenCoordsRel);
-
-            //UI.ShowSubtitle("Cam: " + Math.Round(camPoint.X, 1) + " " + Math.Round(camPoint.Y, 1) + " " +
-            //                Math.Round(camPoint.Z, 1)
-            //                + "\nResult: " + Math.Round(farPoint.X, 1) + " " + Math.Round(farPoint.Y, 1) + " " +
-            //                Math.Round(farPoint.Z, 1));
-
-//+ "\n Cam: " + Math.Round(mView.M11, 1) + " " + Math.Round(mView.M12, 1) + " " + Math.Round(mView.M13, 1) + " " + Math.Round(mView.M14, 1)
-//+ "\n " + Math.Round(mView.M21, 1) + " " + Math.Round(mView.M22, 1) + " " + Math.Round(mView.M23, 1) + " " + Math.Round(mView.M24, 1)
-//+ "\n " + Math.Round(mView.M31, 1) + " " + Math.Round(mView.M32, 1) + " " + Math.Round(mView.M33, 1) + " " + Math.Round(mView.M34, 1)
-//+ "\n " + Math.Round(mView.M41, 1) + " " + Math.Round(mView.M42, 1) + " " + Math.Round(mView.M43, 1) + " " + Math.Round(mView.M44, 1));
 	    }
 
 		public static RaycastResult Raycast(Vector3 source, Vector3 target, int options, Entity entity)
@@ -370,21 +353,11 @@ namespace Gta5EyeTracking
 				null, Type.EmptyTypes, null).Invoke(new[] {(object)result});
 			return obj;
 		}
-		public static Vector3 WorldToRelative(Vector3 worldPosition, Vector3 originPosition, Vector3 originRotation)
-		{
-			var worldDelta = worldPosition - originPosition;
-			var localDelta = new Vector3();
-			var yaw = DegToRad(originRotation.Z);
-			localDelta.X = 0;//(float) (Math.Cos(yaw) * worldDelta.X - Math.Sin(yaw) * worldDelta.Y);
-			localDelta.Y = -5;//(float) (Math.Sin(yaw) * worldDelta.X + Math.Cos(yaw) * worldDelta.Y);
-			localDelta.Z = worldDelta.Z;
-			return localDelta;
-		}
 
 		public static Vector3 RotationToDirection(Vector3 rotation)
 		{
-			var z = DegToRad(rotation.Z);
-			var x = DegToRad(rotation.X);
+			var z = Mathf.Deg2Rad * rotation.Z;
+			var x = Mathf.Deg2Rad * rotation.X;
 			var num = Math.Abs(Math.Cos(x));
 			return new Vector3
 			{
@@ -491,9 +464,9 @@ namespace Gta5EyeTracking
 			double sqy = q.Y * q.Y;
 			double sqz = q.Z * q.Z;
 			Vector3 result;
-			result.X = RadToDeg((float)Math.Asin(2f * (q.X * q.Z - q.W * q.Y)));                             // Pitch 
-			result.Z = RadToDeg((float)Math.Atan2(2f * q.X * q.W + 2f * q.Y * q.Z, 1 - 2f * (sqz + sqw)));     // Yaw 
-			result.Y = RadToDeg((float)Math.Atan2(2f * q.X * q.Y + 2f * q.Z * q.W, 1 - 2f * (sqy + sqz)));
+			result.X = Mathf.Rad2Deg * (float)Math.Asin(2f * (q.X * q.Z - q.W * q.Y));                             // Pitch 
+			result.Z = Mathf.Rad2Deg * (float)Math.Atan2(2f * q.X * q.W + 2f * q.Y * q.Z, 1 - 2f * (sqz + sqw));     // Yaw 
+			result.Y = Mathf.Rad2Deg * (float)Math.Atan2(2f * q.X * q.Y + 2f * q.Z * q.W, 1 - 2f * (sqy + sqz));
 			return result;
 		}
 
@@ -507,7 +480,7 @@ namespace Gta5EyeTracking
 			//finalQuaturnion.Normalize();
 			var result = rotationDeg;
 			result.X += (float)pitchDeg;
-			result.Z += (float)yawDeg * (float)Math.Cos(DegToRad(rotationDeg.Y));
+		    result.Z += (float)yawDeg;// * (float)Math.Cos(Mathf.Deg2Rad * rotationDeg.Y);
 			//UI.ShowSubtitle(Math.Round(rotationDeg.X,0) + " | " + Math.Round(rotationDeg.Y, 0) + " | " + Math.Round(rotationDeg.Z, 0)
 			//	+ " | " + Math.Round(result.X, 0) + " | " + Math.Round(result.Y, 0) + " | " + Math.Round(result.Z, 0));
 			return result;
@@ -523,20 +496,10 @@ namespace Gta5EyeTracking
 
 			return new Vector3
 			{
-				X = RadToDeg(x),
-				Y = RadToDeg(y),
-				Z = RadToDeg(z)
+				X = Mathf.Rad2Deg * x,
+				Y = Mathf.Rad2Deg * y,
+				Z = Mathf.Rad2Deg * z
 			};
-		}
-
-		public static float DegToRad(float deg)
-		{
-			return (float) (deg * Math.PI / 180.0f);
-		}
-
-		public static float RadToDeg(float rad)
-		{
-			return (float) (rad * 180.0f / Math.PI);
 		}
 
 		public static float BoundRotationDeg(float angleDeg)
