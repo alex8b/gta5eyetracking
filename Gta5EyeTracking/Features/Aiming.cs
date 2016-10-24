@@ -259,15 +259,18 @@ namespace Gta5EyeTracking.Features
 
 
 
-		    if (((_settings.ExtendedViewEnabled || _settings.FireAtGazeEnabled)
-		         && !(!_gameState.IsInVehicle && GameState.IsFirstPersonPedCameraActive())
-		         &&
-		         (GameplayCamera.IsAimCamActive || _gameState.IsAimingWithMouse || _gameState.IsAimingWithGamepad ||
-		          _gameState.IsShootingWithMouse || _gameState.IsShootingWithGamepad)
-		         && !_gameState.IsMeleeWeapon
-		         && !_gameState.IsSniperWeaponAndZoomed
-		         && !_gameState.IsInRadialMenu)
-		        || _settings.AlwaysShowCrosshairEnabled)
+		    if ((_settings.ExtendedViewEnabled || _settings.FireAtGazeEnabled)
+				&& !(!_gameState.IsInVehicle && GameState.IsFirstPersonPedCameraActive())
+				&& (GameplayCamera.IsAimCamActive 
+					|| _gameState.IsAimingWithMouse
+					|| _gameState.IsAimingWithGamepad
+					|| _gameState.IsShootingWithMouse
+					|| _gameState.IsShootingWithGamepad
+					|| (_settings.AlwaysShowCrosshairEnabled && !_gameState.IsInVehicle))
+				&& !_gameState.IsMeleeWeapon
+				&& !_gameState.IsSniperWeaponAndZoomed
+				&& !_gameState.IsInRadialMenu
+				&& !_gameState.IsInCharacterSelectionMenu)
 		    {
 		        IsCrosshairVisible = true;
 		    }
