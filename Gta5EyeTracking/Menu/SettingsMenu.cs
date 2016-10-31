@@ -57,7 +57,7 @@ namespace Gta5EyeTracking.Menu
 			_mainMenu.AddItem(snapAtTargets);
 
 			var gazeFilteringSlider = new UIMenuListItem("Gaze Filter", _values0To1, (int)Math.Round(_settings.GazeFiltering / 0.1), "Filter gaze data. Higher values will make crosshair movements smoother, but will increase the latency.");
-			gazeFilteringSlider.OnListChanged += (sender, args) => { _settings.GazeFiltering = gazeFilteringSlider.IndexToItem(gazeFilteringSlider.Index); };
+			gazeFilteringSlider.OnListChanged += (sender, args) => { _settings.GazeFiltering = (float)gazeFilteringSlider.IndexToItem(gazeFilteringSlider.Index); };
 			_mainMenu.AddItem(gazeFilteringSlider);
 
 			var incinerateAtGaze = new UIMenuCheckboxItem("Incinerate At Gaze", _settings.IncinerateAtGazeEnabled, "Push A button to burn things where you look. This feature replaces the default command for A button.");
@@ -96,7 +96,7 @@ namespace Gta5EyeTracking.Menu
 	        _values0To1 = new List<dynamic>();
 	        for (var i = 0; i <= 10; i++)
 	        {
-	            _values0To1.Add(i*0.1);
+	            _values0To1.Add(i*0.1f);
 	        }
 	    }
 
