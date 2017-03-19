@@ -57,7 +57,8 @@ http://ds4windows.com/
 3. Install Microsoft Visual C++ Redistributable Package for Visual Studio 2015 (x64)  
    https://www.microsoft.com/download/details.aspx?id=48145  
 
-4. Unzip Gta5EyeTracking_bundle to to Grand Theft Auto V folder  
+4. Extract bundle zip to Grand Theft Auto V folder  
+   (d:\SteamLibrary\steamapps\common\Grand Theft Auto V\)  
    https://github.com/alex8b/gta5eyetracking/releases  
 
 ## Controls
