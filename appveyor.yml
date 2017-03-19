@@ -12,45 +12,39 @@ assembly_info:
   assembly_informational_version: '{version}'
 install:
 - mkdir lib\ScriptHookV\
-- cd lib/ScriptHookV/
+- cd lib\ScriptHookV\
 - 'echo Downloading ScriptHookV ...'
-- appveyor DownloadFile https://www.dropbox.com/s/ugw7h3j5vpy6s6s/ScriptHookV_1.0.877.1.zip?dl=1 -FileName ScriptHookV.zip
+- appveyor DownloadFile https://www.dropbox.com/s/dkkl6ql63p9vajd/ScriptHookV_1.0.1011.1.zip?dl=1 -FileName ScriptHookV.zip
 - echo Download completed. Extracting ...
 - 7z x ScriptHookV.zip
 - echo Extraction completed. Compiling ...
-- cd ../../
+- cd ..\..\
 - mkdir lib\ScriptHookVDotNet\
-- cd lib/ScriptHookVDotNet/
+- cd lib\ScriptHookVDotNet\
 - 'echo Downloading ScriptHookVDotNet ...'
-- appveyor DownloadFile https://github.com/crosire/scripthookvdotnet/releases/download/v2.9.3/ScriptHookVDotNet.zip -FileName ScriptHookVDotNet.zip
+- appveyor DownloadFile https://github.com/crosire/scripthookvdotnet/releases/download/v2.9.4/ScriptHookVDotNet.zip -FileName ScriptHookVDotNet.zip
 - echo Download completed. Extracting ...
 - 7z x ScriptHookVDotNet.zip
 - echo Extraction completed. Compiling ...
-- cd ../../
+- cd ..\..\
 - mkdir lib\NativeUI\
-- cd lib/NativeUI/
+- cd lib\NativeUI\
 - 'echo Downloading NativeUI ...'
 - appveyor DownloadFile https://github.com/Guad/NativeUI/releases/download/1.7/NativeUI.zip -FileName NativeUI.zip
 - echo Download completed. Extracting ...
 - 7z x NativeUI.zip
 - echo Extraction completed. Compiling ...
-- cd ../../
-- mkdir lib\EasyHook\
-- cd lib/EasyHook/
-- 'echo Downloading EasyHook ...'
-- appveyor DownloadFile https://github.com/EasyHook/EasyHook/releases/download/v2.7.6035.0/EasyHook-2.7.6035.0-Binaries.zip -FileName EasyHook.zip
-- echo Download completed. Extracting ...
-- 7z x EasyHook.zip
-- echo Extraction completed. Compiling ...
-- cd ../../
-- mkdir lib\TobiiEyeXSdk-DotNet\
-- cd lib/TobiiEyeXSdk-DotNet/
-- 'echo Downloading Tobii ...'
-- appveyor DownloadFile https://www.dropbox.com/s/2lvqpotuqctg276/TobiiEyeXSdk-DotNet-1.7.489.zip?dl=1 -FileName Tobii.zip
+- cd ..\..\
+- mkdir lib\Tobii.GameIntegration\
+- cd lib/Tobii.GameIntegration/
+- 'echo Downloading Tobii.GameIntegration ...'
+- appveyor DownloadFile https://github.com/alex8b/gta5eyetracking/releases/download/0.10/Gta5EyeTracking_bundle_0.10.65534.zip -FileName Tobii.zip
 - echo Download completed. Extracting ...
 - 7z x Tobii.zip
 - echo Extraction completed. Compiling ...
-- cd ../../
+- cd ..\..\
+- mkdir lib\Tobii.GameIntegration\x64\
+- copy lib\Tobii.GameIntegration\scripts\Tobii.GameIntegration.dll lib\Tobii.GameIntegration\x64\
 before_build:
 - set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
 - nuget restore
