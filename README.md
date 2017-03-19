@@ -47,11 +47,6 @@ If any skilled mod developers want to help me working on this mod then Tobii wil
 **If you have a PS4 Controller you can use DS4Windows to emulate XInput.**  
 http://ds4windows.com/
 
-## Installation
-### All-in-one installer
-Installer will install all the required components. Download the latest version here:  
-https://github.com/alex8b/gta5eyetracking/releases
-
 ### Manual installation
 1. Install Microsoft .NET Framework 4.5.2  
    https://www.microsoft.com/download/details.aspx?id=42642
@@ -62,24 +57,8 @@ https://github.com/alex8b/gta5eyetracking/releases
 3. Install Microsoft Visual C++ Redistributable Package for Visual Studio 2015 (x64)  
    https://www.microsoft.com/download/details.aspx?id=48145  
 
-4. Install Script Hook V  
-   http://dev-c.com/gtav/scripthookv/  
-   Extract these files to Grand Theft Auto V\  
-   ScriptHookV.dll  
-   dinput8.dll  
-   NativeTrainer.asi  
-
-5. Install Script Hook V .NET 2.9.4  
-   https://github.com/crosire/scripthookvdotnet/releases  
-   Extract ScriptHookVDotNet.asi to Grand Theft Auto V\  
-
-6. Install NativeUI 1.7  
-   https://github.com/Guad/NativeUI/releases  
-   Extract NativeUI.dll to Grand Theft Auto V\scripts\  
-
-7. Install the mod  
+4. Unzip Gta5EyeTracking_bundle to to Grand Theft Auto V folder  
    https://github.com/alex8b/gta5eyetracking/releases  
-   Extract the files to Grand Theft Auto V\scripts\  
 
 ## Controls
 ### Cheats
