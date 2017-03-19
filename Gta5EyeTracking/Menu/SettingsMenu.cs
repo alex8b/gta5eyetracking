@@ -31,6 +31,10 @@ namespace Gta5EyeTracking.Menu
 
 		    InitLists();
 
+			var responsivenessSlider = new UIMenuListItem("Responsiveness", _values0To1, (int)Math.Round(_settings.Responsiveness / 0.1), "Filter gaze data. Higher values will make crosshair movements smoother, but will increase the latency.");
+			responsivenessSlider.OnListChanged += (sender, args) => { _settings.Responsiveness = (float)responsivenessSlider.IndexToItem(responsivenessSlider.Index); };
+			_mainMenu.AddItem(responsivenessSlider);
+
 			var firstPersonFreelook = new UIMenuCheckboxItem("Extended View", _settings.ExtendedViewEnabled, "Extend your view by looking at the edges of the screen");
 			firstPersonFreelook.CheckboxEvent += (sender, args) => { _settings.ExtendedViewEnabled = firstPersonFreelook.Checked; };
 			_mainMenu.AddItem(firstPersonFreelook);
@@ -55,10 +59,6 @@ namespace Gta5EyeTracking.Menu
 			var snapAtTargets = new UIMenuCheckboxItem("Snap At Targets", _settings.SnapAtTargetsEnabled, "Snap crosshair at targets. Makes it less challenging to use Aim At Gaze and Shoot At Gaze features.");
 			snapAtTargets.CheckboxEvent += (sender, args) => { _settings.SnapAtTargetsEnabled = snapAtTargets.Checked; };
 			_mainMenu.AddItem(snapAtTargets);
-
-			var gazeFilteringSlider = new UIMenuListItem("Gaze Filter", _values0To1, (int)Math.Round(_settings.GazeFiltering / 0.1), "Filter gaze data. Higher values will make crosshair movements smoother, but will increase the latency.");
-			gazeFilteringSlider.OnListChanged += (sender, args) => { _settings.GazeFiltering = (float)gazeFilteringSlider.IndexToItem(gazeFilteringSlider.Index); };
-			_mainMenu.AddItem(gazeFilteringSlider);
 
 			var incinerateAtGaze = new UIMenuCheckboxItem("Incinerate At Gaze", _settings.IncinerateAtGazeEnabled, "Push A button to burn things where you look. This feature replaces the default command for A button.");
 			incinerateAtGaze.CheckboxEvent += (sender, args) => { _settings.IncinerateAtGazeEnabled = incinerateAtGaze.Checked; };

@@ -40,6 +40,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -52,34 +53,33 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EasyHook, Version=2.7.5726.0, Culture=neutral, PublicKeyToken=4b580fca19d0b0c5, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\EasyHook\NetFX4.0\EasyHook.dll</HintPath>
-    </Reference>
-    <Reference Include="EyeXFramework">
-      <HintPath>..\lib\TobiiEyeXSdk-DotNet\lib\x64\EyeXFramework.dll</HintPath>
+    <Reference Include="EasyHook, Version=2.7.6035.0, Culture=neutral, PublicKeyToken=4b580fca19d0b0c5, processorArchitecture=MSIL">
+      <HintPath>..\packages\EasyHook.2.7.6035\lib\net40\EasyHook.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="NativeUI">
       <HintPath>..\lib\NativeUI\NativeUI.dll</HintPath>
     </Reference>
-    <Reference Include="ScriptHookVDotNet">
-      <HintPath>..\lib\ScriptHookVDotNet\ScriptHookVDotNet.dll</HintPath>
+    <Reference Include="ScriptHookVDotNet, Version=2.9.4.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\ScriptHookVDotNet\SDK\ScriptHookVDotNet.dll</HintPath>
     </Reference>
-    <Reference Include="SharpDX, Version=3.0.2.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.3.0.2\lib\net45\SharpDX.dll</HintPath>
+    <Reference Include="SharpDX, Version=3.1.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpDX.3.1.1\lib\net45\SharpDX.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SharpDX.Mathematics, Version=3.0.2.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.Mathematics.3.0.2\lib\net45\SharpDX.Mathematics.dll</HintPath>
+    <Reference Include="SharpDX.Mathematics, Version=3.1.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpDX.Mathematics.3.1.1\lib\net45\SharpDX.Mathematics.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SharpDX.XInput, Version=3.0.2.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.XInput.3.0.2\lib\net45\SharpDX.XInput.dll</HintPath>
+    <Reference Include="SharpDX.XInput, Version=3.1.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpDX.XInput.3.1.1\lib\net45\SharpDX.XInput.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -87,9 +87,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Tobii.EyeX.Client.Net20">
-      <HintPath>..\lib\TobiiEyeXSdk-DotNet\lib\x64\Tobii.EyeX.Client.Net20.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Debug.cs" />
@@ -99,30 +96,33 @@
     <Compile Include="Crosshairs\DefaultCrosshair.cs" />
     <Compile Include="DebugOutput.cs" />
     <Compile Include="Features\AnimationHelper.cs" />
+    <Compile Include="Features\ExtendedViewBase.cs" />
     <Compile Include="ForegroundWindowWatcher.cs" />
     <Compile Include="Features\ExtendedView.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="GazeProjector.cs" />
+    <Compile Include="Gaze\Interop.cs" />
     <Compile Include="Geometry.cs" />
     <Compile Include="GoogleAnalyticsApi.cs" />
     <Compile Include="Gta5EyeTracking.cs" />
-    <Compile Include="Gaze\ITobiiTracker.cs" />
-    <Compile Include="Gaze\TobiiInteractionEngineTracker.cs" />
+    <Compile Include="Gaze\EyeTrackingHost.cs" />
     <Compile Include="HidEmulation\ControllerEmulation.cs" />
     <Compile Include="HidEmulation\IHidEmulation.cs" />
     <Compile Include="HomingMissiles\HomingMissile.cs" />
     <Compile Include="HomingMissiles\HomingMissilesHelper.cs" />
-    <Compile Include="IComparableExtensions.cs" />
     <Compile Include="HidEmulation\MouseEmulation.cs" />
     <Compile Include="HidEmulation\MouseApi.cs" />
     <Compile Include="Crosshairs\MissileLockCrosshair.cs" />
     <Compile Include="Mathf.cs" />
+    <Compile Include="CameraHelper.cs" />
     <Compile Include="Menu\IntroScreen.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Features\RadialMenu.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Menu\SettingsMenu.cs" />
     <Compile Include="SettingsStorage.cs" />
+    <Compile Include="SigScan.cs" />
+    <Compile Include="Time.cs" />
     <Compile Include="User32.cs" />
     <Compile Include="ScriptHookExtensions.cs" />
   </ItemGroup>
@@ -131,10 +131,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MemoryAccess\MemoryAccess.vcxproj">
-      <Project>{3b6acfed-0b3c-4e64-b419-f8651fd42e9f}</Project>
-      <Name>MemoryAccess</Name>
-    </ProjectReference>
+    <Content Include="..\packages\EasyHook.2.7.6035\content\net40\EasyHook64.dll">
+      <Link>EasyHook64.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
@@ -142,16 +142,13 @@
 rd /s /q "$(SolutionDir)bin\bundle\"
 
 xcopy "$(ProjectDir)bin\x64\Release\Gta5EyeTracking.dll" "$(SolutionDir)bin\scripts\"
-xcopy "$(ProjectDir)bin\x64\Release\MemoryAccess.dll" "$(SolutionDir)bin\scripts\"
 
 xcopy "$(SolutionDir)licenses\*.*" "$(SolutionDir)bin\scripts\licenses\*.*"
 
-xcopy "$(SolutionDir)lib\EasyHook\NetFX4.0\EasyHook64.dll" "$(SolutionDir)bin\scripts\"
-xcopy "$(SolutionDir)lib\EasyHook\NetFX4.0\EasyHook.dll" "$(SolutionDir)bin\scripts\"
+xcopy "$(SolutionDir)lib\Tobii.GameIntegration\x64\Tobii.GameIntegration.dll" "$(SolutionDir)bin\scripts\"
 
-xcopy "$(SolutionDir)lib\TobiiEyeXSdk-DotNet\lib\x64\EyeXFramework.dll" "$(SolutionDir)bin\scripts\"
-xcopy "$(SolutionDir)lib\TobiiEyeXSdk-DotNet\lib\x64\Tobii.EyeX.Client.Net20.dll" "$(SolutionDir)bin\scripts\"
-xcopy "$(SolutionDir)lib\TobiiEyeXSdk-DotNet\lib\x64\Tobii.EyeX.Client.dll" "$(SolutionDir)bin\scripts\"
+xcopy "$(ProjectDir)bin\x64\Release\EasyHook64.dll" "$(SolutionDir)bin\scripts\"
+xcopy "$(ProjectDir)bin\x64\Release\EasyHook.dll" "$(SolutionDir)bin\scripts\"
 
 xcopy "$(ProjectDir)bin\x64\Release\SharpDX.dll" "$(SolutionDir)bin\scripts\"
 xcopy "$(ProjectDir)bin\x64\Release\SharpDX.XInput.dll" "$(SolutionDir)bin\scripts\"

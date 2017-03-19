@@ -35,7 +35,7 @@ namespace Gta5EyeTracking
 		private readonly SettingsStorage _settingsStorage;
 
         //Gaze
-        private ITobiiTracker _tobiiTracker;
+        private EyeTrackingHost _tobiiTracker;
 
         //Features
         private readonly GameState _gameState;
@@ -83,7 +83,7 @@ namespace Gta5EyeTracking
 			_googleAnalyticsApi = new GoogleAnalyticsApi("UA-68420530-1", _settings.UserGuid, "GTA V Eye Tracking Mod", "gta5eyetracking", versionString);
 
             //Gaze
-            _tobiiTracker = new TobiiInteractionEngineTracker();
+            _tobiiTracker = new EyeTrackingHost();
 
             //Menu
             _menuPool = new MenuPool();
@@ -103,8 +103,8 @@ namespace Gta5EyeTracking
             _gameState = new GameState(_controllerEmulation, _menuPool);
             _animationHelper = new AnimationHelper();
 			_aiming = new Aiming(_settings, _animationHelper, _gameState);
-			_extendedView = new ExtendedView(_settings, _gameState, _tobiiTracker, _aiming, _debugOutput);
-			_radialMenu = new RadialMenu(_controllerEmulation, _tobiiTracker);
+			_extendedView = new ExtendedView(_settings, _gameState, _aiming, _debugOutput);
+			_radialMenu = new RadialMenu(_controllerEmulation);
 
 			//Window
 			_foregroundWindowWatcher = new ForegroundWindowWatcher();
@@ -118,7 +118,13 @@ namespace Gta5EyeTracking
 			KeyDown += OnKeyDown;
 			Tick += OnTick;
 			Aborted += OnAborted;
+			AppDomain.CurrentDomain.ProcessExit += AppDomainOnProcessExit;
 			Debug.Log("End Initialize");
+		}
+
+		private void AppDomainOnProcessExit(object sender, EventArgs eventArgs)
+		{
+			ShutDown();
 		}
 
 		private void OnAborted(object sender, EventArgs eventArgs)
@@ -141,13 +147,16 @@ namespace Gta5EyeTracking
 			Debug.Log("Begin Dispose");
 			ShutDown();
 			Debug.Log("End Dispose");
+			base.Dispose(disposing);
 		}
 
-        private void ShutDown()
+		private void ShutDown()
         {
             _shutDownRequestFlag = true;
 	        KeyDown -= OnKeyDown;
 			Tick -= OnTick;
+			Aborted -= OnAborted;
+			AppDomain.CurrentDomain.ProcessExit -= AppDomainOnProcessExit;
 
 			_shutDownRequestedEvent.WaitOne(100);
             Debug.Log("Begin ShutDown");
@@ -208,7 +217,9 @@ namespace Gta5EyeTracking
 		{
 			if (_shutDownRequestFlag) return;
 
-            _debugGazeVisualization.Move(new Vector2(UI.WIDTH * 0.5f + _tobiiTracker.GazeX * UI.WIDTH * 0.5f, UI.HEIGHT * 0.5f + _tobiiTracker.GazeY * UI.HEIGHT * 0.5f));
+			_tobiiTracker.Update();
+
+            _debugGazeVisualization.Move(new Vector2(TobiiAPI.GetGazePoint().X * UI.WIDTH, TobiiAPI.GetGazePoint().Y * UI.HEIGHT));
 
             _controllerEmulation.Enabled = !Game.IsPaused;
 			_mouseEmulation.Enabled = !Game.IsPaused && !_menuPool.IsAnyMenuOpen() &&_isWindowForeground;
@@ -243,16 +254,16 @@ namespace Gta5EyeTracking
 
             _gameState.Update();
 
-            _gazeProjector.FindGazeProjection(
-				new Vector2(_tobiiTracker.GazeX,_tobiiTracker.GazeY), 
+			var centeredNormalizedGaze = new Vector2(TobiiAPI.GetGazePoint().X, TobiiAPI.GetGazePoint().Y) * 2 - new Vector2(1, 1);
+
+			_gazeProjector.FindGazeProjection(
+				centeredNormalizedGaze, 
 				joystickDelta,
                 out shootCoord, 
 				out shootCoordSnap, 
 				out shootMissileCoord, 
 				out ped, 
 				out missileTarget);
-
-			
 
 			_controlsProcessor.Update(_lastTickTime, shootCoord, shootCoordSnap, shootMissileCoord, ped, missileTarget);
 

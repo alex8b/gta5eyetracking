@@ -163,21 +163,5 @@ namespace Gta5EyeTracking
         {
             return Function.Call<int>(Hash.GET_SOUND_ID);
         }
-
-		public static Matrix GetCameraMatrix()
-        {
-            IntPtr baseAddress = System.Diagnostics.Process.GetCurrentProcess().MainModule.BaseAddress;
-            int length = System.Diagnostics.Process.GetCurrentProcess().MainModule.ModuleMemorySize;
-            Matrix matrix = MemoryAccess.CCamera.GetCurrentCameraMatrix(baseAddress, length);
-
-            if (matrix != Matrix.Zero)
-                return matrix;
-            else
-            {
-	            Debug.Log("ERROR: Matrix haven't returned anything!");
-                return Matrix.Identity;
-            }
-
-        }
 	}
 }

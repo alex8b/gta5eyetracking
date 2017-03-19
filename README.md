@@ -1,11 +1,11 @@
 # GTA V Eye Tracking Mod
 [![Appveyor](https://ci.appveyor.com/api/projects/status/github/alex8b/gta5eyetracking?svg=true)](https://ci.appveyor.com/project/alex8b/gta5eyetracking)
 
-[![GTA V Eye Tracking Mod Review](https://i.ytimg.com/vi_webp/23rPOdg_mH8/mqdefault.webp)](https://www.youtube.com/watch?v=23rPOdg_mH8)
+[![GTA V Eye Tracking Mod Review](https://i.ytimg.com/vi_webp/RqayFa_nSXs/mqdefault.webp)](https://www.youtube.com/watch?v=6UQdwbOINm4)
 
 ## Dependencies
 
-1.	Tobii EyeX Engine SDK – http://developer.tobii.com/
+1.	Tobii Game Integration SDK – http://developer.tobii.com/
 
 2.	ScriptHook V – http://www.dev-c.com/gtav/scripthookv/
 
@@ -25,19 +25,19 @@ This mod allows you to control the camera and aim in GTA V with your eyes!
 If any skilled mod developers want to help me working on this mod then Tobii will give them few eye trackers **FOR FREE**.
 
 **You need to have one of these eye trackers to use it:**
-- Tobii Eye Tracker 4C  
-  http://www.tobiigaming.com/ 
+- Tobii Eye Tracker 4C 
+  https://tobiigaming.com/ 
   $149 / €159  
-  
-- Tobii EyeX  
-  http://www.tobiigaming.com/ 
+
+- Tobii EyeX Controller  
+  https://tobiigaming.com/ 
   $99 / €109  
  
 - SteelSeries Sentry Gaming Eye Tracker  
   http://steelseries.com/gaming-controllers/sentry-gaming-eye-tracker  
 
 - MSI GT72 Tobii Gaming Laptop  
-  https://www.msi.com/Laptop/GT72-6QE-DOMINATOR-PRO-G-tobii.html#hero-overview
+  https://www.msi.com/Laptop/GT72VR-6RE-Dominator-Pro-Tobii.html
 
 - Alienware 17 Gaming Laptop  
   http://www.dell.com/en-us/shop/productdetails/alienware-17-laptop
@@ -69,7 +69,7 @@ https://github.com/alex8b/gta5eyetracking/releases
    dinput8.dll  
    NativeTrainer.asi  
 
-5. Install Script Hook V .NET 2.9.3  
+5. Install Script Hook V .NET 2.9.4  
    https://github.com/crosire/scripthookvdotnet/releases  
    Extract ScriptHookVDotNet.asi to Grand Theft Auto V\  
 

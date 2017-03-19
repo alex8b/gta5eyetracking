@@ -4,13 +4,14 @@ namespace Gta5EyeTracking
 {
 	public class Settings
 	{
+		public float Responsiveness { get; set; }
+
 		public bool ExtendedViewEnabled { get; set; }
 		public float ExtendedViewSensitivity { get; set; }
 
 		public bool AimAtGazeEnabled { get; set; }
 		public bool FireAtGazeEnabled { get; set; }
 		public bool SnapAtTargetsEnabled { get; set; }
-		public float GazeFiltering { get; set; }
 		public bool IncinerateAtGazeEnabled { get; set; }
 		public bool TaseAtGazeEnabled { get; set; }
 		public bool MissilesAtGazeEnabled { get; set; }
@@ -22,14 +23,14 @@ namespace Gta5EyeTracking
 
 		public Settings()
 		{
+			Responsiveness = 0.5f;
+
 			ExtendedViewEnabled = true;
 			ExtendedViewSensitivity = 0.5f;
 
-			GazeFiltering = 0.5f;
-
             AimAtGazeEnabled = true;
 
-            FireAtGazeEnabled = true;
+            FireAtGazeEnabled = false;
 			SnapAtTargetsEnabled = false;
 
             IncinerateAtGazeEnabled = false;

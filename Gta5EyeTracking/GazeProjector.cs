@@ -21,7 +21,7 @@ namespace Gta5EyeTracking
 		}
 
 		private int _frameSkip = 0;
-		private int _maxSkipFrames = 3;
+		private int _maxSkipFrames = 6;
 		private Ped _lastPed = null;
 		private Vehicle _lastVehicle = null;
 
@@ -37,7 +37,7 @@ namespace Gta5EyeTracking
 		{
 			Entity target = null;
 			
-			var w = (float)(1 - _settings.GazeFiltering * 0.9);
+			var w = (float)(1 - _settings.Responsiveness * 0.9);
 			_filteredGazePoint = new Vector2(_filteredGazePoint.X + (gazePoint.X - _filteredGazePoint.X) * w,
 				_filteredGazePoint.Y + (gazePoint.Y - _filteredGazePoint.Y) * w);
 
@@ -51,7 +51,7 @@ namespace Gta5EyeTracking
 			shootCoordSnap = hitUnfiltered;
 
 
-			var hitFiltered = Geometry.RaycastEverything(filteredGazePointPlusJoystickDelta, out filteredEntity, true);
+			var hitFiltered = Geometry.RaycastEverything(filteredGazePointPlusJoystickDelta, out filteredEntity, 0);
 			shootCoord = hitFiltered;
 
 
@@ -63,12 +63,12 @@ namespace Gta5EyeTracking
 			}
 			else
 			{
-				if (_frameSkip == 0)
-				{
-					ped = Geometry.SearchPed(unfilteredGazePointPlusJoystickDelta); //Too slow :(
-					_lastPed = ped;
-				}
-				else
+				//if (_frameSkip == 0)
+				//{
+				//	ped = Geometry.SearchPed(unfilteredGazePointPlusJoystickDelta); //Too slow :(
+				//	_lastPed = ped;
+				//}
+				//else
 				{
 					ped = _lastPed;
 				}
@@ -96,12 +96,12 @@ namespace Gta5EyeTracking
 				}
 				else
 				{
-					if (_frameSkip == 0)
-					{
-						vehicle = Geometry.SearchVehicle(unfilteredGazePointPlusJoystickDelta); // Too slow :(
-						_lastVehicle = vehicle;
-					}
-					else
+					//if (_frameSkip == 0)
+					//{
+					//	vehicle = Geometry.SearchVehicle(unfilteredGazePointPlusJoystickDelta); // Too slow :(
+					//	_lastVehicle = vehicle;
+					//}
+					//else
 					{
 						vehicle = _lastVehicle;
 					}

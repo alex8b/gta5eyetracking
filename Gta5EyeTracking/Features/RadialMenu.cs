@@ -8,14 +8,12 @@ namespace Gta5EyeTracking.Features
 	public class RadialMenu
 	{
 		private readonly ControllerEmulation _controllerEmulation;
-	    private readonly ITobiiTracker _tobiiTracker;
 	    private readonly Stopwatch _newRadialMenuRegionStopwatch;
 		private int _lastRadialMenuRegion;
 
-		public RadialMenu(ControllerEmulation controllerEmulation, ITobiiTracker tobiiTracker)
+		public RadialMenu(ControllerEmulation controllerEmulation)
 		{
 			_controllerEmulation = controllerEmulation;
-		    _tobiiTracker = tobiiTracker;
 		    _lastRadialMenuRegion = -1;
 			_newRadialMenuRegionStopwatch = new Stopwatch();
 		}
@@ -27,7 +25,9 @@ namespace Gta5EyeTracking.Features
 			const int numberOfSectors = 8;
 			const int sectorSize = 360 / numberOfSectors;
 
-			var deltaVector = new Vector2(_tobiiTracker.GazeX * _tobiiTracker.AspectRatio, (float)(_tobiiTracker.GazeY + radialMenuYOffset));
+			var centeredNormalizedGaze = new Vector2(TobiiAPI.GetGazePoint().X, TobiiAPI.GetGazePoint().Y) * 2 - new Vector2(1, 1);
+
+			var deltaVector = new Vector2(centeredNormalizedGaze.X * TobiiAPI.AspectRatio, centeredNormalizedGaze.Y + radialMenuYOffset);
 			if (deltaVector.Length() < radialMenuInnerRadius) return;
 
 			var angleRad = (float)Math.Atan2(-deltaVector.Y, deltaVector.X);

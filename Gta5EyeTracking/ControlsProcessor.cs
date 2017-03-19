@@ -179,7 +179,7 @@ namespace Gta5EyeTracking
 	            var target3D = source3D + dir*1000;
 
 	            Entity hitEntity;
-	            shootCoord = Geometry.RaycastEverything(out hitEntity, target3D, source3D);
+	            shootCoord = Geometry.RaycastEverything(out hitEntity, target3D, source3D, 0);
 	        }
 	        return shootCoord;
 	    }

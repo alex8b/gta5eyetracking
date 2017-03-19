@@ -4,11 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gta5EyeTracking", "Gta5EyeTracking\Gta5EyeTracking.csproj", "{9585ABAB-B222-40B4-A9F7-AC8BE027DFAF}"
-	ProjectSection(ProjectDependencies) = postProject
-		{3B6ACFED-0B3C-4E64-B419-F8651FD42E9F} = {3B6ACFED-0B3C-4E64-B419-F8651FD42E9F}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MemoryAccess", "MemoryAccess\MemoryAccess.vcxproj", "{3B6ACFED-0B3C-4E64-B419-F8651FD42E9F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstallerUI", "InstallerUI\InstallerUI.csproj", "{47BE85E9-3420-4B93-BF48-0E69C1A00386}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -30,10 +25,6 @@ Global
 		{9585ABAB-B222-40B4-A9F7-AC8BE027DFAF}.Debug|x64.Build.0 = Debug|x64
 		{9585ABAB-B222-40B4-A9F7-AC8BE027DFAF}.Release|x64.ActiveCfg = Release|x64
 		{9585ABAB-B222-40B4-A9F7-AC8BE027DFAF}.Release|x64.Build.0 = Release|x64
-		{3B6ACFED-0B3C-4E64-B419-F8651FD42E9F}.Debug|x64.ActiveCfg = Debug|x64
-		{3B6ACFED-0B3C-4E64-B419-F8651FD42E9F}.Debug|x64.Build.0 = Debug|x64
-		{3B6ACFED-0B3C-4E64-B419-F8651FD42E9F}.Release|x64.ActiveCfg = Release|x64
-		{3B6ACFED-0B3C-4E64-B419-F8651FD42E9F}.Release|x64.Build.0 = Release|x64
 		{47BE85E9-3420-4B93-BF48-0E69C1A00386}.Debug|x64.ActiveCfg = Debug|x86
 		{47BE85E9-3420-4B93-BF48-0E69C1A00386}.Debug|x64.Build.0 = Debug|x86
 		{47BE85E9-3420-4B93-BF48-0E69C1A00386}.Release|x64.ActiveCfg = Release|x86

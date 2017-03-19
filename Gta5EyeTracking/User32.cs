@@ -17,6 +17,22 @@ namespace Gta5EyeTracking
 		VK_LMENU = 0xA4
 	}
 
+	[StructLayout(LayoutKind.Sequential)]
+	public struct POINT
+	{
+		public int x;
+		public int y;
+	}
+
+	[StructLayout(LayoutKind.Sequential)]
+	public struct RECT
+	{
+		public int left;
+		public int top;
+		public int right;
+		public int bottom;
+	}
+
 	public static class User32
 	{
 		public const int KEY_TOGGLED = 0x1;
@@ -30,5 +46,8 @@ namespace Gta5EyeTracking
 		{
 			return Convert.ToBoolean(GetKeyState(nVirtKey) & KEY_PRESSED);
 		}
+
+		[DllImport("user32.dll")]
+		public static extern bool GetClientRect(IntPtr hwnd, ref RECT windowClientRect);
 	}
 }

@@ -10,9 +10,6 @@ namespace Gta5EyeTracking
 {
 	public static class Geometry
 	{
-
-	
-
 		public static bool IsInFrontOfThePlayer(Vector3 shootCoord)
 		{
             //TODO
@@ -26,16 +23,16 @@ namespace Gta5EyeTracking
 			//return ((rotationDiffBound < 90) || (rotationDiffBound > 270));
 		}
 
-		public static Vector3 RaycastEverything(Vector2 screenCoord, out Entity hitEntity, bool skipProjection)
+		public static Vector3 RaycastEverything(Vector2 screenCoord, out Entity hitEntity, float radius)
 		{
 		    Vector3 source3D;
 		    Vector3 target3D;
             ScreenRelToWorld(screenCoord, out source3D, out target3D);
 
-			return RaycastEverything(out hitEntity, target3D, source3D);
+			return RaycastEverything(out hitEntity, target3D, source3D, radius);
 		}
 
-		public static Vector3 RaycastEverything(out Entity hitEntity, Vector3 target3D, Vector3 source3D)
+		public static Vector3 RaycastEverything(out Entity hitEntity, Vector3 target3D, Vector3 source3D, float radius)
 		{
 			hitEntity = null;
 			const float raycastToDist = 200.0f;
@@ -49,10 +46,24 @@ namespace Gta5EyeTracking
 
 			var dir = (target3D - source3D);
 			dir.Normalize();
-			var raycastResults = World.Raycast(source3D + dir*raycastFromDist,
-				source3D + dir*raycastToDist,
-				(IntersectOptions) (1 | 16 | 256 | 2 | 4 | 8) // | peds + vehicles
-				, ignoreEntity);
+
+			RaycastResult raycastResults;
+			if (radius > 0)
+			{
+				raycastResults = World.RaycastCapsule(source3D + dir * raycastFromDist,
+					source3D + dir * raycastToDist,
+					radius,
+					(IntersectOptions)(1 | 16 | 256 | 2 | 4 | 8) // | peds + vehicles
+					, ignoreEntity);
+			}
+			else
+			{
+				raycastResults = World.Raycast(source3D + dir * raycastFromDist,
+					source3D + dir * raycastToDist,
+					(IntersectOptions)(1 | 16 | 256 | 2 | 4 | 8) // | peds + vehicles
+					, ignoreEntity);
+			}
+
 
 			if (raycastResults.DitHitAnything)
 			{
@@ -67,10 +78,11 @@ namespace Gta5EyeTracking
 		}
 
 		public static Vector3 ConecastPedsAndVehicles(Vector2 screenCoords, out  Entity hitEntity)
-        {
-            var numPoints = 5;
+		{
+			var radius = 1;
+			var numPoints = 5;
             var angleStep = Math.PI * 0.2;
-            var distStep = 0.05 / 5;
+            var distStep = 0.05 / numPoints;
             var resultCoord = new Vector3();
             hitEntity = null;
             for (var i = 0; i < numPoints; i++)
@@ -81,7 +93,7 @@ namespace Gta5EyeTracking
                 var offsetY = Math.Cos(angle) * dist;
                 var coord = screenCoords + new Vector2((float)offsetX, (float)offsetY);
                 Entity entity;
-                var hitcoord = RaycastEverything(coord, out entity, i!=0);
+                var hitcoord = RaycastEverything(coord, out entity, radius);
                 if (i == 0)
                 {
                     resultCoord = hitcoord;
@@ -102,130 +114,130 @@ namespace Gta5EyeTracking
             return resultCoord;
         }
 
-		public static bool IsOccluded(Entity entity, Vector3 target3D)
-		{
-			const float raycastToDist = 200.0f;
-			const float raycastFromDist = 1f;
+		//public static bool IsOccluded(Entity entity, Vector3 target3D)
+		//{
+		//	const float raycastToDist = 200.0f;
+		//	const float raycastFromDist = 1f;
 
-			var mView = ScriptHookExtensions.GetCameraMatrix();
-			var source3D = ViewMatrixToCameraPosition(mView);
+		//	var mView = ScriptHookExtensions.GetCameraMatrix();
+		//	var source3D = ViewMatrixToCameraPosition(mView);
 
-			Entity ignoreEntity = Game.Player.Character;
-			if (Game.Player.Character.IsInVehicle())
-			{
-				ignoreEntity = Game.Player.Character.CurrentVehicle;
-			}
+		//	Entity ignoreEntity = Game.Player.Character;
+		//	if (Game.Player.Character.IsInVehicle())
+		//	{
+		//		ignoreEntity = Game.Player.Character.CurrentVehicle;
+		//	}
 
-			var dir = (target3D - source3D);
-			dir.Normalize();
-			var raycastResults = World.Raycast(source3D + dir*raycastFromDist,
-				source3D + dir*raycastToDist,
-				(IntersectOptions) (1 | 16 | 256 | 2 | 4 | 8) // | peds + vehicles
-				, ignoreEntity);
+		//	var dir = (target3D - source3D);
+		//	dir.Normalize();
+		//	var raycastResults = World.Raycast(source3D + dir*raycastFromDist,
+		//		source3D + dir*raycastToDist,
+		//		(IntersectOptions) (1 | 16 | 256 | 2 | 4 | 8) // | peds + vehicles
+		//		, ignoreEntity);
 
 
-			if (raycastResults.DitHitEntity)
-			{
-				return raycastResults.HitEntity.Handle != entity.Handle;
-			}
-			return true;
-		}
+		//	if (raycastResults.DitHitEntity)
+		//	{
+		//		return raycastResults.HitEntity.Handle != entity.Handle;
+		//	}
+		//	return true;
+		//}
 
-		public static Ped SearchPed(Vector2 screenCoords)
-		{
-			const double searchRange = 0.1;
-			const double thresholdRange = 0.025;
-			const float raycastToDist = 200.0f;
-			var peds = World.GetNearbyPeds(Game.Player.Character.Position, raycastToDist);
-			var mindist = Double.MaxValue;
-			Ped foundPed = null;
-			//Util.Log("Peds - " + peds.Length);
-			//Util.Log("P - " + DateTime.UtcNow.Ticks);
-			foreach (var ped in peds)
-			{
-				if (ped.Handle == Game.Player.Character.Handle) continue;
-                if (!ped.IsAlive) continue;
-                //if (ped.IsOccluded) continue; slow?
+		//public static Ped SearchPed(Vector2 screenCoords)
+		//{
+		//	const double searchRange = 0.1;
+		//	const double thresholdRange = 0.025;
+		//	const float raycastToDist = 200.0f;
+		//	var peds = World.GetNearbyPeds(Game.Player.Character.Position, raycastToDist);
+		//	var mindist = Double.MaxValue;
+		//	Ped foundPed = null;
+		//	//Util.Log("Peds - " + peds.Length);
+		//	//Util.Log("P - " + DateTime.UtcNow.Ticks);
+		//	foreach (var ped in peds)
+		//	{
+		//		if (ped.Handle == Game.Player.Character.Handle) continue;
+  //              if (!ped.IsAlive) continue;
+  //              //if (ped.IsOccluded) continue; slow?
 
-                {
-					var headOffest = ped.GetBoneCoord(Bone.SKEL_ROOT);
-					Vector2 pedScreenCoords;
-					if (WorldToScreenRel(headOffest, out pedScreenCoords))
-					{
-						var dist = (screenCoords - pedScreenCoords).Length();
-						if ((dist < mindist) && (dist < searchRange))
-						{
-							if (ped.IsOccluded) continue;
-							//if (IsOccluded(ped, headOffest)) continue;
-							mindist = dist;
-							foundPed = ped;
-						}
-						if (dist < thresholdRange)
-						{
-							break;
-						}
-					}
-				}
+  //              {
+		//			var headOffest = ped.GetBoneCoord(Bone.SKEL_ROOT);
+		//			Vector2 pedScreenCoords;
+		//			if (WorldToScreenRel(headOffest, out pedScreenCoords))
+		//			{
+		//				var dist = (screenCoords - pedScreenCoords).Length();
+		//				if ((dist < mindist) && (dist < searchRange))
+		//				{
+		//					if (ped.IsOccluded) continue;
+		//					//if (IsOccluded(ped, headOffest)) continue;
+		//					mindist = dist;
+		//					foundPed = ped;
+		//				}
+		//				if (dist < thresholdRange)
+		//				{
+		//					break;
+		//				}
+		//			}
+		//		}
 
-				{
-					var headOffest = ped.GetBoneCoord(Bone.SKEL_Head);
-					Vector2 pedScreenCoords;
+		//		{
+		//			var headOffest = ped.GetBoneCoord(Bone.SKEL_Head);
+		//			Vector2 pedScreenCoords;
 					
-					if (!WorldToScreenRel(headOffest, out pedScreenCoords)) continue;
+		//			if (!WorldToScreenRel(headOffest, out pedScreenCoords)) continue;
 					
-					var dist = (screenCoords - pedScreenCoords).Length();
+		//			var dist = (screenCoords - pedScreenCoords).Length();
 
-					if (!(dist < mindist) || !(dist < searchRange)) continue;
-					if (ped.IsOccluded) continue;
-					//if (IsOccluded(ped, headOffest)) continue;
-					mindist = dist;
-					foundPed = ped;
-					if (dist < thresholdRange)
-					{
-						break;
-					}
-				}
+		//			if (!(dist < mindist) || !(dist < searchRange)) continue;
+		//			if (ped.IsOccluded) continue;
+		//			//if (IsOccluded(ped, headOffest)) continue;
+		//			mindist = dist;
+		//			foundPed = ped;
+		//			if (dist < thresholdRange)
+		//			{
+		//				break;
+		//			}
+		//		}
 
-			}
-			//Util.Log("Q - " + DateTime.UtcNow.Ticks);
-			return foundPed;
-		}
+		//	}
+		//	//Util.Log("Q - " + DateTime.UtcNow.Ticks);
+		//	return foundPed;
+		//}
 
-		public static Vehicle SearchVehicle(Vector2 screenCoords)
-		{
-			const double searchRange = 0.1;
-			const double thresholdRange = 0.025;
-			const float raycastToDist = 200.0f;
-			var vehs = World.GetNearbyVehicles(Game.Player.Character.Position, raycastToDist);
-			var mindist = Double.MaxValue;
-			Vehicle foundVeh = null;
-			//Util.Log("Vehs - " + vehs.Length);
-			//Util.Log("V - " + DateTime.UtcNow.Ticks);
-			foreach (var vehicle in vehs)
-			{
-				if (Game.Player.Character.IsInVehicle() && (vehicle.Handle == Game.Player.Character.CurrentVehicle.Handle)) continue; //you own veh
-			    if (!vehicle.IsAlive) continue;
+		//public static Vehicle SearchVehicle(Vector2 screenCoords)
+		//{
+		//	const double searchRange = 0.1;
+		//	const double thresholdRange = 0.025;
+		//	const float raycastToDist = 200.0f;
+		//	var vehs = World.GetNearbyVehicles(Game.Player.Character.Position, raycastToDist);
+		//	var mindist = Double.MaxValue;
+		//	Vehicle foundVeh = null;
+		//	//Util.Log("Vehs - " + vehs.Length);
+		//	//Util.Log("V - " + DateTime.UtcNow.Ticks);
+		//	foreach (var vehicle in vehs)
+		//	{
+		//		if (Game.Player.Character.IsInVehicle() && (vehicle.Handle == Game.Player.Character.CurrentVehicle.Handle)) continue; //you own veh
+		//	    if (!vehicle.IsAlive) continue;
 
-				var vehOffset = vehicle.Position;
-				Vector2 vehScreenCoords;
+		//		var vehOffset = vehicle.Position;
+		//		Vector2 vehScreenCoords;
 			    
-                if (!WorldToScreenRel(vehOffset, out vehScreenCoords)) continue;
+  //              if (!WorldToScreenRel(vehOffset, out vehScreenCoords)) continue;
 			    
-                var dist = (screenCoords - vehScreenCoords).Length();
-			    if (!(dist < mindist) || !(dist < searchRange)) continue;
-				if (vehicle.IsOccluded) continue;
-				//if (IsOccluded(vehicle, vehOffset)) continue;
-				mindist = dist;
-			    foundVeh = vehicle;
-				if (dist < thresholdRange)
-				{
-					break;
-				}
-			}
-			//Util.Log("W - " + DateTime.UtcNow.Ticks);
+  //              var dist = (screenCoords - vehScreenCoords).Length();
+		//	    if (!(dist < mindist) || !(dist < searchRange)) continue;
+		//		if (vehicle.IsOccluded) continue;
+		//		//if (IsOccluded(vehicle, vehOffset)) continue;
+		//		mindist = dist;
+		//	    foundVeh = vehicle;
+		//		if (dist < thresholdRange)
+		//		{
+		//			break;
+		//		}
+		//	}
+		//	//Util.Log("W - " + DateTime.UtcNow.Ticks);
 
-			return foundVeh;
-		}
+		//	return foundVeh;
+		//}
 
 		public static bool WorldToScreenRel_Native(Vector3 worldCoords, out Vector2 screenCoords)
 		{
@@ -242,7 +254,7 @@ namespace Gta5EyeTracking
 
         public static bool WorldToScreenRel(Vector3 entityPosition, out Vector2 screenCoords)
         {
-            var mView = ScriptHookExtensions.GetCameraMatrix();
+            var mView = CameraHelper.GetCameraMatrix();
             mView.Transpose();
 
             var vForward = mView.Row4;
@@ -338,7 +350,7 @@ namespace Gta5EyeTracking
 
         public static void ScreenRelToWorld(Vector2 screenCoordsRel, out Vector3 camPoint, out Vector3 farPoint)
 	    {
-            var mView = ScriptHookExtensions.GetCameraMatrix();
+            var mView = CameraHelper.GetCameraMatrix();
 
             camPoint = ViewMatrixToCameraPosition(mView);
             farPoint = ScreenRelToWorld(mView, screenCoordsRel);
