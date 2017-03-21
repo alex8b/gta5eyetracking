@@ -446,7 +446,7 @@ public abstract class ExtendedViewBase
 		float targetYaw = _gazeViewTarget.X*yawLimit;
 
 		var pitchLimit = gazeViewExtensionAngleDegrees;
-		float targetPitch = -_gazeViewTarget.Y*pitchLimit;
+		float targetPitch = _gazeViewTarget.Y*pitchLimit;
 
 		//if (ScaleScreenShiftByBasePitch)
 		//{
