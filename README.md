@@ -24,7 +24,7 @@ This mod allows you to control the camera and aim in GTA V with your eyes!
  
 If any skilled mod developers want to help me working on this mod then Tobii will give them few eye trackers **FOR FREE**.
 
-**You need to have one of these eye trackers to use it:**
+**You need to have one of these eye trackers to use the mod:**
 - Tobii Eye Tracker 4C  
   https://tobiigaming.com/  
   $149 / €159  
@@ -47,7 +47,8 @@ If any skilled mod developers want to help me working on this mod then Tobii wil
 **If you have a PS4 Controller you can use DS4Windows to emulate XInput.**  
 http://ds4windows.com/
 
-### Manual installation
+## Installation
+
 1. Install Microsoft .NET Framework 4.5.2  
    https://www.microsoft.com/download/details.aspx?id=42642
 
