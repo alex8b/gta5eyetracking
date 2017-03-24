@@ -67,7 +67,7 @@ http://ds4windows.com/
 Loook at the sides of the screen or turn your head to look around.
 
 ### Aim at gaze
-Push **Right Mouse Button** or **Left Trigger** on gamepad to aim your gun and center the camera at where you are looking.
+Push **Right Mouse Button** or **Left Trigger** on gamepad to aim your gun and center the camera at where you are looking.  
 *You can enable snapping at targets in the Setting menu (F8).*
 
 ### Weapon selection menu
