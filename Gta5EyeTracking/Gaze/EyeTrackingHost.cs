@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Gta5EyeTracking;
 using SharpDX;
 using Tobii.GameIntegration;
@@ -73,8 +74,15 @@ public class EyeTrackingHost : IDisposable
 
 		Debug.Log("Interop.Start() before");
 		Interop.SetWindow(Process.GetCurrentProcess().MainWindowHandle);
-		Interop.Start(false);
+		Interop.Start(true);
 		Debug.Log("Interop.Start() after");
+
+		Task.Run(() =>
+		{
+			Debug.Log("Interop.CustomThreadCode() before");
+			Interop.CustomThreadCode();
+			Debug.Log("Interop.CustomThreadCode() after");
+		});
 
 		AspectRatio = 16f / 9f;
 	}

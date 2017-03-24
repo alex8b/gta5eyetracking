@@ -119,6 +119,7 @@ namespace Gta5EyeTracking
 			Tick += OnTick;
 			Aborted += OnAborted;
 			AppDomain.CurrentDomain.ProcessExit += AppDomainOnProcessExit;
+			AppDomain.CurrentDomain.DomainUnload += AppDomainOnProcessExit;
 			Debug.Log("End Initialize");
 		}
 
@@ -152,14 +153,14 @@ namespace Gta5EyeTracking
 
 		private void ShutDown()
         {
-            _shutDownRequestFlag = true;
+			Debug.Log("Begin ShutDown");
+			_shutDownRequestFlag = true;
 	        KeyDown -= OnKeyDown;
 			Tick -= OnTick;
 			Aborted -= OnAborted;
 			AppDomain.CurrentDomain.ProcessExit -= AppDomainOnProcessExit;
 
 			_shutDownRequestedEvent.WaitOne(100);
-            Debug.Log("Begin ShutDown");
 			_settingsStorage.SaveSettings(_settings);
 
 			//General

@@ -64,6 +64,8 @@ namespace Tobii.GameIntegration
 		    return HeadPosesBuffer;
 	    }
 
+		[DllImport(TobiiGameIntegrationCoreExtensionDll, CallingConvention = CallingConvention.Cdecl, EntryPoint = "CustomThreadCode")]
+		public static extern bool CustomThreadCode();
 		[DllImport(TobiiGameIntegrationCoreExtensionDll, CallingConvention = CallingConvention.Cdecl, EntryPoint = "IsInitialised")]
 		[return: MarshalAs(UnmanagedType.I1)]
 		public static extern bool IsInitialised();
