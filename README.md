@@ -55,10 +55,7 @@ http://ds4windows.com/
 2. Install Microsoft Visual C++ Redistributable Package for Visual Studio 2013 (x64)  
    https://www.microsoft.com/download/details.aspx?id=40784  
 
-3. Install Microsoft Visual C++ Redistributable Package for Visual Studio 2015 (x64)  
-   https://www.microsoft.com/download/details.aspx?id=48145  
-
-4. Extract bundle zip to Grand Theft Auto V folder  
+3. Extract bundle zip to Grand Theft Auto V folder  
    (d:\SteamLibrary\steamapps\common\Grand Theft Auto V\)  
    https://github.com/alex8b/gta5eyetracking/releases  
 
