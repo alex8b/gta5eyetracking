@@ -61,6 +61,20 @@ http://ds4windows.com/
    (d:\SteamLibrary\steamapps\common\Grand Theft Auto V\)  
    https://github.com/alex8b/gta5eyetracking/releases  
 
+## Features
+### Extended view
+Loook at the sides of the screen or turn your head to look around.
+
+### Aim at gaze
+Push **Right Mouse Button** or **Left Trigger** on gamepad to aim your gun and center the camera at where you are looking.
+*You can enable snapping at targets in the Setting menu (F8).*
+
+### Weapon selection menu
+Press **Left Button** on gamepad to open weapon selection menu. Look at an item and release the button to confirm your selection.
+
+### Shoot missile at gaze
+Press **N** on keyboard or **B** on gamepad to shoot a missile at where you are looking.
+
 ## Controls
 ### Cheats
 - F4 - Cheat menu (Immortality/Give all weapons/Disable cops/Spawn vehicles) 
