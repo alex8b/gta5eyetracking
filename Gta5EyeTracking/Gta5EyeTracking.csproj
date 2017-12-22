@@ -170,6 +170,7 @@ xcopy "$(ProjectDir)bin\x64\Release\SharpDX.XInput.dll" "$(SolutionDir)bin\scrip
 xcopy "$(ProjectDir)bin\x64\Release\SharpDX.Mathematics.dll" "$(SolutionDir)bin\scripts\"
 
 xcopy "$(SolutionDir)lib\ScriptHookVDotNet\ScriptHookVDotNet.asi" "$(SolutionDir)bin\bundle\"
+xcopy "$(SolutionDir)lib\ScriptHookVDotNet\ScriptHookVDotNet2.dll" "$(SolutionDir)bin\bundle\"
 
 xcopy "$(SolutionDir)lib\ScriptHookV\bin\NativeTrainer.asi" "$(SolutionDir)bin\bundle\"
 xcopy "$(SolutionDir)lib\ScriptHookV\bin\ScriptHookV.dll" "$(SolutionDir)bin\bundle\"
