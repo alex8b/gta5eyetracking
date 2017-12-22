@@ -14,7 +14,7 @@ install:
 - mkdir lib\ScriptHookV\
 - cd lib\ScriptHookV\
 - 'echo Downloading ScriptHookV ...'
-- appveyor DownloadFile https://www.dropbox.com/s/pwzj1v0dge5bkye/ScriptHookV_1.0.1180.2.zip?dl=1 -FileName ScriptHookV.zip
+- appveyor DownloadFile https://www.dropbox.com/s/o8wiu9dr49y6fs4/ScriptHookV_1.0.1290.1.zip?dl=1 -FileName ScriptHookV.zip
 - echo Download completed. Extracting ...
 - 7z x ScriptHookV.zip
 - echo Extraction completed. Compiling ...
@@ -22,7 +22,7 @@ install:
 - mkdir lib\ScriptHookVDotNet\
 - cd lib\ScriptHookVDotNet\
 - 'echo Downloading ScriptHookVDotNet ...'
-- appveyor DownloadFile https://github.com/crosire/scripthookvdotnet/releases/download/v2.10.3/ScriptHookVDotNet.zip -FileName ScriptHookVDotNet.zip
+- appveyor DownloadFile https://github.com/crosire/scripthookvdotnet/releases/download/v2.10.5/ScriptHookVDotNet.zip -FileName ScriptHookVDotNet.zip
 - echo Download completed. Extracting ...
 - 7z x ScriptHookVDotNet.zip
 - echo Extraction completed. Compiling ...
