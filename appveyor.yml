@@ -38,7 +38,7 @@ install:
 - mkdir lib\Tobii.GameIntegration\
 - cd lib/Tobii.GameIntegration/
 - 'echo Downloading Tobii.GameIntegration ...'
-- appveyor DownloadFile https://github.com/alex8b/gta5eyetracking/releases/download/0.10/Gta5EyeTracking_bundle_0.10.269.zip -FileName Tobii.zip
+- appveyor DownloadFile https://github.com/alex8b/gta5eyetracking/releases/download/0.10/Gta5EyeTracking_bundle_0.10.272.zip -FileName Tobii.zip
 - echo Download completed. Extracting ...
 - 7z x Tobii.zip
 - echo Extraction completed. Compiling ...
