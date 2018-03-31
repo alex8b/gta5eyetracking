@@ -22,7 +22,7 @@ install:
 - mkdir lib\ScriptHookVDotNet\
 - cd lib\ScriptHookVDotNet\
 - 'echo Downloading ScriptHookVDotNet ...'
-- appveyor DownloadFile https://github.com/crosire/scripthookvdotnet/releases/download/v2.10.5/ScriptHookVDotNet.zip -FileName ScriptHookVDotNet.zip
+- appveyor DownloadFile https://github.com/crosire/scripthookvdotnet/releases/download/v2.10.6/ScriptHookVDotNet.zip -FileName ScriptHookVDotNet.zip
 - echo Download completed. Extracting ...
 - 7z x ScriptHookVDotNet.zip
 - echo Extraction completed. Compiling ...
