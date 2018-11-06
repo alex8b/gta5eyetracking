@@ -52,8 +52,8 @@ http://ds4windows.com/
 1. Install Microsoft .NET Framework 4.5.2  
    https://www.microsoft.com/download/details.aspx?id=42642
 
-2. Install Microsoft Visual C++ Redistributable Package for Visual Studio 2013 (x64)  
-   https://www.microsoft.com/download/details.aspx?id=40784  
+2. Install Microsoft Visual C++ Redistributable Package for Visual Studio 2015 (x64)
+   https://www.microsoft.com/download/details.aspx?id=53587
 
 3. Extract bundle zip to Grand Theft Auto V folder  
    (d:\SteamLibrary\steamapps\common\Grand Theft Auto V\)  
