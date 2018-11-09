@@ -35,8 +35,8 @@ install:
 - 7z x NativeUI.zip
 - echo Extraction completed. Compiling ...
 - cd ..\..\
-- mkdir lib\Tobii.GameIntegration.Net\
-- cd lib/Tobii.GameIntegration.Net/
+- mkdir lib\Tobii\
+- cd lib/Tobii/
 - 'echo Downloading Tobii.GameIntegration ...'
 - appveyor DownloadFile https://github.com/alex8b/gta5eyetracking/releases/download/0.10/Gta5EyeTracking_bundle_0.10.279.zip -FileName Tobii.zip
 - echo Download completed. Extracting ...
@@ -44,9 +44,9 @@ install:
 - echo Extraction completed. Compiling ...
 - cd ..\..\
 - mkdir lib\Tobii.GameIntegration.Net\
-- copy lib\Tobii.GameIntegration.Net\scripts\Tobii.GameIntegration.Net.dll lib\Tobii.GameIntegration.Net\
-- copy lib\Tobii.GameIntegration.Net\scripts\tobii_gameintegration_x64.dll lib\Tobii.GameIntegration.Net\
-- copy lib\Tobii.GameIntegration.Net\scripts\tobii_gameintegration_x86.dll lib\Tobii.GameIntegration.Net\
+- copy lib\Tobii\scripts\Tobii.GameIntegration.Net.dll lib\Tobii.GameIntegration.Net\
+- copy lib\Tobii\scripts\tobii_gameintegration_x64.dll lib\Tobii.GameIntegration.Net\
+- copy lib\Tobii\scripts\tobii_gameintegration_x86.dll lib\Tobii.GameIntegration.Net\
 before_build:
 - set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
 - nuget restore
