@@ -80,7 +80,11 @@ namespace Gta5EyeTracking.Menu
 			dontFallFromBikes.CheckboxEvent += (sender, args) => { _settings.DontFallFromBikesEnabled = dontFallFromBikes.Checked; };
 			_mainMenu.AddItem(dontFallFromBikes);
 
-			const string privacyPolicyText = "By selecting to send usage statistics you agree that your usage statistics, such as a game session time, " +
+            var firtsPersonMode = new UIMenuCheckboxItem("First person mode", _settings.FirstPersonModeEnabled, "Switch to first person view");
+            firtsPersonMode.CheckboxEvent += (sender, args) => { _settings.FirstPersonModeEnabled = firtsPersonMode.Checked; };
+            _mainMenu.AddItem(firtsPersonMode);
+
+            const string privacyPolicyText = "By selecting to send usage statistics you agree that your usage statistics, such as a game session time, " +
 											 "mod settings and mod features you use will be collected by the developer. The data will be collected " +
 											 "anonymously, processed on Google Analytics and used solely to enhance user experience.";
 

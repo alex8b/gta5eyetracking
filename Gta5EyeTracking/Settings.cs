@@ -20,8 +20,9 @@ namespace Gta5EyeTracking
 		public bool SendUsageStatistics { get; set; }
 		public bool UserAgreementAccepted { get; set; }
 		public string UserGuid { get; set; }
+        public bool FirstPersonModeEnabled { get; set; }
 
-		public Settings()
+        public Settings()
 		{
 			Responsiveness = 0.5f;
 
@@ -45,6 +46,8 @@ namespace Gta5EyeTracking
 			UserAgreementAccepted = false;
 
 			UserGuid = Guid.NewGuid().ToString();
+
+            FirstPersonModeEnabled = false;
         }
 	}
 }

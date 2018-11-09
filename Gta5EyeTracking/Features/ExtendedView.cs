@@ -331,7 +331,7 @@ namespace Gta5EyeTracking.Features
 				//vehicle
 				var timeInVehicle = DateTime.UtcNow - _lastNotInVehicle;
 				if ((timeInVehicle > TimeSpan.FromSeconds(0.5))
-					&& GameState.IsFirstPersonVehicleCameraActive())
+					&& _settings.FirstPersonModeEnabled)
 				{
 					ProcessFirstPersonVehicle();
 				}
@@ -345,7 +345,7 @@ namespace Gta5EyeTracking.Features
 				_lastNotInVehicle = DateTime.UtcNow;
 
                 //on foot
-                if (GameState.IsFirstPersonPedCameraActive())
+                if (_settings.FirstPersonModeEnabled)
 				{
 					if (_gameState.IsAimingWithGamepad || _gameState.IsAimingWithMouse)
 					{
