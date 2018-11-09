@@ -345,7 +345,7 @@ namespace Gta5EyeTracking.Features
 				_lastNotInVehicle = DateTime.UtcNow;
 
                 //on foot
-                if (_settings.FirstPersonModeEnabled)
+                if (_settings.FirstPersonModeEnabled && GameState.IsFirstPersonPedCameraActive())
 				{
 					if (_gameState.IsAimingWithGamepad || _gameState.IsAimingWithMouse)
 					{
