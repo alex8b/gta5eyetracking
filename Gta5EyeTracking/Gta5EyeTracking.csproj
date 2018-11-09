@@ -60,9 +60,8 @@
     <Reference Include="NativeUI">
       <HintPath>..\lib\NativeUI\NativeUI.dll</HintPath>
     </Reference>
-    <Reference Include="ScriptHookVDotNet, Version=2.9.4.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\ScriptHookVDotNet\ScriptHookVDotNet2.dll</HintPath>
+    <Reference Include="ScriptHookVDotNet">
+      <HintPath>..\lib\ScriptHookVDotNet\ScriptHookVDotNet.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpDX.4.0.1\lib\net45\SharpDX.dll</HintPath>
@@ -87,6 +86,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Tobii.GameIntegration.Net">
+      <HintPath>..\lib\Tobii.GameIntegration.Net\Tobii.GameIntegration.Net.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Debug.cs" />
@@ -101,7 +103,6 @@
     <Compile Include="Features\ExtendedView.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="GazeProjector.cs" />
-    <Compile Include="Gaze\Interop.cs" />
     <Compile Include="Geometry.cs" />
     <Compile Include="GoogleAnalyticsApi.cs" />
     <Compile Include="Gta5EyeTracking.cs" />
@@ -160,7 +161,9 @@ xcopy "$(ProjectDir)bin\x64\Release\Gta5EyeTracking.dll" "$(SolutionDir)bin\scri
 
 xcopy "$(SolutionDir)licenses\*.*" "$(SolutionDir)bin\scripts\licenses\*.*"
 
-xcopy "$(SolutionDir)lib\Tobii.GameIntegration\x64\Tobii.GameIntegration.dll" "$(SolutionDir)bin\scripts\"
+xcopy "$(SolutionDir)lib\Tobii.GameIntegration.Net\Tobii.GameIntegration.Net.dll" "$(SolutionDir)bin\scripts\"
+xcopy "$(SolutionDir)lib\Tobii.GameIntegration.Net\tobii_gameintegration_x64.dll" "$(SolutionDir)bin\scripts\"
+xcopy "$(SolutionDir)lib\Tobii.GameIntegration.Net\tobii_gameintegration_x86.dll" "$(SolutionDir)bin\scripts\"
 
 xcopy "$(ProjectDir)bin\x64\Release\EasyHook64.dll" "$(SolutionDir)bin\scripts\"
 xcopy "$(ProjectDir)bin\x64\Release\EasyHook.dll" "$(SolutionDir)bin\scripts\"

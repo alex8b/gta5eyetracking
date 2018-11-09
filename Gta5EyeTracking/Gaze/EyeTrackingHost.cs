@@ -5,8 +5,30 @@ using System.Linq;
 using System.Threading.Tasks;
 using Gta5EyeTracking;
 using SharpDX;
-using Tobii.GameIntegration;
+using Tobii.GameIntegration.Net;
 using Debug = Gta5EyeTracking.Debug;
+
+public class HeadPosition
+{
+    public float X;
+    public float Y;
+    public float Z;
+}
+
+public class HeadRotation
+{
+    public float Yaw;
+    public float Pitch;
+    public float Roll;
+}
+
+public class HeadPose
+{
+    public HeadRotation Rotation;
+    public HeadPosition Position;
+    public long TimeStampMicroSeconds;
+}
+
 
 public static class TobiiAPI
 {
@@ -72,33 +94,25 @@ public class EyeTrackingHost : IDisposable
 	{
 		_instance = this;
 
-		Debug.Log("Interop.Start() before");
-		Interop.SetWindow(Process.GetCurrentProcess().MainWindowHandle);
-		Interop.Start(true);
-		Debug.Log("Interop.Start() after");
-
-		Task.Run(() =>
-		{
-			Debug.Log("Interop.CustomThreadCode() before");
-			Interop.CustomThreadCode();
-			Debug.Log("Interop.CustomThreadCode() after");
-		});
+		Debug.Log("TobiiGameIntegrationApi.TrackWindow() before");
+		TobiiGameIntegrationApi.TrackWindow(Process.GetCurrentProcess().MainWindowHandle);
+		Debug.Log("TobiiGameIntegrationApi.TrackWindow() after");
 
 		AspectRatio = 16f / 9f;
 	}
 
 	public void Dispose()
 	{
-		Debug.Log("Interop.Stop() before");
-		Interop.Stop();
-		Debug.Log("Interop.Stop() after");
+		Debug.Log("TobiiGameIntegrationApi.StopTracking() before");
+        TobiiGameIntegrationApi.StopTracking();
+		Debug.Log("TobiiGameIntegrationApi.StopTracking() after");
 	}
 
 	public bool IsHeadTrackingAvailable
 	{
 		get
 		{
-			return Interop.TimeSinceLastHeadPacket() > 5;
+			return TobiiGameIntegrationApi.GetTrackerInfo()?.Capabilities.HasFlag(CapabilityFlags.Head) ?? false;
 		}
 	}
 
@@ -128,17 +142,17 @@ public class EyeTrackingHost : IDisposable
 	}
 
 	public void Update()
-	{
-		if (Interop.Update())
+    {
+        TobiiGameIntegrationApi.Update();
 		{
-			var gazePoints = Interop.GetNewGazePoints(UnitType.Normalized);
+			var gazePoints = TobiiGameIntegrationApi.GetGazePoints();
 			if (gazePoints.Count > 0)
 			{
-				GazeX = (Math.Min(Math.Max(gazePoints.Last().X, 0.0f), 1.0f) - 0.5f) * 2;
-				GazeY = (Math.Min(Math.Max(gazePoints.Last().Y, 0.0f), 1.0f) - 0.5f) * 2;
+				GazeX = (Math.Min(Math.Max(gazePoints.Last().X, -1.0f), 1.0f));
+				GazeY = -(Math.Min(Math.Max(gazePoints.Last().Y, -1.0f), 1.0f));
 			}
 
-			var headPoses = Interop.GetNewHeadPoses();
+			var headPoses = TobiiGameIntegrationApi.GetHeadPoses();
 			if (headPoses.Count > 0)
 			{
 				Yaw = -headPoses.Last().Rotation.Yaw;

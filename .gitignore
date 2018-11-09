@@ -2,7 +2,7 @@
 *.suo
 *.user
 *.sln.docstates
-
+.vs/
 Gta5EyeTracking/bin/
 Gta5EyeTracking/obj/
 InstallerUI/bin/
