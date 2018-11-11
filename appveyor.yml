@@ -30,7 +30,7 @@ install:
 - mkdir lib\NativeUI\
 - cd lib\NativeUI\
 - 'echo Downloading NativeUI ...'
-- appveyor DownloadFile https://github.com/Guad/NativeUI/releases/download/1.7/NativeUI.zip -FileName NativeUI.zip
+- appveyor DownloadFile https://github.com/Guad/NativeUI/releases/download/1.8/NativeUI.zip -FileName NativeUI.zip
 - echo Download completed. Extracting ...
 - 7z x NativeUI.zip
 - echo Extraction completed. Compiling ...
@@ -59,8 +59,6 @@ artifacts:
   name: Gta5EyeTracking_bundle
 - path: bin/scripts/
   name: Gta5EyeTracking
-- path: bin/installer/Gta5EyeTrackingModInstaller.exe
-  name: Gta5EyeTrackingModInstaller
 deploy:
 - provider: GitHub
   tag: $(appveyor_repo_tag_name)
