@@ -27,11 +27,10 @@ If any skilled mod developers want to help me working on this mod then Tobii wil
 **You need to have one of these eye trackers to use the mod:**
 - Tobii Eye Tracker 4C  
   https://tobiigaming.com/  
-  $149 / €159  
+  $169 / €169  
 
 - Tobii EyeX Controller  
   https://tobiigaming.com/  
-  $99 / €109  
  
 - SteelSeries Sentry Gaming Eye Tracker  
   http://steelseries.com/gaming-controllers/sentry-gaming-eye-tracker  
