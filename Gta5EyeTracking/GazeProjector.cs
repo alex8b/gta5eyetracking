@@ -77,7 +77,7 @@ namespace Gta5EyeTracking
 			if ((ped != null)
 				&& (ped.Handle != Game.Player.Character.Handle))
 			{
-				shootCoordSnap = ped.GetBoneCoord(Bone.SKEL_L_Clavicle);
+				shootCoordSnap = ped.Bones[Bone.SkelLeftClavicle].Position;
 				target = ped;
 				if (_settings.SnapAtTargetsEnabled)
 				{

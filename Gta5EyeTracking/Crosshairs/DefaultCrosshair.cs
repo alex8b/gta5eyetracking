@@ -1,5 +1,4 @@
 using System.Drawing;
-using GTA;
 
 namespace Gta5EyeTracking.Crosshairs
 {

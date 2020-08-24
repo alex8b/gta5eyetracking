@@ -61,14 +61,14 @@ namespace Gta5EyeTracking.Features
 				var fireRateTime = TimeSpan.FromSeconds(0.2);
 				if (_shootStopWatch.Elapsed > fireRateTime)
 				{
-					World.ShootBullet(weaponPos, target, Game.Player.Character, new Model(Game.Player.Character.Weapons.Current.Hash),
+					World.ShootBullet(weaponPos, target, Game.Player.Character, new WeaponAsset(Game.Player.Character.Weapons.Current.Hash),
 						1);
 					_shootStopWatch.Restart();
 				}
 			}
 			else
 			{
-				var dir = target - Game.Player.Character.GetBoneCoord(Bone.SKEL_R_Hand);
+				var dir = target - Game.Player.Character.Bones[Bone.SkelRightHand].Position;
 				var pitchToTarget = Geometry.DirectionToRotation(dir).X;
 
 				_animationHelper.PlayShootingAnimation(pitchToTarget);
@@ -104,7 +104,7 @@ namespace Gta5EyeTracking.Features
 
 		public void RotatePlayerCharacterTowardsTarget(Vector3 target)
 		{
-			var dir = target - Game.Player.Character.GetBoneCoord(Bone.SKEL_R_Hand);
+			var dir = target - Game.Player.Character.Bones[Bone.SkelRightHand].Position;
 			var headingToTarget = Geometry.DirectionToRotation(dir).Z;
 			if (!(Game.Player.Character.IsWalking
 			      || Game.Player.Character.IsRunning)

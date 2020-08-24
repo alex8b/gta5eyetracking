@@ -323,7 +323,7 @@ namespace Gta5EyeTracking.Features
 
             if (Game.Player.Character.IsInVehicle())
 			{
-				if (Game.IsControlPressed(0, Control.NextCamera))
+				if (Game.IsControlPressed(Control.NextCamera))
 				{
 					_lastNotInVehicle = DateTime.UtcNow;
 				}

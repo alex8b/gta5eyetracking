@@ -69,7 +69,6 @@ namespace Gta5EyeTracking
 	    public Gta5EyeTracking()
 		{
             Debug.Log("Begin Initialize");
-
 			//Disposing
 			_shutDownRequestedEvent = new ManualResetEvent(false);
 
@@ -123,7 +122,7 @@ namespace Gta5EyeTracking
 			Debug.Log("End Initialize");
 		}
 
-		private void AppDomainOnProcessExit(object sender, EventArgs eventArgs)
+        private void AppDomainOnProcessExit(object sender, EventArgs eventArgs)
 		{
 			ShutDown();
 		}
@@ -141,14 +140,6 @@ namespace Gta5EyeTracking
 		private void OnKeyDown(object sender, KeyEventArgs e)
 		{
 			_controlsProcessor.KeyDown(sender, e);
-		}
-
-	    protected override void Dispose(bool disposing)
-	    {
-			Debug.Log("Begin Dispose");
-			ShutDown();
-			Debug.Log("End Dispose");
-			base.Dispose(disposing);
 		}
 
 		private void ShutDown()

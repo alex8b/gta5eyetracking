@@ -61,14 +61,14 @@ namespace Gta5EyeTracking.HomingMissiles
             var model = new Model("w_at_ar_supp_02");
             var playerCharacter = Game.Player.Character;
             if (playerCharacter == null) return;
-            var position = playerCharacter.GetBoneCoord(Bone.SKEL_R_Hand) + _launchDir * 1f;
+            var position = playerCharacter.Bones[Bone.SkelRightHand].Position + _launchDir * 1f;
             if (playerCharacter.IsInVehicle())
             {
-                position = playerCharacter.GetBoneCoord(Bone.SKEL_R_Hand) + _launchDir * 2f;
+                position = playerCharacter.Bones[Bone.SkelRightHand].Position + _launchDir * 2f;
             }
             if (playerCharacter.IsInPlane)
             {
-                position = playerCharacter.GetBoneCoord(Bone.SKEL_R_Hand) + _launchDir * 4f;
+                position = playerCharacter.Bones[Bone.SkelRightHand].Position + _launchDir * 4f;
             }
             _missile = World.CreateProp(model, position, false, false);
             if (_missile == null)
@@ -172,7 +172,7 @@ namespace Gta5EyeTracking.HomingMissiles
                 && _target.Exists())
             {
                 var ped = _target as Ped;
-                _targetPosition = ped != null ? ped.GetBoneCoord(Bone.SKEL_Spine0) : _target.Position;
+                _targetPosition = ped != null ? ped.Bones[Bone.SkelSpine0].Position : _target.Position;
             }
         }
 
