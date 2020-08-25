@@ -148,7 +148,7 @@ namespace Gta5EyeTracking
         {
             if (sAsset != "")
             {
-                Function.Call(Hash._SET_PTFX_ASSET_NEXT_CALL, sAsset); 
+                Function.Call(Hash.USE_PARTICLE_FX_ASSET, sAsset); 
             }
 
             return Function.Call<int>(Hash.START_PARTICLE_FX_LOOPED_ON_ENTITY, sPTFX, ent, offset.X, offset.Y, offset.Z, rot.X, rot.Y, rot.Z, size, 0, 0, 0);
