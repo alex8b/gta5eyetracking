@@ -49,7 +49,7 @@ install:
 - copy lib\Tobii\scripts\tobii_gameintegration_x86.dll lib\Tobii.GameIntegration.Net\
 before_build:
 - set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
-- nuget restore
+- appveyor-retry nuget restore
 build:
   project: Gta5EyeTracking.sln
   parallel: true
