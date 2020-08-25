@@ -1,9 +1,8 @@
-version: 0.10.{build}
+version: 0.11.{build}
+max_jobs: 1
+image: Visual Studio 2019
 configuration: Release
 platform: x64
-os: Visual Studio 2019
-environment:
-  VisualStudioVersion: 16.7
 assembly_info:
   patch: true
   file: AssemblyInfo.*
@@ -11,62 +10,89 @@ assembly_info:
   assembly_file_version: '{version}'
   assembly_informational_version: '{version}'
 install:
-- mkdir lib\ScriptHookV\
-- cd lib\ScriptHookV\
-- 'echo Downloading ScriptHookV ...'
-- appveyor DownloadFile https://www.dropbox.com/s/86gx6gfj7wdzpgv/ScriptHookV_1.0.2060.0.zip?dl=1 -FileName ScriptHookV.zip
-- echo Download completed. Extracting ...
-- 7z x ScriptHookV.zip
-- echo Extraction completed. Compiling ...
-- cd ..\..\
-- mkdir lib\ScriptHookVDotNet\
-- cd lib\ScriptHookVDotNet\
-- 'echo Downloading ScriptHookVDotNet ...'
-- appveyor DownloadFile https://github.com/crosire/scripthookvdotnet/releases/download/v3.0.4/ScriptHookVDotNet.zip -FileName ScriptHookVDotNet.zip
-- echo Download completed. Extracting ...
-- 7z x ScriptHookVDotNet.zip
-- echo Extraction completed. Compiling ...
-- cd ..\..\
-- mkdir lib\NativeUI\
-- cd lib\NativeUI\
-- 'echo Downloading NativeUI ...'
-- appveyor DownloadFile https://github.com/Guad/NativeUI/releases/download/1.9.1/Release.zip -FileName NativeUI.zip
-- echo Download completed. Extracting ...
-- 7z x NativeUI.zip
-- echo Extraction completed. Compiling ...
-- cd ..\..\
-- mkdir lib\Tobii\
-- cd lib/Tobii/
-- 'echo Downloading Tobii.GameIntegration ...'
-- appveyor DownloadFile https://github.com/alex8b/gta5eyetracking/releases/download/0.10/Gta5EyeTracking_bundle_0.10.285.zip -FileName Tobii.zip
-- echo Download completed. Extracting ...
-- 7z x Tobii.zip
-- echo Extraction completed. Compiling ...
-- cd ..\..\
-- mkdir lib\Tobii.GameIntegration.Net\
-- copy lib\Tobii\scripts\Tobii.GameIntegration.Net.dll lib\Tobii.GameIntegration.Net\
-- copy lib\Tobii\scripts\tobii_gameintegration_x64.dll lib\Tobii.GameIntegration.Net\
-- copy lib\Tobii\scripts\tobii_gameintegration_x86.dll lib\Tobii.GameIntegration.Net\
+- cmd: >-
+    mkdir lib\ScriptHookV\
+
+    cd lib\ScriptHookV\
+
+    echo Downloading ScriptHookV ...
+
+    appveyor DownloadFile https://www.dropbox.com/s/86gx6gfj7wdzpgv/ScriptHookV_1.0.2060.0.zip?dl=1 -FileName ScriptHookV.zip
+
+    echo Download completed. Extracting ...
+
+    7z x ScriptHookV.zip
+
+    echo Extraction completed. Compiling ...
+
+    cd ..\..\
+
+    mkdir lib\ScriptHookVDotNet\
+
+    cd lib\ScriptHookVDotNet\
+
+    echo Downloading ScriptHookVDotNet ...
+
+    appveyor DownloadFile https://github.com/crosire/scripthookvdotnet/releases/download/v3.0.4/ScriptHookVDotNet.zip -FileName ScriptHookVDotNet.zip
+
+    echo Download completed. Extracting ...
+
+    7z x ScriptHookVDotNet.zip
+
+    echo Extraction completed. Compiling ...
+
+    cd ..\..\
+
+    mkdir lib\NativeUI\
+
+    cd lib\NativeUI\
+
+    echo Downloading NativeUI ...
+
+    appveyor DownloadFile https://github.com/Guad/NativeUI/releases/download/1.9.1/Release.zip -FileName NativeUI.zip
+
+    echo Download completed. Extracting ...
+
+    7z x NativeUI.zip
+
+    echo Extraction completed. Compiling ...
+
+    cd ..\..\
+
+    mkdir lib\Tobii\
+
+    cd lib/Tobii/
+
+    echo Downloading Tobii.GameIntegration ...
+
+    appveyor DownloadFile https://github.com/alex8b/gta5eyetracking/releases/download/0.10/Gta5EyeTracking_bundle_0.10.285.zip -FileName Tobii.zip
+
+    echo Download completed. Extracting ...
+
+    7z x Tobii.zip
+
+    echo Extraction completed. Compiling ...
+
+    cd ..\..\
+
+    mkdir lib\Tobii.GameIntegration.Net\
+
+    copy lib\Tobii\scripts\Tobii.GameIntegration.Net.dll lib\Tobii.GameIntegration.Net\
+
+    copy lib\Tobii\scripts\tobii_gameintegration_x64.dll lib\Tobii.GameIntegration.Net\
+
+    copy lib\Tobii\scripts\tobii_gameintegration_x86.dll lib\Tobii.GameIntegration.Net\
+cache: bin
 before_build:
-- set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
-- appveyor-retry nuget restore
+- cmd: >-
+    set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
+
+    appveyor-retry nuget restore
 build:
   project: Gta5EyeTracking.sln
-  parallel: true
   verbosity: minimal
 artifacts:
 - path: bin/bundle/
   name: Gta5EyeTracking_bundle
 - path: bin/scripts/
   name: Gta5EyeTracking
-deploy:
-- provider: GitHub
-  tag: $(appveyor_repo_tag_name)
-  release: Gta5EyeTracking $(appveyor_repo_tag_name)
-  auth_token:
-    secure: XGNrRPut5e3rnjwY8YkPnlOlz18Qd/XvWUfnsAeOYZkmeoJp/zH10uOURNlK726f
-  artifact: Gta5EyeTracking
-  draft: true
-  on:
-    branch: master
-    appveyor_repo_tag: true
