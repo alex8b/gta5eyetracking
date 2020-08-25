@@ -53,25 +53,25 @@ namespace Gta5EyeTracking
 				raycastResults = World.RaycastCapsule(source3D + dir * raycastFromDist,
 					source3D + dir * raycastToDist,
 					radius,
-					(IntersectOptions)(1 | 16 | 256 | 2 | 4 | 8) // | peds + vehicles
+					(IntersectFlags)(1 | 16 | 256 | 2 | 4 | 8) // | peds + vehicles
 					, ignoreEntity);
 			}
 			else
 			{
 				raycastResults = World.Raycast(source3D + dir * raycastFromDist,
 					source3D + dir * raycastToDist,
-					(IntersectOptions)(1 | 16 | 256 | 2 | 4 | 8) // | peds + vehicles
+					(IntersectFlags)(1 | 16 | 256 | 2 | 4 | 8) // | peds + vehicles
 					, ignoreEntity);
 			}
 
 
-			if (raycastResults.DitHitAnything)
+			if (raycastResults.DidHit)
 			{
-				if (raycastResults.DitHitEntity)
+				if (raycastResults.HitEntity != null)
 				{
 					hitEntity = raycastResults.HitEntity;
 				}
-				return raycastResults.HitCoords;
+				return raycastResults.HitPosition;
 			}
 
 			return source3D + dir*defaultDist;
@@ -243,7 +243,7 @@ namespace Gta5EyeTracking
 		{
 			var num1 = new OutputArgument();
 			var num2 = new OutputArgument();
-			if (!Function.Call<bool>(Hash._WORLD3D_TO_SCREEN2D, worldCoords.X, worldCoords.Y, worldCoords.Z, num1, num2))
+			if (!Function.Call<bool>(Hash.GET_SCREEN_COORD_FROM_WORLD_COORD/*._WORLD3D_TO_SCREEN2D*/, worldCoords.X, worldCoords.Y, worldCoords.Z, num1, num2))
 			{
 				screenCoords = new Vector2();
 				return false;
@@ -356,15 +356,15 @@ namespace Gta5EyeTracking
             farPoint = ScreenRelToWorld(mView, screenCoordsRel);
 	    }
 
-		public static RaycastResult Raycast(Vector3 source, Vector3 target, int options, Entity entity)
-		{
-            var result = Function.Call<int>(Hash._CAST_RAY_POINT_TO_POINT, source.X, source.Y, source.Z, target.X, target.Y, target.Z, options,
-                (entity != null) ? entity.Handle : 0, 7);
-			var obj = (RaycastResult) typeof(RaycastResult).GetConstructor(
-				BindingFlags.NonPublic | BindingFlags.Instance,
-				null, Type.EmptyTypes, null).Invoke(new[] {(object)result});
-			return obj;
-		}
+		//public static RaycastResult Raycast(Vector3 source, Vector3 target, int options, Entity entity)
+		//{
+  //          var result = Function.Call<int>(Hash._CAST_RAY_POINT_TO_POINT, source.X, source.Y, source.Z, target.X, target.Y, target.Z, options,
+  //              (entity != null) ? entity.Handle : 0, 7);
+		//	var obj = (RaycastResult) typeof(RaycastResult).GetConstructor(
+		//		BindingFlags.NonPublic | BindingFlags.Instance,
+		//		null, Type.EmptyTypes, null).Invoke(new[] {(object)result});
+		//	return obj;
+		//}
 
 		public static Vector3 RotationToDirection(Vector3 rotation)
 		{
@@ -475,7 +475,7 @@ namespace Gta5EyeTracking
 			double sqx = q.X * q.X;
 			double sqy = q.Y * q.Y;
 			double sqz = q.Z * q.Z;
-			Vector3 result;
+			Vector3 result = new Vector3();
 			result.X = Mathf.Rad2Deg * (float)Math.Asin(2f * (q.X * q.Z - q.W * q.Y));                             // Pitch 
 			result.Z = Mathf.Rad2Deg * (float)Math.Atan2(2f * q.X * q.W + 2f * q.Y * q.Z, 1 - 2f * (sqz + sqw));     // Yaw 
 			result.Y = Mathf.Rad2Deg * (float)Math.Atan2(2f * q.X * q.Y + 2f * q.Z * q.W, 1 - 2f * (sqy + sqz));

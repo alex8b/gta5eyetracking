@@ -96,7 +96,7 @@ namespace Gta5EyeTracking.HomingMissiles
                 var dist = (player.Position - _missile.Position).Length();
                 if (dist > 1.5)
                 {
-                    World.AddOwnedExplosion(player, _missile.Position, ExplosionType.Rocket, 1.5f, 0.1f);
+                    World.AddExplosion(_missile.Position, ExplosionType.Rocket, 1.5f, 0.1f, player);
                     ScriptHookExtensions.PtfxStop(_fxId);
                     ScriptHookExtensions.StopSound(_soundId);
                     Detonated = true;

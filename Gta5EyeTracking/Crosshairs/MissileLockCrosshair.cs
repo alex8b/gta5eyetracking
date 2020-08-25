@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using GTA;
+using GTA.UI;
 
 namespace Gta5EyeTracking.Crosshairs
 {
@@ -21,17 +22,17 @@ namespace Gta5EyeTracking.Crosshairs
 
 		private void CreateUiContainer()
 		{
-			UiContainer = new UIContainer(new Point(0, 0), new Size(40, 40), Color.FromArgb(0, 0, 0, 0));
+			UiContainer = new ContainerElement(new Point(0, 0), new Size(40, 40), Color.FromArgb(0, 0, 0, 0));
 
 			var color = Color.FromArgb(220, 255, 50, 50);
-			UiContainer.Items.Add(new UIRectangle(new Point(0, 0), new Size(5, 2), color));
-			UiContainer.Items.Add(new UIRectangle(new Point(0, 38), new Size(5, 2), color));
-			UiContainer.Items.Add(new UIRectangle(new Point(0, 2), new Size(2, 3), color));
-			UiContainer.Items.Add(new UIRectangle(new Point(38, 2), new Size(2, 3), color));
-			UiContainer.Items.Add(new UIRectangle(new Point(35, 0), new Size(5, 2), color));
-			UiContainer.Items.Add(new UIRectangle(new Point(35, 38), new Size(5, 2), color));
-			UiContainer.Items.Add(new UIRectangle(new Point(0, 35), new Size(2, 3), color));
-			UiContainer.Items.Add(new UIRectangle(new Point(38, 35), new Size(2, 3), color));
+			UiContainer.Items.Add(new ContainerElement(new Point(0, 0), new Size(5, 2), color));
+			UiContainer.Items.Add(new ContainerElement(new Point(0, 38), new Size(5, 2), color));
+			UiContainer.Items.Add(new ContainerElement(new Point(0, 2), new Size(2, 3), color));
+			UiContainer.Items.Add(new ContainerElement(new Point(38, 2), new Size(2, 3), color));
+			UiContainer.Items.Add(new ContainerElement(new Point(35, 0), new Size(5, 2), color));
+			UiContainer.Items.Add(new ContainerElement(new Point(35, 38), new Size(5, 2), color));
+			UiContainer.Items.Add(new ContainerElement(new Point(0, 35), new Size(2, 3), color));
+			UiContainer.Items.Add(new ContainerElement(new Point(38, 35), new Size(2, 3), color));
 		}
 
 		private void Animate()

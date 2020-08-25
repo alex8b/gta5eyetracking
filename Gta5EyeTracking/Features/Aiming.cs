@@ -5,6 +5,7 @@ using Gta5EyeTracking.HomingMissiles;
 using GTA;
 using GTA.Math;
 using GTA.Native;
+using GTA.UI;
 
 namespace Gta5EyeTracking.Features
 {
@@ -281,7 +282,7 @@ namespace Gta5EyeTracking.Features
 
 			if (IsCrosshairVisible)
 			{
-				UI.HideHudComponentThisFrame((HudComponent)14);
+				GTA.UI.Hud.HideComponentThisFrame(HudComponent.Reticle);
 			}
 
 			if (IsCrosshairVisible
@@ -304,11 +305,11 @@ namespace Gta5EyeTracking.Features
 	    {
 	        CrosshairPosition = screenCoords;
 
-			var crosshairPosition = new Vector2(UI.WIDTH * 0.5f + screenCoords.X * UI.WIDTH * 0.5f, UI.HEIGHT * 0.5f + screenCoords.Y * UI.HEIGHT * 0.5f);
+			var crosshairPosition = new Vector2(GTA.UI.Screen.Width * 0.5f + screenCoords.X * GTA.UI.Screen.Width * 0.5f, GTA.UI.Screen.Height * 0.5f + screenCoords.Y * GTA.UI.Screen.Height * 0.5f);
 			const float w = 1f;//Filtering is done earlier 0.6f;
 			_crosshairPosition = new Vector2(_crosshairPosition.X + (crosshairPosition.X - _crosshairPosition.X) * w,
 				_crosshairPosition.Y + (crosshairPosition.Y - _crosshairPosition.Y) * w);
-	        var centerPosition = new Vector2(UI.WIDTH*0.5f, UI.HEIGHT*0.5f);
+	        var centerPosition = new Vector2(GTA.UI.Screen.Width * 0.5f, GTA.UI.Screen.Height * 0.5f);
 	        var deadzone = 2f;
             if ((_crosshairPosition - centerPosition).Length() < deadzone)
             {

@@ -211,7 +211,7 @@ namespace Gta5EyeTracking
 
 			_tobiiTracker.Update();
 
-            _debugGazeVisualization.Move(new Vector2(TobiiAPI.GetGazePoint().X * UI.WIDTH, TobiiAPI.GetGazePoint().Y * UI.HEIGHT));
+            _debugGazeVisualization.Move(new Vector2(TobiiAPI.GetGazePoint().X * GTA.UI.Screen.Width, TobiiAPI.GetGazePoint().Y * GTA.UI.Screen.Height));
 
             _controllerEmulation.Enabled = !Game.IsPaused;
 			_mouseEmulation.Enabled = !Game.IsPaused && !_menuPool.IsAnyMenuOpen() &&_isWindowForeground;
