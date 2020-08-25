@@ -131,11 +131,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\packages\EasyHook.2.7.6789\content\net40\EasyHook64.dll">
-      <Link>EasyHook64.dll</Link>
+    <Content Include="EasyHook32.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="EasyHook32.dll">
+    <Content Include="EasyHook64.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="EasyHook32Svc.exe">
@@ -173,6 +172,7 @@ xcopy "$(ProjectDir)bin\x64\Release\SharpDX.Mathematics.dll" "$(SolutionDir)bin\
 
 xcopy "$(SolutionDir)lib\ScriptHookVDotNet\ScriptHookVDotNet.asi" "$(SolutionDir)bin\bundle\"
 xcopy "$(SolutionDir)lib\ScriptHookVDotNet\ScriptHookVDotNet2.dll" "$(SolutionDir)bin\bundle\"
+xcopy "$(SolutionDir)lib\ScriptHookVDotNet\ScriptHookVDotNet3.dll" "$(SolutionDir)bin\bundle\"
 
 xcopy "$(SolutionDir)lib\ScriptHookV\bin\NativeTrainer.asi" "$(SolutionDir)bin\bundle\"
 xcopy "$(SolutionDir)lib\ScriptHookV\bin\ScriptHookV.dll" "$(SolutionDir)bin\bundle\"
@@ -181,7 +181,7 @@ xcopy "$(SolutionDir)lib\ScriptHookV\bin\dinput8.dll" "$(SolutionDir)bin\bundle\
 xcopy "$(SolutionDir)bin\scripts" "$(SolutionDir)bin\bundle\scripts" /s /i
 xcopy "$(SolutionDir)lib\NativeUI\NativeUI.dll" "$(SolutionDir)bin\bundle\scripts\"</PostBuildEvent>
   </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
