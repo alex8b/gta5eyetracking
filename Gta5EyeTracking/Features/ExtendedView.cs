@@ -47,6 +47,7 @@ namespace Gta5EyeTracking.Features
 
 		private float _headXFiltered;
 
+		private Vector3 _extendedViewCameraRotation;
 
 		public ExtendedView(Settings settings,
             GameState gameState,
@@ -95,7 +96,7 @@ namespace Gta5EyeTracking.Features
 
                 ApplyCameraPosition(_extendedViewCamera, _extraOffset, false);
                 ApplyCameraPosition(_forwardCamera, _extraOffset, false);
-            }
+			}
 			else
 			{
 				World.RenderingCamera = null;
@@ -198,8 +199,13 @@ namespace Gta5EyeTracking.Features
 	    {
 	        var pitch = Mathf.Deg2Rad * camera.Rotation.X;
 	        var yaw = Mathf.Deg2Rad * camera.Rotation.Z;
+			if (camera == _extendedViewCamera)
+			{
+				pitch = Mathf.Deg2Rad * _extendedViewCameraRotation.X;
+				yaw = Mathf.Deg2Rad * _extendedViewCameraRotation.Z;
+			}
 
-	        var delta = new Vector3(extraOffset.X, (float) (_distanceToCharacter*-Math.Cos(pitch)),
+			var delta = new Vector3(extraOffset.X, (float) (_distanceToCharacter*-Math.Cos(pitch)),
 	            (float) (_distanceToCharacter*-Math.Sin(pitch)));
 	        delta.Z = Math.Max(delta.Z, -1f) + extraOffset.Z;
 
@@ -231,7 +237,8 @@ namespace Gta5EyeTracking.Features
             rot = Geometry.BoundRotationDeg(rot);
 
 			_extendedViewCamera.Rotation = rot;
-            _forwardCamera.Rotation = GameplayCameraRotationFiltered;
+			_extendedViewCameraRotation = rot;
+			_forwardCamera.Rotation = GameplayCameraRotationFiltered;
         }
 
 	    private void RotateGameplayCameraTowardsTarget()
