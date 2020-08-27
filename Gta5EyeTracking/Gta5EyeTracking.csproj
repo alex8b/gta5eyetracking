@@ -115,6 +115,7 @@
     <Compile Include="Crosshairs\MissileLockCrosshair.cs" />
     <Compile Include="Mathf.cs" />
     <Compile Include="CameraHelper.cs" />
+    <Compile Include="MathR.cs" />
     <Compile Include="Menu\IntroScreen.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Features\RadialMenu.cs" />
