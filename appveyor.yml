@@ -65,7 +65,7 @@ install:
 
     echo Downloading Tobii.GameIntegration ...
 
-    appveyor DownloadFile https://github.com/alex8b/gta5eyetracking/releases/download/0.11/Gta5EyeTracking_bundle_0.11.308.zip -FileName Tobii.zip
+    appveyor DownloadFile https://github.com/alex8b/gta5eyetracking/releases/download/0.11/Gta5EyeTracking_bundle_0.11.311.zip -FileName Tobii.zip
 
     echo Download completed. Extracting ...
 
