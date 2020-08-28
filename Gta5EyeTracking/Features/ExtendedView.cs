@@ -9,11 +9,11 @@ namespace Gta5EyeTracking.Features
 	{
         public Vector3 CameraPositionWithoutExtendedView { get; private set; }
         public Vector3 CameraRotationWithoutExtendedView { get; private set; }
-		public Quaternion CameraRotationWithoutExtendedViewQ { get; private set; }
+		public Quaternion CameraRotationWithoutExtendedViewQ { get; private set; } = Quaternion.Identity;
 		public Vector3 GameplayCameraRotationFiltered { get; private set; }
-		public Quaternion GameplayCameraRotationFilteredQ { get; private set; }
+		public Quaternion GameplayCameraRotationFilteredQ { get; private set; } = Quaternion.Identity;
 		public Vector3 VehicleRotationFiltered { get; private set; }
-		public Quaternion VehicleRotationFilteredQ { get; private set; }
+		public Quaternion VehicleRotationFilteredQ { get; private set; } = Quaternion.Identity;
 
 		public float AimAtCrosshairDeadzoneSize = 0.1f;
 
@@ -134,7 +134,7 @@ namespace Gta5EyeTracking.Features
 						
 						//Quat
 						var diffQ = Quaternion.Multiply(GameplayCameraRotationFilteredQ, _extendedViewCameraRotationQinv);
-						YawOffset = diffQ.ToEulerAngles().Z * Mathf.Deg2Rad;
+						YawOffset = diffQ.ToEulerAngles().Y * Mathf.Deg2Rad;
 						PitchOffset = diffQ.ToEulerAngles().X * Mathf.Deg2Rad;
 
 						_aimAtGazeRequested = false;
@@ -226,9 +226,9 @@ namespace Gta5EyeTracking.Features
 	        extendedViewCameraOffset.Y = (float) (Math.Sin(yaw)*delta.X + Math.Cos(yaw)*delta.Y);
 
 			//Quat
-			extendedViewCameraOffset = _extendedViewCameraRotationQ.RotateTransform(extraOffset);
-
-			ScriptHookExtensions.AttachCamToEntity(camera, Game.Player.Character, extendedViewCameraOffset, isRelative);
+            extendedViewCameraOffset = _extendedViewCameraRotationQ.RotateTransform(extraOffset);//_extendedViewCameraRotationQ.RotateTransform(extraOffset);
+			var d = new Vector3(extendedViewCameraOffset.Z, extendedViewCameraOffset.X, extendedViewCameraOffset.Y);
+			ScriptHookExtensions.AttachCamToEntity(camera, Game.Player.Character, d, isRelative);
 	    }
 
 
@@ -257,11 +257,13 @@ namespace Gta5EyeTracking.Features
 			_forwardCamera.Rotation = GameplayCameraRotationFiltered;
 
 			//Quat
-			var extraQ = Quaternion.RotationYawPitchRoll(-Yaw * Mathf.Deg2Rad, -Pitch * Mathf.Deg2Rad, 0);
+			var extraQ = Quaternion.RotationYawPitchRoll(Yaw * Mathf.Deg2Rad, Pitch * Mathf.Deg2Rad, 0);
 
-			_extendedViewCameraRotationQ = Quaternion.Multiply(GameplayCameraRotationFilteredQ, extraQ);
-			_extendedViewCamera.Rotation = _extendedViewCameraRotationQ.ToEulerAngles() * Mathf.Rad2Deg;
-			_forwardCamera.Rotation = GameplayCameraRotationFilteredQ.ToEulerAngles() * Mathf.Rad2Deg;
+            _extendedViewCameraRotationQ = GameplayCameraRotationFilteredQ;//Quaternion.Multiply(GameplayCameraRotationFilteredQ, extraQ);
+            var extendedViewCameraRotationTemp = _extendedViewCameraRotationQ.ToEulerAngles() * Mathf.Rad2Deg;
+			_extendedViewCamera.Rotation = new Vector3(extendedViewCameraRotationTemp.Y, 0, extendedViewCameraRotationTemp.Z);
+            var forwardCameraRotationTemp = GameplayCameraRotationFilteredQ.ToEulerAngles() * Mathf.Rad2Deg;
+			_forwardCamera.Rotation = new Vector3(forwardCameraRotationTemp.Y, forwardCameraRotationTemp.X, forwardCameraRotationTemp.Z);
 		}
 
 	    private void RotateGameplayCameraTowardsTarget()
@@ -272,8 +274,8 @@ namespace Gta5EyeTracking.Features
 	        _yawToTarget = Geometry.DirectionToRotation(dir).Z;
 	        _pitchToTarget = Geometry.DirectionToRotation(dir).X;
 
-			_yawToTarget = MathR.XLookRotation(dir).ToEulerAngles().Z * Mathf.Rad2Deg;
-			_yawToTarget = MathR.XLookRotation(dir).ToEulerAngles().X * Mathf.Rad2Deg;
+			_yawToTarget = MathR.XLookRotation(dir).ToEulerAngles().Y * Mathf.Rad2Deg;
+            _pitchToTarget = MathR.XLookRotation(dir).ToEulerAngles().X * Mathf.Rad2Deg;
 
 			Game.Player.Character.Heading = _yawToTarget;
 
@@ -303,7 +305,7 @@ namespace Gta5EyeTracking.Features
             GameplayCameraRotationFiltered = Geometry.BoundRotationDeg(GameplayCameraRotationFiltered);
 
 			//Quat
-			var gameplayCameraRotationQ = Quaternion.RotationYawPitchRoll(GameplayCamera.Rotation.X * Mathf.Deg2Rad, GameplayCamera.Rotation.Y * Mathf.Deg2Rad, GameplayCamera.Rotation.Z * Mathf.Deg2Rad);
+			var gameplayCameraRotationQ = Quaternion.RotationYawPitchRoll(-GameplayCamera.Rotation.Z * Mathf.Deg2Rad, -3.14f-GameplayCamera.Rotation.X * Mathf.Deg2Rad, GameplayCamera.Rotation.Y * Mathf.Deg2Rad);
 			GameplayCameraRotationFilteredQ = Quaternion.Lerp(GameplayCameraRotationFilteredQ, gameplayCameraRotationQ, GameplayCameraFilteringScalar);
 		}
 
@@ -317,7 +319,7 @@ namespace Gta5EyeTracking.Features
 
 			//Quat
 			var vehicleRotationRad = vehicle.Rotation * Mathf.Deg2Rad;
-			var vehicleRotationQ = Quaternion.RotationYawPitchRoll(vehicleRotationRad.X, vehicleRotationRad.Y, vehicleRotationRad.Z);
+			var vehicleRotationQ = Quaternion.RotationYawPitchRoll(vehicleRotationRad.Z, vehicleRotationRad.X, vehicleRotationRad.Y);
 			VehicleRotationFilteredQ = Quaternion.Lerp(VehicleRotationFilteredQ, vehicleRotationQ, GameplayCameraFilteringScalar);
 		}
 
@@ -358,16 +360,22 @@ namespace Gta5EyeTracking.Features
 		    {
 		        CameraRotationWithoutExtendedView = _forwardCamera.Rotation;
 		        CameraPositionWithoutExtendedView = _forwardCamera.Position;
-		    }
-		    else
+
+				//Quat
+				var forwardCameraRotationRad = _forwardCamera.Rotation * Mathf.Deg2Rad;
+				CameraRotationWithoutExtendedViewQ = Quaternion.RotationYawPitchRoll(forwardCameraRotationRad.Z, forwardCameraRotationRad.X, forwardCameraRotationRad.Y);
+			}
+			else
 		    {
                 CameraRotationWithoutExtendedView = GameplayCameraRotationFiltered;
+				CameraPositionWithoutExtendedView = GameplayCamera.Position;
+
+				//Quat
 				CameraRotationWithoutExtendedViewQ = GameplayCameraRotationFilteredQ;
-				CameraRotationWithoutExtendedView = GameplayCamera.Position;
-            }
+			}
 
 
-            if (Game.Player.Character.IsInVehicle())
+			if (Game.Player.Character.IsInVehicle())
 			{
 				if (Game.IsControlPressed(Control.NextCamera))
 				{
