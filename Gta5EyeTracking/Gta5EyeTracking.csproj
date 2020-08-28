@@ -85,9 +85,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Tobii.GameIntegration.Net">
-      <HintPath>..\lib\Tobii.GameIntegration.Net\Tobii.GameIntegration.Net.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Debug.cs" />
@@ -123,6 +120,7 @@
     <Compile Include="SettingsStorage.cs" />
     <Compile Include="SigScan.cs" />
     <Compile Include="Time.cs" />
+    <Compile Include="TobiiGameIntegrationApi.cs" />
     <Compile Include="User32.cs" />
     <Compile Include="ScriptHookExtensions.cs" />
   </ItemGroup>
