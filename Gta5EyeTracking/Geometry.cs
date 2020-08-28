@@ -371,12 +371,14 @@ namespace Gta5EyeTracking
 			var z = Mathf.Deg2Rad * rotation.Z;
 			var x = Mathf.Deg2Rad * rotation.X;
 			var num = Math.Abs(Math.Cos(x));
-			return new Vector3
+			var dir = new Vector3
 			{
 				X = (float)(-Math.Sin(z) * num),
 				Y = (float)(Math.Cos(z) * num),
 				Z = (float)Math.Sin(x)
 			};
+            
+            return dir.Normalized;
 		}
 
 		//public static Vector3 QuaturnionToEulerDeg(Quaternion q1)

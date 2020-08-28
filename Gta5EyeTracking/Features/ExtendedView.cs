@@ -11,6 +11,7 @@ namespace Gta5EyeTracking.Features
         public Vector3 CameraRotationWithoutExtendedView { get; private set; }
         public Vector3 GameplayCameraRotationFiltered { get; private set; }
         public Vector3 VehicleRotationFiltered { get; private set; }
+        public float DistanceToCharacter { get; private set; }
 
 		public float AimAtCrosshairDeadzoneSize = 0.1f;
 
@@ -32,7 +33,6 @@ namespace Gta5EyeTracking.Features
         private readonly Camera _forwardCamera;
 
 		private DateTime _lastNotInVehicle;
-		private float _distanceToCharacter;
 
 		private float _aimTransitionState;
 
@@ -166,7 +166,7 @@ namespace Gta5EyeTracking.Features
 
 				ApplyCameraRotation(false);
 
-				_distanceToCharacter = 0;
+				DistanceToCharacter = 0;
 
                 if (Game.Player.Character.IsInPlane)
                 {
@@ -192,7 +192,7 @@ namespace Gta5EyeTracking.Features
 		{
 			var attachPointPosition = Game.Player.Character.Position + extraOffset;
 			var currentDistanceToCharacter = Vector3.Distance(GameplayCamera.Position, attachPointPosition);
-			_distanceToCharacter = Math.Min(100, Mathf.Lerp(_distanceToCharacter, currentDistanceToCharacter, DistanceToCharacterLerpScalar));
+			DistanceToCharacter = Math.Min(100, Mathf.Lerp(DistanceToCharacter, currentDistanceToCharacter, DistanceToCharacterLerpScalar));
 		}
 
 		private void ApplyCameraPosition(Camera camera, Vector3 extraOffset, bool isRelative)
@@ -205,8 +205,8 @@ namespace Gta5EyeTracking.Features
 				yaw = Mathf.Deg2Rad * _extendedViewCameraRotation.Z;
 			}
 
-			var delta = new Vector3(extraOffset.X, (float) (_distanceToCharacter*-Math.Cos(pitch)),
-	            (float) (_distanceToCharacter*-Math.Sin(pitch)));
+			var delta = new Vector3(extraOffset.X, (float) (DistanceToCharacter*-Math.Cos(pitch)),
+	            (float) (DistanceToCharacter*-Math.Sin(pitch)));
 	        delta.Z = Math.Max(delta.Z, -1f) + extraOffset.Z;
 
 	        var extendedViewCameraOffset = delta;
@@ -324,7 +324,7 @@ namespace Gta5EyeTracking.Features
 		    else
 		    {
                 CameraRotationWithoutExtendedView = GameplayCameraRotationFiltered;
-                CameraRotationWithoutExtendedView = GameplayCamera.Position;
+				CameraPositionWithoutExtendedView = GameplayCamera.Position;
             }
 
 
