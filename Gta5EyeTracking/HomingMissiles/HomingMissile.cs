@@ -4,7 +4,7 @@ using GTA.Math;
 
 namespace Gta5EyeTracking.HomingMissiles
 {
-    public class HomingMissile: IDisposable
+    public class HomingMissile : IDisposable
     {
         public bool Exists { get; private set; }
         public bool Detonated { get; private set; }
@@ -39,7 +39,7 @@ namespace Gta5EyeTracking.HomingMissiles
             _targetPosition = targetPosition;
             var player = Game.Player.Character;
             _launchDir = _targetPosition - player.Position;
-            _targetPosition = player.Position + _launchDir*10000;
+            _targetPosition = player.Position + _launchDir * 10000;
             _launchDir.Normalize();
             Init();
         }
@@ -100,9 +100,9 @@ namespace Gta5EyeTracking.HomingMissiles
                     ScriptHookExtensions.PtfxStop(_fxId);
                     ScriptHookExtensions.StopSound(_soundId);
                     Detonated = true;
-                }              
+                }
             }
-            
+
         }
 
         private void RemoveMissileEntity()
@@ -113,7 +113,7 @@ namespace Gta5EyeTracking.HomingMissiles
                 _missile.IsVisible = false;
                 _missile.Detach();
                 _missile.MarkAsNoLongerNeeded();
-                _missile.Position = Vector3.Zero;                
+                _missile.Position = Vector3.Zero;
             }
 
             Exists = false;
@@ -147,7 +147,7 @@ namespace Gta5EyeTracking.HomingMissiles
 
             if (HasTimeOut())
             {
-                RemoveMissileEntity(); 
+                RemoveMissileEntity();
             }
 
             if (HasCollided())
@@ -157,12 +157,12 @@ namespace Gta5EyeTracking.HomingMissiles
 
             if (Detonated)
             {
-                _detonatedTime = _detonatedTime  + 0.05;
+                _detonatedTime = _detonatedTime + 0.05;
             }
 
             if (_detonatedTime > _waitAfterDetonationTime.TotalSeconds)
             {
-                RemoveMissileEntity(); 
+                RemoveMissileEntity();
             }
         }
 
@@ -182,7 +182,7 @@ namespace Gta5EyeTracking.HomingMissiles
 
             var flightDir = _targetPosition - _missile.Position;
             flightDir.Normalize();
-            _launchDir += (flightDir - _launchDir)*(float) _flightFixCoef;
+            _launchDir += (flightDir - _launchDir) * (float)_flightFixCoef;
 
             if (_flightFixCoef < 1)
             {
@@ -218,7 +218,7 @@ namespace Gta5EyeTracking.HomingMissiles
                 GTA.Native.Function.Call(GTA.Native.Hash.SET_ENTITY_RECORDS_COLLISIONS, _missile, false);
                 GTA.Native.Function.Call(GTA.Native.Hash.SET_ENTITY_RECORDS_COLLISIONS, _missile, true);
             }
-            
+
             return ((GTA.Native.Function.Call<bool>(GTA.Native.Hash.HAS_ENTITY_COLLIDED_WITH_ANYTHING, _missile)));
         }
 
