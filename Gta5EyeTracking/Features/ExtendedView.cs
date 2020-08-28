@@ -285,7 +285,7 @@ namespace Gta5EyeTracking.Features
             var vehicle = Game.Player.Character.CurrentVehicle;
             if (vehicle == null) return;
 
-            //Quat DONE
+            //Quat
             var vehicleRotationQ = Geometry.GtaRotationToQuaternion(vehicle.Rotation);
 			VehicleRotationFilteredQ = Quaternion.Lerp(VehicleRotationFilteredQ, vehicleRotationQ, GameplayCameraVehicleFilteringScalar);
 		}
