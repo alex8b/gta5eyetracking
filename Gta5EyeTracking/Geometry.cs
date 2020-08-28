@@ -1,5 +1,4 @@
 using System;
-using System.Reflection;
 using GTA;
 using GTA.Native;
 using SharpDX;
@@ -379,6 +378,40 @@ namespace Gta5EyeTracking
             };
 
             return dir.Normalized;
+        }
+
+        public static GTA.Math.Quaternion GtaRotationToQuaternion(Vector3 euler)
+        {
+            Vector3 rotVec = Mathf.Deg2Rad * euler;
+
+            GTA.Math.Quaternion xRot = GTA.Math.Quaternion.RotationAxis(new Vector3(1.0f, 0.0f, 0.0f), rotVec.X);
+            GTA.Math.Quaternion yRot = GTA.Math.Quaternion.RotationAxis(new Vector3(0.0f, 1.0f, 0.0f), rotVec.Y);
+            GTA.Math.Quaternion zRot = GTA.Math.Quaternion.RotationAxis(new Vector3(0.0f, 0.0f, 1.0f), rotVec.Z);
+
+            GTA.Math.Quaternion rot = zRot * yRot * xRot;
+            return rot;
+        }
+
+        public static Vector3 QuaternionToGtaRotation(GTA.Math.Quaternion q)
+        {
+            float r11 = -2 * (q.X * q.Y - q.W * q.Z);
+            float r12 = q.W * q.W - q.X * q.X + q.Y * q.Y - q.Z * q.Z;
+            float r21 = 2 * (q.Y * q.Z + q.W * q.X);
+            float r31 = -2 * (q.X * q.Z - q.W * q.Y);
+            float r32 = q.W * q.W - q.X * q.X - q.Y * q.Y + q.Z * q.Z;
+
+            float ax = (float)Math.Asin(r21);
+            float ay = (float)Math.Atan2(r31, r32);
+            float az = (float)Math.Atan2(r11, r12);
+
+            const float f = 360.0f / 2.0f / 3.1415926535897f;
+            ax *= f;
+            ay *= f;
+            az *= f;
+
+            Vector3 ret = new Vector3(ax, ay, az);
+
+            return ret;
         }
 
         //public static Vector3 QuaturnionToEulerDeg(Quaternion q1)

@@ -8,11 +8,11 @@ namespace Gta5EyeTracking.Features
     public class ExtendedView : ExtendedViewBase, IDisposable
     {
         public Vector3 CameraPositionWithoutExtendedView { get; private set; }
-        public Vector3 CameraRotationWithoutExtendedView { get; private set; }
+        //public Vector3 CameraRotationWithoutExtendedView { get; private set; }
 		public Quaternion CameraRotationWithoutExtendedViewQ { get; private set; } = Quaternion.Identity;
-		public Vector3 GameplayCameraRotationFiltered { get; private set; }
+		//public Vector3 GameplayCameraRotationFiltered { get; private set; }
 		public Quaternion GameplayCameraRotationFilteredQ { get; private set; } = Quaternion.Identity;
-		public Vector3 VehicleRotationFiltered { get; private set; }
+		//public Vector3 VehicleRotationFiltered { get; private set; }
 		public Quaternion VehicleRotationFilteredQ { get; private set; } = Quaternion.Identity;
         public float DistanceToCharacter { get; private set; }
 
@@ -127,14 +127,14 @@ namespace Gta5EyeTracking.Features
 
 					if (_aimAtGazeRequested)
 					{
-						YawOffset = Geometry.BoundRotationDeg(GameplayCameraRotationFiltered.Z - _extendedViewCamera.Rotation.Z);
-						PitchOffset = Geometry.BoundRotationDeg(GameplayCameraRotationFiltered.X - _extendedViewCamera.Rotation.X);
+						//YawOffset = Geometry.BoundRotationDeg(GameplayCameraRotationFiltered.Z - _extendedViewCamera.Rotation.Z);
+						//PitchOffset = Geometry.BoundRotationDeg(GameplayCameraRotationFiltered.X - _extendedViewCamera.Rotation.X);
 
                         //Quat
                         var extendedViewCameraRotationQinv = _extendedViewCameraRotationQ;
 						extendedViewCameraRotationQinv.Invert();
-						var diffQ = Quaternion.Multiply(GameplayCameraRotationFilteredQ, extendedViewCameraRotationQinv);
-                        var diffRot = QuaternionToGtaRotation(diffQ);
+						var diffQ = Quaternion.Multiply(extendedViewCameraRotationQinv, GameplayCameraRotationFilteredQ);
+                        var diffRot = Geometry.QuaternionToGtaRotation(diffQ);
 						YawOffset = diffRot.Z;
                         PitchOffset = diffRot.X;
 
@@ -234,77 +234,45 @@ namespace Gta5EyeTracking.Features
             ScriptHookExtensions.AttachCamToEntity(camera, Game.Player.Character, extendedViewCameraOffset, isRelative);
 	    }
 
-        Quaternion GtaRotationToQuaternion(Vector3 euler)
-        {
-            Vector3 rotVec = Mathf.Deg2Rad * euler;
-
-            Quaternion xRot = Quaternion.RotationAxis(new Vector3(1.0f, 0.0f, 0.0f), rotVec.X);
-            Quaternion yRot = Quaternion.RotationAxis(new Vector3(0.0f, 1.0f, 0.0f), rotVec.Y);
-            Quaternion zRot = Quaternion.RotationAxis(new Vector3(0.0f, 0.0f, 1.0f), rotVec.Z);
-
-            Quaternion rot = zRot * yRot * xRot;
-            return rot;
-        }
-
-        Vector3 QuaternionToGtaRotation(Quaternion q)
-        {
-            float r11 = -2 * (q.X * q.Y - q.W * q.Z);
-            float r12 = q.W * q.W - q.X * q.X + q.Y * q.Y - q.Z * q.Z;
-            float r21 = 2 * (q.Y * q.Z + q.W * q.X);
-            float r31 = -2 * (q.X * q.Z - q.W * q.Y);
-            float r32 = q.W * q.W - q.X * q.X - q.Y * q.Y + q.Z * q.Z;
-
-            float ax = (float) Math.Asin(r21);
-            float ay = (float) Math.Atan2(r31, r32);
-            float az = (float) Math.Atan2(r11, r12);
-
-            const float f = 360.0f / 2.0f / 3.1415926535897f;
-            ax *= f;
-            ay *= f;
-            az *= f;
-
-            Vector3 ret = new Vector3(ax, ay, az);
-
-            return ret;
-        }
 
         private void ApplyCameraRotation(bool noRoll)
 		{
             //var timeSince = DateTime.UtcNow - _lastAimCameraAtTargetTime;
             _debugOutput.DebugText1.Caption = _aimTransitionState.ToString();
 
-            Vector3 rot;
+   //         Vector3 rot;
 
-			if (noRoll)
-		    {
-                rot = Geometry.OffsetRotation(GameplayCameraRotationFiltered, -Pitch, -Yaw);
-                rot.Y = 0;
-            }
-            else
-            {
-                rot = Math.Abs(GameplayCameraRotationFiltered.Y) > 90 ? Geometry.OffsetRotation(GameplayCameraRotationFiltered, -Pitch, Yaw) : Geometry.OffsetRotation(GameplayCameraRotationFiltered, -Pitch, -Yaw);
-            }
+			//if (noRoll)
+		 //   {
+   //             rot = Geometry.OffsetRotation(GameplayCameraRotationFiltered, -Pitch, -Yaw);
+   //             rot.Y = 0;
+   //         }
+   //         else
+   //         {
+   //             rot = Math.Abs(GameplayCameraRotationFiltered.Y) > 90 ? Geometry.OffsetRotation(GameplayCameraRotationFiltered, -Pitch, Yaw) : Geometry.OffsetRotation(GameplayCameraRotationFiltered, -Pitch, -Yaw);
+   //         }
 
-            rot = Geometry.BoundRotationDeg(rot);
+   //         rot = Geometry.BoundRotationDeg(rot);
 
-			_extendedViewCamera.Rotation = rot;
-			_extendedViewCameraRotation = rot;
+			//_extendedViewCamera.Rotation = rot;
+			//_extendedViewCameraRotation = rot;
 
-			_forwardCamera.Rotation = GameplayCameraRotationFiltered;
+			//_forwardCamera.Rotation = GameplayCameraRotationFiltered;
 
             //Quat DONE
-            var extendedViewCameraRotationTemp = QuaternionToGtaRotation(GameplayCameraRotationFilteredQ);
+            var extendedViewCameraRotationTemp = Geometry.QuaternionToGtaRotation(GameplayCameraRotationFilteredQ);
             extendedViewCameraRotationTemp.X += -Pitch;
             extendedViewCameraRotationTemp.Z += -Yaw;
-            _extendedViewCameraRotationQ = GtaRotationToQuaternion(extendedViewCameraRotationTemp);
-            extendedViewCameraRotationTemp = QuaternionToGtaRotation(_extendedViewCameraRotationQ);
+            _extendedViewCameraRotationQ = Geometry.GtaRotationToQuaternion(extendedViewCameraRotationTemp);
+            _extendedViewCameraRotation = Geometry.QuaternionToGtaRotation(_extendedViewCameraRotationQ);
 
-            _debugOutput.DebugText3.Caption = "x " + extendedViewCameraRotationTemp.X;
-            _debugOutput.DebugText4.Caption = "y " + extendedViewCameraRotationTemp.Y; 
-            _debugOutput.DebugText5.Caption = "z " + extendedViewCameraRotationTemp.Z;
+            _debugOutput.DebugText3.Caption = "x " + _extendedViewCameraRotation;
+            _debugOutput.DebugText4.Caption = "y " + _extendedViewCameraRotation; 
+            _debugOutput.DebugText5.Caption = "z " + _extendedViewCameraRotation;
 
-            _extendedViewCamera.Rotation = new Vector3(extendedViewCameraRotationTemp.X, extendedViewCameraRotationTemp.Y, extendedViewCameraRotationTemp.Z);
-			_forwardCamera.Rotation = QuaternionToGtaRotation(GameplayCameraRotationFilteredQ);
+            _extendedViewCamera.Rotation = _extendedViewCameraRotation;
+
+            _forwardCamera.Rotation = Geometry.QuaternionToGtaRotation(GameplayCameraRotationFilteredQ);
         }
 
         private void RotateGameplayCameraTowardsTarget()
@@ -312,8 +280,8 @@ namespace Gta5EyeTracking.Features
             if (!_lastTarget.HasValue) return;
 
             var dir = _lastTarget.Value - _forwardCamera.Position;
-            _yawToTarget = Geometry.DirectionToRotation(dir).Z;
-            _pitchToTarget = Geometry.DirectionToRotation(dir).X;
+            //_yawToTarget = Geometry.DirectionToRotation(dir).Z;
+            //_pitchToTarget = Geometry.DirectionToRotation(dir).X;
 
             //quat
 			_yawToTarget = Geometry.DirectionToRotation(dir).Z;
@@ -324,10 +292,11 @@ namespace Gta5EyeTracking.Features
             GameplayCamera.RelativeHeading = 0;
             GameplayCamera.ClampPitch(_pitchToTarget, _pitchToTarget);
             GameplayCamera.RelativePitch = _pitchToTarget;
-            GameplayCameraRotationFiltered = Geometry.DirectionToRotation(dir);
+            
+            //GameplayCameraRotationFiltered = Geometry.DirectionToRotation(dir);
 
             //Quat
-            GameplayCameraRotationFilteredQ = GtaRotationToQuaternion(GameplayCameraRotationFiltered);
+            GameplayCameraRotationFilteredQ = Geometry.GtaRotationToQuaternion(Geometry.DirectionToRotation(dir));
             //GameplayCameraRotationFilteredQ = MathR.XLookRotation(dir);
 
 			var deltaPitch = _forwardCamera.Rotation.Z - _yawToTarget;
@@ -341,14 +310,14 @@ namespace Gta5EyeTracking.Features
 
         private void FilterGameplayCameraRotation()
         {
-            var gameplayCameraRotation = GameplayCamera.Rotation;
-            var diff = gameplayCameraRotation - GameplayCameraRotationFiltered;
-            var boundDiff = Geometry.BoundRotationDeg(diff);
-            GameplayCameraRotationFiltered = GameplayCameraRotationFiltered + boundDiff * GameplayCameraFilteringScalar;
-            GameplayCameraRotationFiltered = Geometry.BoundRotationDeg(GameplayCameraRotationFiltered);
+            //var gameplayCameraRotation = GameplayCamera.Rotation;
+            //var diff = gameplayCameraRotation - GameplayCameraRotationFiltered;
+            //var boundDiff = Geometry.BoundRotationDeg(diff);
+            //GameplayCameraRotationFiltered = GameplayCameraRotationFiltered + boundDiff * GameplayCameraFilteringScalar;
+            //GameplayCameraRotationFiltered = Geometry.BoundRotationDeg(GameplayCameraRotationFiltered);
 
             //Quat DONE
-            var gameplayCameraRotationQ = GtaRotationToQuaternion(GameplayCamera.Rotation);
+            var gameplayCameraRotationQ = Geometry.GtaRotationToQuaternion(GameplayCamera.Rotation);
             GameplayCameraRotationFilteredQ = Quaternion.Lerp(GameplayCameraRotationFilteredQ, gameplayCameraRotationQ, GameplayCameraFilteringScalar);
 		}
 
@@ -356,12 +325,12 @@ namespace Gta5EyeTracking.Features
         {
             var vehicle = Game.Player.Character.CurrentVehicle;
             if (vehicle == null) return;
-            var diff = vehicle.Rotation - VehicleRotationFiltered;
-            var boundDiff = Geometry.BoundRotationDeg(diff);
-            VehicleRotationFiltered = Geometry.BoundRotationDeg(VehicleRotationFiltered + boundDiff * GameplayCameraFilteringScalar);
+            //var diff = vehicle.Rotation - VehicleRotationFiltered;
+            //var boundDiff = Geometry.BoundRotationDeg(diff);
+            //VehicleRotationFiltered = Geometry.BoundRotationDeg(VehicleRotationFiltered + boundDiff * GameplayCameraFilteringScalar);
 
             //Quat DONE
-            var vehicleRotationQ = GtaRotationToQuaternion(vehicle.Rotation);
+            var vehicleRotationQ = Geometry.GtaRotationToQuaternion(vehicle.Rotation);
 			VehicleRotationFilteredQ = Quaternion.Lerp(VehicleRotationFilteredQ, vehicleRotationQ, GameplayCameraFilteringScalar);
 		}
 
@@ -400,15 +369,15 @@ namespace Gta5EyeTracking.Features
 
             if (_settings.ExtendedViewEnabled)
 		    {
-		        CameraRotationWithoutExtendedView = _forwardCamera.Rotation;
+		        //CameraRotationWithoutExtendedView = _forwardCamera.Rotation;
 		        CameraPositionWithoutExtendedView = _forwardCamera.Position;
 
 				//Quat DONE
-                CameraRotationWithoutExtendedViewQ = GtaRotationToQuaternion(_forwardCamera.Rotation);
+                CameraRotationWithoutExtendedViewQ = Geometry.GtaRotationToQuaternion(_forwardCamera.Rotation);
             }
 			else
 		    {
-                CameraRotationWithoutExtendedView = GameplayCameraRotationFiltered;
+                //CameraRotationWithoutExtendedView = GameplayCameraRotationFiltered;
 				CameraPositionWithoutExtendedView = GameplayCamera.Position;
 
 				//Quat DONE
