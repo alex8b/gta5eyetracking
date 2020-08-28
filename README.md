@@ -9,7 +9,7 @@
 
 2.	ScriptHook V – http://www.dev-c.com/gtav/scripthookv/
 
-3.	ScriptHook .NET – https://github.com/crosire/scripthookvdotnet/
+3.	ScriptHook .NET 3.x – https://github.com/crosire/scripthookvdotnet/
 
 4.	NativeUI – https://github.com/Guad/NativeUI/
 	
@@ -25,21 +25,26 @@ This mod allows you to control the camera and aim in GTA V with your eyes!
 If any skilled mod developers want to help me working on this mod then Tobii will give them few eye trackers **FOR FREE**.
 
 **You need to have one of these eye trackers to use the mod:**
-- Tobii Eye Tracker 4C  
-  https://tobiigaming.com/  
-  $169 / €169  
-
-- Tobii EyeX Controller  
-  https://tobiigaming.com/  
- 
-- SteelSeries Sentry Gaming Eye Tracker  
-  http://steelseries.com/gaming-controllers/sentry-gaming-eye-tracker  
-
-- MSI GT72 Tobii Gaming Laptop  
-  https://www.msi.com/Laptop/GT72VR-6RE-Dominator-Pro-Tobii.html
-
-- Alienware 17 Gaming Laptop  
-  http://www.dell.com/en-us/shop/productdetails/alienware-17-laptop
+- Tobii Eye Tracker 5 $229/ €229
+http://www.tobiigaming.com/
+- Tobii Eye Tracker 4C
+http://www.tobiigaming.com/
+- Tobii EyeX
+Follow https://twitter.com/tobiigaming for DISCOUNTS!
+- SteelSeries Sentry Gaming Eye Tracker
+http://steelseries.com/gaming-controllers/sentry-gaming-eye-tracker
+- Alienware m15
+https://gaming.tobii.com/product/alienware-m15/
+- Alienware m17
+https://gaming.tobii.com/product/alienware-m17/
+- Alienware m17 R3
+https://gaming.tobii.com/product/alienware-m17-r3/
+- Alienware Area-51m
+https://gaming.tobii.com/product/alienware-area-51m/
+- Alienware 17
+https://gaming.tobii.com/product/alienware-17/
+- MSI GT72
+https://gaming.tobii.com/product/msi-gt72/
 
 **You need to have an XBOX 360 Controller (or any other XInput compatible).**
 
@@ -48,11 +53,11 @@ http://ds4windows.com/
 
 ## Installation
 
-1. Install Microsoft .NET Framework 4.5.2  
-   https://www.microsoft.com/download/details.aspx?id=42642
+1. Install Microsoft .NET Framework 4.8 
+   https://dotnet.microsoft.com/download/dotnet-framework/net48
 
-2. Install Microsoft Visual C++ Redistributable Package for Visual Studio 2015 (x64)
-   https://www.microsoft.com/download/details.aspx?id=53587
+2. Install Microsoft Visual C++ Redistributable Package for Visual Studio 2019 (x64)  
+   https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
 
 3. Extract bundle zip to Grand Theft Auto V folder  
    (d:\SteamLibrary\steamapps\common\Grand Theft Auto V\)  
