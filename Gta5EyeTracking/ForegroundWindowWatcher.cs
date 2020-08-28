@@ -24,8 +24,8 @@ namespace Gta5EyeTracking
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool UnhookWinEvent(IntPtr hWinEventHook);
 
-		[DllImport("user32.dll")]
-		public static extern IntPtr GetForegroundWindow();
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetForegroundWindow();
     }
 
     internal class ForegroundWindowWatcher : IDisposable, IForegroundWindowWatcher
@@ -47,24 +47,24 @@ namespace Gta5EyeTracking
             _eventHook = WinEventsNativeMethods.SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, _callback, 0, 0, WINEVENT_OUTOFCONTEXT);
         }
 
-	    public bool IsWindowForeground()
-	    {
-		    return Process.GetCurrentProcess().MainWindowHandle == WinEventsNativeMethods.GetForegroundWindow();
-	    }
+        public bool IsWindowForeground()
+        {
+            return Process.GetCurrentProcess().MainWindowHandle == WinEventsNativeMethods.GetForegroundWindow();
+        }
 
         public void SetGameWindowHandle(IntPtr handle)
         {
-			_gameWindowHandle = handle;
+            _gameWindowHandle = handle;
         }
 
-		public void Dispose()
+        public void Dispose()
         {
             WinEventsNativeMethods.UnhookWinEvent(_eventHook);
         }
 
         private void PublishWindowChangeEvent(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
-	        _gameWindowHandle = Process.GetCurrentProcess().MainWindowHandle;
+            _gameWindowHandle = Process.GetCurrentProcess().MainWindowHandle;
 
             var foregroundIsNowGameHwnd = _gameWindowHandle == hwnd;
 

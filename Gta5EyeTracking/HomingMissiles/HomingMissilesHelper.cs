@@ -6,7 +6,7 @@ using GTA.Math;
 
 namespace Gta5EyeTracking.HomingMissiles
 {
-    public class HomingMissilesHelper: IDisposable
+    public class HomingMissilesHelper : IDisposable
     {
         private List<HomingMissile> _missiles;
         private bool _initFlag;
@@ -43,7 +43,7 @@ namespace Gta5EyeTracking.HomingMissiles
                 ScriptHookExtensions.PtfxRequestAsset("scr_exile2");
                 _initFlag = false;
             }
-            
+
             foreach (var missile in _missiles)
             {
                 missile.Process();
