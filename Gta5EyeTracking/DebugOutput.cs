@@ -9,7 +9,7 @@ namespace Gta5EyeTracking
         public TextElement DebugText2;
         public TextElement DebugText3;
         public TextElement DebugText4;
-        public static TextElement DebugText5;
+        public TextElement DebugText5;
 
         private ContainerElement _uiContainer;
 
