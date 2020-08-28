@@ -28,6 +28,7 @@ namespace Gta5EyeTracking
         public void FindGazeProjection(
             Vector2 gazePoint,
             Vector2 joystickDelta,
+            float ignoreRange,
             out Vector3 shootCoord,
             out Vector3 shootCoordSnap,
             out Vector3 shootMissileCoord,
@@ -46,12 +47,12 @@ namespace Gta5EyeTracking
 
             Entity unfilteredEntity;
             Entity filteredEntity;
-            var hitUnfiltered = Geometry.ConecastPedsAndVehicles(unfilteredGazePointPlusJoystickDelta, out unfilteredEntity);
+            var hitUnfiltered = Geometry.ConecastPedsAndVehicles(unfilteredGazePointPlusJoystickDelta, out unfilteredEntity, ignoreRange);
             shootMissileCoord = hitUnfiltered;
             shootCoordSnap = hitUnfiltered;
 
 
-            var hitFiltered = Geometry.RaycastEverything(filteredGazePointPlusJoystickDelta, out filteredEntity, 0);
+            var hitFiltered = Geometry.RaycastEverything(filteredGazePointPlusJoystickDelta, out filteredEntity, 0, ignoreRange);
             shootCoord = hitFiltered;
 
 

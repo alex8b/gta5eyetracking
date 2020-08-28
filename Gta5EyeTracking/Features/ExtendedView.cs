@@ -8,9 +8,9 @@ namespace Gta5EyeTracking.Features
     public class ExtendedView : ExtendedViewBase, IDisposable
     {
         public Vector3 CameraPositionWithoutExtendedView { get; private set; }
-        public Vector3 CameraRotationWithoutExtendedView { get; private set; }
-        public Vector3 GameplayCameraRotationFiltered { get; private set; }
-        public Vector3 VehicleRotationFiltered { get; private set; }
+		public Quaternion CameraRotationWithoutExtendedViewQ { get; private set; } = Quaternion.Identity;
+		public Quaternion GameplayCameraRotationFilteredQ { get; private set; } = Quaternion.Identity;
+		public Quaternion VehicleRotationFilteredQ { get; private set; } = Quaternion.Identity;
         public float DistanceToCharacter { get; private set; }
 
         public float AimAtCrosshairDeadzoneSize = 0.1f;
@@ -18,7 +18,8 @@ namespace Gta5EyeTracking.Features
         private const float HeadPositionSensitivity = 0.5f;
         private const float HeadPositionScalar = 0.001f;
 
-        private const float GameplayCameraFilteringScalar = 0.1f;
+        private const float GameplayCameraFilteringScalar = 0.9f;
+        private const float GameplayCameraVehicleFilteringScalar = 0.9f;
         private const float AimTransitionDuration = 1f;
 
         private const float ExtraOffsetLerpScalar = 0.1f;
@@ -47,7 +48,8 @@ namespace Gta5EyeTracking.Features
 
         private float _headXFiltered;
 
-        private Vector3 _extendedViewCameraRotation;
+		private Vector3 _extendedViewCameraRotation;
+		private Quaternion _extendedViewCameraRotationQ;
 
         public ExtendedView(Settings settings,
             GameState gameState,
@@ -88,7 +90,7 @@ namespace Gta5EyeTracking.Features
                     extraOffset = Game.Player.Character.IsInPlane ? new Vector3(0, 0, 3f) : new Vector3(0, 0, 2f);
                 }
 
-                ApplyCameraRotation(true);
+                ApplyCameraRotation(!Game.Player.Character.IsInPlane);
 
                 CalculateDistanceToCharacter(extraOffset);
 
@@ -118,16 +120,22 @@ namespace Gta5EyeTracking.Features
                 }
 
                 if (_aimTransitionState > 0)
-                {
-                    RotateGameplayCameraTowardsTarget();
+				{
+					RotateGameplayCameraTowardsTarget();
 
-                    if (_aimAtGazeRequested)
-                    {
-                        YawOffset = Geometry.BoundRotationDeg(GameplayCameraRotationFiltered.Z - _extendedViewCamera.Rotation.Z);
-                        PitchOffset = Geometry.BoundRotationDeg(GameplayCameraRotationFiltered.X - _extendedViewCamera.Rotation.X);
+					if (_aimAtGazeRequested)
+					{
+                        //Quat
+                        var extendedViewCameraRotationQinv = _extendedViewCameraRotationQ;
+						extendedViewCameraRotationQinv.Invert();
+						var diffQ = Quaternion.Multiply(extendedViewCameraRotationQinv, GameplayCameraRotationFilteredQ);
+                        var diffRot = Geometry.QuaternionToGtaRotation(diffQ);
+						YawOffset = diffRot.Z;
+                        PitchOffset = diffRot.X;
+
                         _aimAtGazeRequested = false;
-                    }
-                }
+					}
+				}
 
                 ApplyCameraRotation(true);
 
@@ -162,8 +170,6 @@ namespace Gta5EyeTracking.Features
                     World.RenderingCamera = _extendedViewCamera;
                 }
 
-                //ScriptHookExtensions.CamInheritRollVehicle(_extendedViewCamera, Game.Player.Character.CurrentVehicle);
-
                 ApplyCameraRotation(false);
 
                 DistanceToCharacter = 0;
@@ -171,8 +177,8 @@ namespace Gta5EyeTracking.Features
                 if (Game.Player.Character.IsInPlane)
                 {
                     var extraOffset = new Vector3(0, 0, 0.6f);
-                    ApplyCameraPosition(_extendedViewCamera, extraOffset, true);
-                    ApplyCameraPosition(_forwardCamera, extraOffset, true);
+                    ApplyCameraPosition(_extendedViewCamera, extraOffset, false);
+                    ApplyCameraPosition(_forwardCamera, extraOffset, false);
                 }
                 else
                 {
@@ -189,56 +195,55 @@ namespace Gta5EyeTracking.Features
         }
 
         private void CalculateDistanceToCharacter(Vector3 extraOffset)
-        {
-            var attachPointPosition = Game.Player.Character.Position + extraOffset;
-            var currentDistanceToCharacter = Vector3.Distance(GameplayCamera.Position, attachPointPosition);
-            DistanceToCharacter = Math.Min(100, Mathf.Lerp(DistanceToCharacter, currentDistanceToCharacter, DistanceToCharacterLerpScalar));
-        }
+		{
+			var attachPointPosition = Game.Player.Character.Position + extraOffset;
+			var currentDistanceToCharacter = Vector3.Distance(GameplayCamera.Position, attachPointPosition);
+			DistanceToCharacter = Math.Min(100, Mathf.Lerp(DistanceToCharacter, currentDistanceToCharacter, DistanceToCharacterLerpScalar));
+		}
 
-        private void ApplyCameraPosition(Camera camera, Vector3 extraOffset, bool isRelative)
-        {
-            var pitch = Mathf.Deg2Rad * camera.Rotation.X;
-            var yaw = Mathf.Deg2Rad * camera.Rotation.Z;
-            if (camera == _extendedViewCamera)
-            {
-                pitch = Mathf.Deg2Rad * _extendedViewCameraRotation.X;
-                yaw = Mathf.Deg2Rad * _extendedViewCameraRotation.Z;
-            }
+		private void ApplyCameraPosition(Camera camera, Vector3 extraOffset, bool isRelative)
+	    {
+	        var pitch = Mathf.Deg2Rad * camera.Rotation.X;
+	        var yaw = Mathf.Deg2Rad * camera.Rotation.Z;
+			if (camera == _extendedViewCamera)
+			{
+				pitch = Mathf.Deg2Rad * _extendedViewCameraRotation.X;
+				yaw = Mathf.Deg2Rad * _extendedViewCameraRotation.Z;
+			}
 
-            var delta = new Vector3(extraOffset.X, (float)(DistanceToCharacter * -Math.Cos(pitch)),
-                (float)(DistanceToCharacter * -Math.Sin(pitch)));
-            delta.Z = Math.Max(delta.Z, -1f) + extraOffset.Z;
-
-            var extendedViewCameraOffset = delta;
-            extendedViewCameraOffset.X = (float)(Math.Cos(yaw) * delta.X - Math.Sin(yaw) * delta.Y);
-            extendedViewCameraOffset.Y = (float)(Math.Sin(yaw) * delta.X + Math.Cos(yaw) * delta.Y);
+            //Quat
+            var delta = new Vector3(0, -DistanceToCharacter, 0) + extraOffset;
+            var extendedViewCameraOffset = _extendedViewCameraRotationQ * delta;
 
             ScriptHookExtensions.AttachCamToEntity(camera, Game.Player.Character, extendedViewCameraOffset, isRelative);
-        }
+	    }
 
 
         private void ApplyCameraRotation(bool noRoll)
-        {
+		{
             //var timeSince = DateTime.UtcNow - _lastAimCameraAtTargetTime;
             _debugOutput.DebugText1.Caption = _aimTransitionState.ToString();
 
-            Vector3 rot;
-
+            //Quat
+            ScriptHookExtensions.CamInheritRollVehicle(_extendedViewCamera, !noRoll);
             if (noRoll)
             {
-                rot = Geometry.OffsetRotation(GameplayCameraRotationFiltered, -Pitch, -Yaw);
-                rot.Y = 0;
+                var extendedViewCameraRotationTemp = Geometry.QuaternionToGtaRotation(GameplayCameraRotationFilteredQ);
+                extendedViewCameraRotationTemp.X += -Pitch;
+                extendedViewCameraRotationTemp.Z += -Yaw;
+                _extendedViewCameraRotationQ = Geometry.GtaRotationToQuaternion(extendedViewCameraRotationTemp);
             }
             else
             {
-                rot = Math.Abs(GameplayCameraRotationFiltered.Y) > 90 ? Geometry.OffsetRotation(GameplayCameraRotationFiltered, -Pitch, Yaw) : Geometry.OffsetRotation(GameplayCameraRotationFiltered, -Pitch, -Yaw);
+                var extraQ = Geometry.GtaRotationToQuaternion(new Vector3(-Pitch, 0, -Yaw));
+                _extendedViewCameraRotationQ = GameplayCameraRotationFilteredQ * extraQ;
             }
 
-            rot = Geometry.BoundRotationDeg(rot);
+            _extendedViewCameraRotation = Geometry.QuaternionToGtaRotation(_extendedViewCameraRotationQ);
 
-            _extendedViewCamera.Rotation = rot;
-            _extendedViewCameraRotation = rot;
-            _forwardCamera.Rotation = GameplayCameraRotationFiltered;
+            _extendedViewCamera.Rotation = _extendedViewCameraRotation;
+
+            _forwardCamera.Rotation = Geometry.QuaternionToGtaRotation(GameplayCameraRotationFilteredQ);
         }
 
         private void RotateGameplayCameraTowardsTarget()
@@ -246,7 +251,8 @@ namespace Gta5EyeTracking.Features
             if (!_lastTarget.HasValue) return;
 
             var dir = _lastTarget.Value - _forwardCamera.Position;
-            _yawToTarget = Geometry.DirectionToRotation(dir).Z;
+
+			_yawToTarget = Geometry.DirectionToRotation(dir).Z;
             _pitchToTarget = Geometry.DirectionToRotation(dir).X;
 
             Game.Player.Character.Heading = _yawToTarget;
@@ -254,9 +260,11 @@ namespace Gta5EyeTracking.Features
             GameplayCamera.RelativeHeading = 0;
             GameplayCamera.ClampPitch(_pitchToTarget, _pitchToTarget);
             GameplayCamera.RelativePitch = _pitchToTarget;
-            GameplayCameraRotationFiltered = Geometry.DirectionToRotation(dir);
+            
+            //Quat
+            GameplayCameraRotationFilteredQ = Geometry.GtaRotationToQuaternion(Geometry.DirectionToRotation(dir));
 
-            var deltaPitch = _forwardCamera.Rotation.Z - _yawToTarget;
+			var deltaPitch = _forwardCamera.Rotation.Z - _yawToTarget;
             var deltaYaw = _forwardCamera.Rotation.X - _pitchToTarget;
             var minAngle = 0.01f;
             if (Math.Abs(deltaYaw) < minAngle && Math.Abs(deltaPitch) < minAngle)
@@ -267,28 +275,27 @@ namespace Gta5EyeTracking.Features
 
         private void FilterGameplayCameraRotation()
         {
-            var gameplayCameraRotation = GameplayCamera.Rotation;
-            var diff = gameplayCameraRotation - GameplayCameraRotationFiltered;
-            var boundDiff = Geometry.BoundRotationDeg(diff);
-            GameplayCameraRotationFiltered = GameplayCameraRotationFiltered + boundDiff * GameplayCameraFilteringScalar;
-            GameplayCameraRotationFiltered = Geometry.BoundRotationDeg(GameplayCameraRotationFiltered);
-        }
+            //Quat
+            var gameplayCameraRotationQ = Geometry.GtaRotationToQuaternion(GameplayCamera.Rotation);
+            GameplayCameraRotationFilteredQ = Quaternion.Lerp(GameplayCameraRotationFilteredQ, gameplayCameraRotationQ, GameplayCameraFilteringScalar);
+		}
 
         private void FilterVehicleRotation()
         {
             var vehicle = Game.Player.Character.CurrentVehicle;
             if (vehicle == null) return;
-            var diff = vehicle.Rotation - VehicleRotationFiltered;
-            var boundDiff = Geometry.BoundRotationDeg(diff);
-            VehicleRotationFiltered = Geometry.BoundRotationDeg(VehicleRotationFiltered + boundDiff * GameplayCameraFilteringScalar);
-        }
 
-        public void ProcessFirstPerson()
-        {
-            //TODO
-            Game.Player.Character.IsVisible = true;
-            World.RenderingCamera = null;
-        }
+            //Quat
+            var vehicleRotationQ = Geometry.GtaRotationToQuaternion(vehicle.Rotation);
+			VehicleRotationFilteredQ = Quaternion.Lerp(VehicleRotationFilteredQ, vehicleRotationQ, GameplayCameraVehicleFilteringScalar);
+		}
+
+		public void ProcessFirstPerson()
+		{
+			//TODO
+			Game.Player.Character.IsVisible = true;
+			World.RenderingCamera = null;
+		}
 
         public void ProcessFirstPersonAim()
         {
@@ -317,39 +324,45 @@ namespace Gta5EyeTracking.Features
             FilterVehicleRotation();
 
             if (_settings.ExtendedViewEnabled)
-            {
-                CameraRotationWithoutExtendedView = _forwardCamera.Rotation;
-                CameraPositionWithoutExtendedView = _forwardCamera.Position;
+		    {
+		        //CameraRotationWithoutExtendedView = _forwardCamera.Rotation;
+		        CameraPositionWithoutExtendedView = _forwardCamera.Position;
+
+				//Quat
+                CameraRotationWithoutExtendedViewQ = Geometry.GtaRotationToQuaternion(_forwardCamera.Rotation);
             }
-            else
-            {
-                CameraRotationWithoutExtendedView = GameplayCameraRotationFiltered;
-                CameraPositionWithoutExtendedView = GameplayCamera.Position;
-            }
+			else
+		    {
+                //CameraRotationWithoutExtendedView = GameplayCameraRotationFiltered;
+				CameraPositionWithoutExtendedView = GameplayCamera.Position;
+
+				//Quat
+				CameraRotationWithoutExtendedViewQ = GameplayCameraRotationFilteredQ;
+			}
 
 
-            if (Game.Player.Character.IsInVehicle())
-            {
-                if (Game.IsControlPressed(Control.NextCamera))
-                {
-                    _lastNotInVehicle = DateTime.UtcNow;
-                }
+			if (Game.Player.Character.IsInVehicle())
+			{
+				if (Game.IsControlPressed(Control.NextCamera))
+				{
+					_lastNotInVehicle = DateTime.UtcNow;
+				}
 
-                //vehicle
-                var timeInVehicle = DateTime.UtcNow - _lastNotInVehicle;
-                if ((timeInVehicle > TimeSpan.FromSeconds(0.5))
-                    && _settings.FirstPersonModeEnabled)
-                {
-                    ProcessFirstPersonVehicle();
-                }
-                else
-                {
-                    ProcessThirdPerson();
-                }
-            }
-            else
-            {
-                _lastNotInVehicle = DateTime.UtcNow;
+				//vehicle
+				var timeInVehicle = DateTime.UtcNow - _lastNotInVehicle;
+				if ((timeInVehicle > TimeSpan.FromSeconds(0.5))
+					&& _settings.FirstPersonModeEnabled)
+				{
+					ProcessFirstPersonVehicle();
+				}
+				else
+				{
+					ProcessThirdPerson();
+				}
+			}
+			else
+			{
+				_lastNotInVehicle = DateTime.UtcNow;
 
                 //on foot
                 if (_settings.FirstPersonModeEnabled && GameState.IsFirstPersonPedCameraActive())

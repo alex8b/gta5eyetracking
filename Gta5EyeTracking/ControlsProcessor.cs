@@ -173,13 +173,14 @@ namespace Gta5EyeTracking
                 || _gameState.IsAimingWithMouse
                 || _gameState.IsShootingWithMouse))
             {
-                var rotation = _extendedView.CameraRotationWithoutExtendedView;
+                var rotation = Geometry.QuaternionToGtaRotation(_extendedView.CameraRotationWithoutExtendedViewQ);
                 var dir = Geometry.RotationToDirection(rotation);
-                var source3D = _extendedView.CameraPositionWithoutExtendedView + dir * _extendedView.DistanceToCharacter * 0.5f;
+
+                var source3D = _extendedView.CameraPositionWithoutExtendedView;
                 var target3D = source3D + dir * 1000;
 
                 Entity hitEntity;
-                shootCoord = Geometry.RaycastEverything(out hitEntity, target3D, source3D, 0);
+                shootCoord = Geometry.RaycastEverything(out hitEntity, target3D, source3D, 0, _extendedView.DistanceToCharacter * 0.9f);
             }
             return shootCoord;
         }
