@@ -237,18 +237,6 @@ namespace Gta5EyeTracking
         //	return foundVeh;
         //}
 
-        public static bool WorldToScreenRel_Native(Vector3 worldCoords, out Vector2 screenCoords)
-        {
-            var num1 = new OutputArgument();
-            var num2 = new OutputArgument();
-            if (!Function.Call<bool>(Hash.GET_SCREEN_COORD_FROM_WORLD_COORD/*._WORLD3D_TO_SCREEN2D*/, worldCoords.X, worldCoords.Y, worldCoords.Z, num1, num2))
-            {
-                screenCoords = new Vector2();
-                return false;
-            }
-            screenCoords = new Vector2((num1.GetResult<float>() - 0.5f) * 2, (num2.GetResult<float>() - 0.5f) * 2);
-            return true;
-        }
 
         public static bool WorldToScreenRel(Vector3 entityPosition, out Vector2 screenCoords)
         {
@@ -413,125 +401,6 @@ namespace Gta5EyeTracking
             return ret;
         }
 
-        //public static Vector3 QuaturnionToEulerDeg(Quaternion q1)
-        //{
-        //	double rollRad;
-        //	double yawRad;
-        //	double pitchRad;
-        //	//if (Math.Abs(q.X*q.Y + q.Z*q.W - 0.5) < 0.001)
-        //	//{
-        //	//	yawRad = 2*Math.Atan2(q.X, q.W);
-        //	//	rollRad = 0;
-        //	//}
-        //	//else if (Math.Abs(q.X*q.Y + q.Z*q.W - (-0.5)) < 0.001)
-        //	//{
-        //	//	yawRad = -2*Math.Atan2(q.X, q.W);
-        //	//	rollRad = 0;
-        //	//}
-        //	//else
-        //	//{
-        //	//	rollRad = Math.Atan2(2 * (q.X * q.W - q.Y * q.Z), 1 - 2 * (q.X * q.X + q.Z * q.Z));
-        //	//	yawRad = Math.Atan2(2 * (q.Y * q.W - q.X * q.Z), 1 - 2 * (q.Y * q.Y + q.Z * q.Z));
-        //	//}
-
-        //	//pitchRad = Math.Asin(2*(q.X * q.Y + q.Z * q.W));
-
-        //	double sqw = q1.W * q1.W;
-        //	double sqx = q1.X * q1.X;
-        //	double sqy = q1.Y * q1.Y;
-        //	double sqz = q1.Z * q1.Z;
-        //	double unit = sqx + sqy + sqz + sqw; // if normalised is one, otherwise is correction factor
-        //	double test = q1.X * q1.Y + q1.Z * q1.W;
-        //	if (test > 0.499 * unit)
-        //	{ // singularity at north pole
-        //		yawRad = 2 * Math.Atan2(q1.X, q1.W);
-        //		pitchRad = Math.PI / 2;
-        //		rollRad = 0;
-        //	}
-        //	else if (test < -0.499 * unit)
-        //	{
-        //		// singularity at south pole
-        //		yawRad = -2 * Math.Atan2(q1.X, q1.W);
-        //		pitchRad = -Math.PI / 2;
-        //		rollRad = 0;
-        //	}
-        //	else
-        //	{
-        //		yawRad = Math.Atan2(2 * q1.Y * q1.W - 2 * q1.X * q1.Z, sqx - sqy - sqz + sqw);
-        //		pitchRad = Math.Asin(2 * test / unit);
-        //		rollRad = Math.Atan2(2 * q1.X * q1.W - 2 * q1.Y * q1.Z, -sqx + sqy - sqz + sqw);
-        //	}
-
-        //	return new Vector3((float)RadToDeg(yawRad), (float)RadToDeg(pitchRad), (float)RadToDeg(-rollRad));
-        //}
-
-        //public static Quaternion EulerDegToQuaturnion(double yaw, double pitch, double roll)
-        //{
-        //	// Assuming the angles are in radians.
-        //	double c1 = Math.Cos(DegToRad(yaw / 2));
-        //	double s1 = Math.Sin(DegToRad(yaw / 2));
-        //	double c2 = Math.Cos(DegToRad(pitch / 2));
-        //	double s2 = Math.Sin(DegToRad(pitch / 2));
-        //	double c3 = Math.Cos(DegToRad(roll / 2));
-        //	double s3 = Math.Sin(roll / 2);
-        //	double c1c2 = c1 * c2;
-        //	double s1s2 = s1 * s2;
-        //	return new Quaternion
-        //	{
-        //		W = (float) (c1c2*c3 - s1s2*s3),
-        //		X = (float) (c1c2*s3 + s1s2*c3),
-        //		Y = (float) (s1*c2*c3 + c1*s2*s3),
-        //		Z = (float) (c1*s2*c3 - s1*c2*s3)
-        //	};
-        //}
-        public static Quaternion EulerDegToQuaturnion(float yaw, float pitch, float roll)
-        {
-            float rollOver2 = roll * 0.5f;
-            float sinRollOver2 = (float)Math.Sin((double)rollOver2);
-            float cosRollOver2 = (float)Math.Cos((double)rollOver2);
-            float pitchOver2 = pitch * 0.5f;
-            float sinPitchOver2 = (float)Math.Sin((double)pitchOver2);
-            float cosPitchOver2 = (float)Math.Cos((double)pitchOver2);
-            float yawOver2 = yaw * 0.5f;
-            float sinYawOver2 = (float)Math.Sin((double)yawOver2);
-            float cosYawOver2 = (float)Math.Cos((double)yawOver2);
-            Quaternion result;
-            result.X = cosYawOver2 * cosPitchOver2 * cosRollOver2 + sinYawOver2 * sinPitchOver2 * sinRollOver2;
-            result.Y = cosYawOver2 * cosPitchOver2 * sinRollOver2 - sinYawOver2 * sinPitchOver2 * cosRollOver2;
-            result.Z = cosYawOver2 * sinPitchOver2 * cosRollOver2 + sinYawOver2 * cosPitchOver2 * sinRollOver2;
-            result.W = sinYawOver2 * cosPitchOver2 * cosRollOver2 - cosYawOver2 * sinPitchOver2 * sinRollOver2;
-            return result;
-        }
-
-        public static Vector3 QuaturnionToEulerDeg(Quaternion q)
-        {
-            double sqw = q.W * q.W;
-            double sqx = q.X * q.X;
-            double sqy = q.Y * q.Y;
-            double sqz = q.Z * q.Z;
-            Vector3 result = new Vector3();
-            result.X = Mathf.Rad2Deg * (float)Math.Asin(2f * (q.X * q.Z - q.W * q.Y));                             // Pitch 
-            result.Z = Mathf.Rad2Deg * (float)Math.Atan2(2f * q.X * q.W + 2f * q.Y * q.Z, 1 - 2f * (sqz + sqw));     // Yaw 
-            result.Y = Mathf.Rad2Deg * (float)Math.Atan2(2f * q.X * q.Y + 2f * q.Z * q.W, 1 - 2f * (sqy + sqz));
-            return result;
-        }
-
-        public static Vector3 OffsetRotation(Vector3 rotationDeg, double pitchDeg, double yawDeg)
-        {
-            //var quaturnion = EulerDegToQuaturnion((float)DegToRad(rotationDeg.Z),
-            //	(float)DegToRad(rotationDeg.X),
-            //	(float) DegToRad(rotationDeg.Y));
-            //var extraRotation = EulerDegToQuaturnion((float)DegToRad(yawDeg), (float)DegToRad(pitchDeg), 0);
-            //var finalQuaturnion = quaturnion * extraRotation;
-            //finalQuaturnion.Normalize();
-            var result = rotationDeg;
-            result.X += (float)pitchDeg;
-            result.Z += (float)yawDeg;// * (float)Math.Cos(Mathf.Deg2Rad * rotationDeg.Y);
-                                      //UI.ShowSubtitle(Math.Round(rotationDeg.X,0) + " | " + Math.Round(rotationDeg.Y, 0) + " | " + Math.Round(rotationDeg.Z, 0)
-                                      //	+ " | " + Math.Round(result.X, 0) + " | " + Math.Round(result.Y, 0) + " | " + Math.Round(result.Z, 0));
-            return result;
-        }
-
         public static Vector3 DirectionToRotation(Vector3 direction)
         {
             direction.Normalize();
@@ -561,9 +430,6 @@ namespace Gta5EyeTracking
             return angleDeg;
         }
 
-        public static Vector3 BoundRotationDeg(Vector3 angleDeg)
-        {
-            return new Vector3(BoundRotationDeg(angleDeg.X), BoundRotationDeg(angleDeg.Y), BoundRotationDeg(angleDeg.Z));
-        }
+
     }
 }
