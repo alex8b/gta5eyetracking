@@ -204,7 +204,7 @@ namespace Gta5EyeTracking.Features
 		{
 			var attachPointPosition = Game.Player.Character.Position + extraOffset;
 			var currentDistanceToCharacter = Vector3.Distance(GameplayCamera.Position, attachPointPosition);
-			_distanceToCharacter = Math.Min(100, Mathf.Lerp(_distanceToCharacter, currentDistanceToCharacter, DistanceToCharacterLerpScalar));
+			DistanceToCharacter = Math.Min(100, Mathf.Lerp(DistanceToCharacter, currentDistanceToCharacter, DistanceToCharacterLerpScalar));
 		}
 
 		private void ApplyCameraPosition(Camera camera, Vector3 extraOffset, bool isRelative)
@@ -217,8 +217,8 @@ namespace Gta5EyeTracking.Features
 				yaw = Mathf.Deg2Rad * _extendedViewCameraRotation.Z;
 			}
 
-			var delta = new Vector3(extraOffset.X, (float) (_distanceToCharacter*-Math.Cos(pitch)),
-	            (float) (_distanceToCharacter*-Math.Sin(pitch)));
+			var delta = new Vector3(extraOffset.X, (float) (DistanceToCharacter*-Math.Cos(pitch)),
+	            (float) (DistanceToCharacter*-Math.Sin(pitch)));
 	        delta.Z = Math.Max(delta.Z, -1f) + extraOffset.Z;
 
 	        var extendedViewCameraOffset = delta;
