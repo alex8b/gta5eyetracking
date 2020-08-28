@@ -253,11 +253,13 @@ public abstract class ExtendedViewBase
         }
 
         var headPose = TobiiAPI.GetHeadPose();
+        
         var currentFilterredHeadPose = _filteredHeadPose;
-        if (headPose.TimeStampMicroSeconds > _lastHeadPosePreciseTimestamp)
+        if (headPose.TimeStampMicroSeconds != _lastHeadPosePreciseTimestamp)
         {
             _lastHeadPosePreciseTimestamp = headPose.TimeStampMicroSeconds;
             _currentHeadPose = new Vector3(headPose.Rotation.Pitch, headPose.Rotation.Yaw, headPose.Rotation.Roll);
+
             UpdateFilteredHeadPose(_currentHeadPose, Time.unscaledDeltaTime);
             _previousFilteredHeadPose = currentFilterredHeadPose;
             _accumulatedTimeDeltaForHeadPoseLerp -= (1.0f / HeadTrackingFrequency);

@@ -152,6 +152,7 @@ public class EyeTrackingHost : IDisposable
             }
 
             var headPoses = TobiiGameIntegrationApi.GetHeadPoses();
+            DebugOutput.DebugText5.Caption = headPoses.Count  + " --- " +Pitch + " - " + Yaw;
             if (headPoses.Count > 0)
             {
                 Yaw = -headPoses.Last().Rotation.Yaw;

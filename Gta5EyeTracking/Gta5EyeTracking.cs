@@ -251,6 +251,7 @@ namespace Gta5EyeTracking
             _gazeProjector.FindGazeProjection(
                 centeredNormalizedGaze,
                 joystickDelta,
+                _extendedView.DistanceToCharacter * 0.9f,
                 out shootCoord,
                 out shootCoordSnap,
                 out shootMissileCoord,

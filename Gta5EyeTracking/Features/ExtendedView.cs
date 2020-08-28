@@ -263,12 +263,14 @@ namespace Gta5EyeTracking.Features
             var extendedViewCameraRotationTemp = Geometry.QuaternionToGtaRotation(GameplayCameraRotationFilteredQ);
             extendedViewCameraRotationTemp.X += -Pitch;
             extendedViewCameraRotationTemp.Z += -Yaw;
-            _extendedViewCameraRotationQ = Geometry.GtaRotationToQuaternion(extendedViewCameraRotationTemp);
+            var extraQ = Geometry.GtaRotationToQuaternion(new Vector3(-Pitch, 0, -Yaw));
+            _extendedViewCameraRotationQ = GameplayCameraRotationFilteredQ * extraQ;
+            //_extendedViewCameraRotationQ = Geometry.GtaRotationToQuaternion(extendedViewCameraRotationTemp);
             _extendedViewCameraRotation = Geometry.QuaternionToGtaRotation(_extendedViewCameraRotationQ);
 
-            _debugOutput.DebugText3.Caption = "x " + _extendedViewCameraRotation;
-            _debugOutput.DebugText4.Caption = "y " + _extendedViewCameraRotation; 
-            _debugOutput.DebugText5.Caption = "z " + _extendedViewCameraRotation;
+            //_debugOutput.DebugText3.Caption = "x " + _extendedViewCameraRotation;
+            //_debugOutput.DebugText4.Caption = "y " + _extendedViewCameraRotation; 
+            //_debugOutput.DebugText5.Caption = "z " + _extendedViewCameraRotation;
 
             _extendedViewCamera.Rotation = _extendedViewCameraRotation;
 

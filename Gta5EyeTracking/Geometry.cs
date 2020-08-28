@@ -22,20 +22,19 @@ namespace Gta5EyeTracking
             //return ((rotationDiffBound < 90) || (rotationDiffBound > 270));
         }
 
-        public static Vector3 RaycastEverything(Vector2 screenCoord, out Entity hitEntity, float radius)
+        public static Vector3 RaycastEverything(Vector2 screenCoord, out Entity hitEntity, float radius, float ignoreRange)
         {
             Vector3 source3D;
             Vector3 target3D;
             ScreenRelToWorld(screenCoord, out source3D, out target3D);
-
-            return RaycastEverything(out hitEntity, target3D, source3D, radius);
+            return RaycastEverything(out hitEntity, target3D, source3D, radius, ignoreRange);
         }
 
-        public static Vector3 RaycastEverything(out Entity hitEntity, Vector3 target3D, Vector3 source3D, float radius)
+        public static Vector3 RaycastEverything(out Entity hitEntity, Vector3 target3D, Vector3 source3D, float radius, float ignoreRange)
         {
             hitEntity = null;
             const float raycastToDist = 200.0f;
-            const float raycastFromDist = 1f;
+            float raycastFromDist = Mathf.Max(1f, ignoreRange);
             const float defaultDist = 60.0f;
             Entity ignoreEntity = Game.Player.Character;
             if (Game.Player.Character.IsInVehicle())
@@ -45,7 +44,7 @@ namespace Gta5EyeTracking
 
             var dir = (target3D - source3D);
             dir.Normalize();
-
+            
             RaycastResult raycastResults;
             if (radius > 0)
             {
@@ -76,7 +75,7 @@ namespace Gta5EyeTracking
             return source3D + dir * defaultDist;
         }
 
-        public static Vector3 ConecastPedsAndVehicles(Vector2 screenCoords, out Entity hitEntity)
+        public static Vector3 ConecastPedsAndVehicles(Vector2 screenCoords, out Entity hitEntity, float ignoreRange)
         {
             var radius = 1;
             var numPoints = 5;
@@ -92,7 +91,7 @@ namespace Gta5EyeTracking
                 var offsetY = Math.Cos(angle) * dist;
                 var coord = screenCoords + new Vector2((float)offsetX, (float)offsetY);
                 Entity entity;
-                var hitcoord = RaycastEverything(coord, out entity, radius);
+                var hitcoord = RaycastEverything(coord, out entity, radius, ignoreRange);
                 if (i == 0)
                 {
                     resultCoord = hitcoord;
