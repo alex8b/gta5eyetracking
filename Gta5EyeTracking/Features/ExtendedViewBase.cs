@@ -148,7 +148,7 @@ public abstract class ExtendedViewBase
 	private Vector2 _gazeViewTarget;
 
 
-	private double _lastHeadPosePreciseTimestamp = -1;
+	private long _lastHeadPosePreciseTimestamp = -1;
 	private float _accumulatedTimeDeltaForHeadPoseLerp;
 	private Vector3 _previousFilteredHeadPose;
 
