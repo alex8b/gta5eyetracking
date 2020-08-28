@@ -183,9 +183,13 @@ namespace Gta5EyeTracking.Features
 
                 if (Game.Player.Character.IsInPlane)
                 {
-                    var extraOffset = new Vector3(0, 0, 0.6f);
-                    ApplyCameraPosition(_extendedViewCamera, extraOffset, true);
-                    ApplyCameraPosition(_forwardCamera, extraOffset, true);
+                    //var extraOffset = new Vector3(0, 0, 0.6f);
+                    //ApplyCameraPosition(_extendedViewCamera, extraOffset, true);
+                    //ApplyCameraPosition(_forwardCamera, extraOffset, true);
+
+                    var extraOffset = new Vector3(_headXFiltered * HeadPositionScalar, 0, 0.6f);
+                    ApplyCameraPosition(_extendedViewCamera, extraOffset, false);
+                    ApplyCameraPosition(_forwardCamera, extraOffset, false);
                 }
                 else
                 {
@@ -240,33 +244,39 @@ namespace Gta5EyeTracking.Features
             //var timeSince = DateTime.UtcNow - _lastAimCameraAtTargetTime;
             _debugOutput.DebugText1.Caption = _aimTransitionState.ToString();
 
-   //         Vector3 rot;
+            //         Vector3 rot;
 
-			//if (noRoll)
-		 //   {
-   //             rot = Geometry.OffsetRotation(GameplayCameraRotationFiltered, -Pitch, -Yaw);
-   //             rot.Y = 0;
-   //         }
-   //         else
-   //         {
-   //             rot = Math.Abs(GameplayCameraRotationFiltered.Y) > 90 ? Geometry.OffsetRotation(GameplayCameraRotationFiltered, -Pitch, Yaw) : Geometry.OffsetRotation(GameplayCameraRotationFiltered, -Pitch, -Yaw);
-   //         }
+            //if (noRoll)
+            //   {
+            //             rot = Geometry.OffsetRotation(GameplayCameraRotationFiltered, -Pitch, -Yaw);
+            //             rot.Y = 0;
+            //         }
+            //         else
+            //         {
+            //             rot = Math.Abs(GameplayCameraRotationFiltered.Y) > 90 ? Geometry.OffsetRotation(GameplayCameraRotationFiltered, -Pitch, Yaw) : Geometry.OffsetRotation(GameplayCameraRotationFiltered, -Pitch, -Yaw);
+            //         }
 
-   //         rot = Geometry.BoundRotationDeg(rot);
+            //         rot = Geometry.BoundRotationDeg(rot);
 
-			//_extendedViewCamera.Rotation = rot;
-			//_extendedViewCameraRotation = rot;
+            //_extendedViewCamera.Rotation = rot;
+            //_extendedViewCameraRotation = rot;
 
-			//_forwardCamera.Rotation = GameplayCameraRotationFiltered;
+            //_forwardCamera.Rotation = GameplayCameraRotationFiltered;
 
             //Quat DONE
-            var extendedViewCameraRotationTemp = Geometry.QuaternionToGtaRotation(GameplayCameraRotationFilteredQ);
-            extendedViewCameraRotationTemp.X += -Pitch;
-            extendedViewCameraRotationTemp.Z += -Yaw;
-            var extraQ = Geometry.GtaRotationToQuaternion(new Vector3(-Pitch, 0, -Yaw));
-            _extendedViewCameraRotationQ = GameplayCameraRotationFilteredQ * extraQ;
-            //_extendedViewCameraRotationQ = Geometry.GtaRotationToQuaternion(extendedViewCameraRotationTemp);
-            _extendedViewCameraRotation = Geometry.QuaternionToGtaRotation(_extendedViewCameraRotationQ);
+            if (noRoll)
+            {
+                var extendedViewCameraRotationTemp = Geometry.QuaternionToGtaRotation(GameplayCameraRotationFilteredQ);
+                extendedViewCameraRotationTemp.X += -Pitch;
+                extendedViewCameraRotationTemp.Z += -Yaw;
+                _extendedViewCameraRotationQ = Geometry.GtaRotationToQuaternion(extendedViewCameraRotationTemp);
+            }
+            else
+            {
+                var extraQ = Geometry.GtaRotationToQuaternion(new Vector3(-Pitch, 0, -Yaw));
+                _extendedViewCameraRotationQ = GameplayCameraRotationFilteredQ * extraQ;
+                _extendedViewCameraRotation = Geometry.QuaternionToGtaRotation(_extendedViewCameraRotationQ);
+            }
 
             //_debugOutput.DebugText3.Caption = "x " + _extendedViewCameraRotation;
             //_debugOutput.DebugText4.Caption = "y " + _extendedViewCameraRotation; 
