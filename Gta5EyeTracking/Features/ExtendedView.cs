@@ -92,7 +92,7 @@ namespace Gta5EyeTracking.Features
                     extraOffset = Game.Player.Character.IsInPlane ? new Vector3(0, 0, 3f) : new Vector3(0, 0, 2f);
                 }
 
-                ApplyCameraRotation(true);
+                ApplyCameraRotation(!Game.Player.Character.IsInPlane);
 
                 CalculateDistanceToCharacter(extraOffset);
 
@@ -183,11 +183,7 @@ namespace Gta5EyeTracking.Features
 
                 if (Game.Player.Character.IsInPlane)
                 {
-                    //var extraOffset = new Vector3(0, 0, 0.6f);
-                    //ApplyCameraPosition(_extendedViewCamera, extraOffset, true);
-                    //ApplyCameraPosition(_forwardCamera, extraOffset, true);
-
-                    var extraOffset = new Vector3(_headXFiltered * HeadPositionScalar, 0, 0.6f);
+                    var extraOffset = new Vector3(0, 0, 0.6f);
                     ApplyCameraPosition(_extendedViewCamera, extraOffset, false);
                     ApplyCameraPosition(_forwardCamera, extraOffset, false);
                 }
@@ -222,17 +218,17 @@ namespace Gta5EyeTracking.Features
 				yaw = Mathf.Deg2Rad * _extendedViewCameraRotation.Z;
 			}
 
-			var delta = new Vector3(extraOffset.X, (float) (DistanceToCharacter*-Math.Cos(pitch)),
-	            (float) (DistanceToCharacter*-Math.Sin(pitch)));
-	        delta.Z = Math.Max(delta.Z, -1f) + extraOffset.Z;
+			//var delta = new Vector3(extraOffset.X, (float) (DistanceToCharacter*-Math.Cos(pitch)),
+	  //          (float) (DistanceToCharacter*-Math.Sin(pitch)));
+	  //      delta.Z = Math.Max(delta.Z, -1f) + extraOffset.Z;
 
-	        var extendedViewCameraOffset = delta;
-	        extendedViewCameraOffset.X = (float) (Math.Cos(yaw)*delta.X - Math.Sin(yaw)*delta.Y);
-	        extendedViewCameraOffset.Y = (float) (Math.Sin(yaw)*delta.X + Math.Cos(yaw)*delta.Y);
+	  //      var extendedViewCameraOffset = delta;
+	  //      extendedViewCameraOffset.X = (float) (Math.Cos(yaw)*delta.X - Math.Sin(yaw)*delta.Y);
+	  //      extendedViewCameraOffset.Y = (float) (Math.Sin(yaw)*delta.X + Math.Cos(yaw)*delta.Y);
 
             //Quat DONE
-            delta = new Vector3(0, -DistanceToCharacter, 0) + extraOffset;
-            extendedViewCameraOffset = _extendedViewCameraRotationQ * delta;//_extendedViewCameraRotationQ.RotateTransform(extraOffset);
+            var delta = new Vector3(0, -DistanceToCharacter, 0) + extraOffset;
+            var extendedViewCameraOffset = _extendedViewCameraRotationQ * delta;//_extendedViewCameraRotationQ.RotateTransform(extraOffset);
                                                                                   //extendedViewCameraOffset.Z = Math.Max(extendedViewCameraOffset.Z, -1f) + extraOffset.Z;
 
             ScriptHookExtensions.AttachCamToEntity(camera, Game.Player.Character, extendedViewCameraOffset, isRelative);
@@ -275,8 +271,9 @@ namespace Gta5EyeTracking.Features
             {
                 var extraQ = Geometry.GtaRotationToQuaternion(new Vector3(-Pitch, 0, -Yaw));
                 _extendedViewCameraRotationQ = GameplayCameraRotationFilteredQ * extraQ;
-                _extendedViewCameraRotation = Geometry.QuaternionToGtaRotation(_extendedViewCameraRotationQ);
             }
+
+            _extendedViewCameraRotation = Geometry.QuaternionToGtaRotation(_extendedViewCameraRotationQ);
 
             //_debugOutput.DebugText3.Caption = "x " + _extendedViewCameraRotation;
             //_debugOutput.DebugText4.Caption = "y " + _extendedViewCameraRotation; 
