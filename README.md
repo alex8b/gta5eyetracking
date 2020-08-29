@@ -34,7 +34,6 @@ http://www.tobiigaming.com/
 
 Follow https://twitter.com/tobiigaming for DISCOUNTS!
 - SteelSeries Sentry Gaming Eye Tracker
-http://steelseries.com/gaming-controllers/sentry-gaming-eye-tracker
 - Alienware m15
 https://gaming.tobii.com/product/alienware-m15/
 - Alienware m17
